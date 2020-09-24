@@ -1,9 +1,8 @@
-module github.com/alexjg/dagjose-go
+module github.com/alexjg/go-dag-jose
 
 go 1.14
 
 require (
-	github.com/fxamacker/cbor/v2 v2.2.0
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/ipfs/go-cid v0.0.7
 	github.com/ipld/go-ipld-prime v0.5.0
