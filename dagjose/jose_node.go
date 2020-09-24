@@ -40,8 +40,8 @@ func (d *DagJOSE) LookupByString(key string) (ipld.Node, error) {
 				ipldBasicNode.Prototype.List,
 				len(d.recipients),
 				func(la fluent.ListAssembler) {
-					for _, r := range d.recipients {
-						la.AssembleValue().AssignNode(&r)
+					for i := range d.recipients {
+						la.AssembleValue().AssignNode(&d.recipients[i])
 					}
 				},
 			), nil

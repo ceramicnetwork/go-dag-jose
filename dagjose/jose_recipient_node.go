@@ -17,12 +17,13 @@ func (r *JWERecipient) LookupByString(key string) (ipld.Node, error) {
 			len(r.header),
 			func(ma fluent.MapAssembler) {
 				for key, value := range r.header {
-					ma.AssembleEntry(key).AssignNode(value)
+					ma.AssembleEntry(key).AssignString(value)
 				}
 			},
 		), nil
 	}
 	if key == "encrypted_key" {
+		println("Key in node: ", len(r.encrypted_key))
 		return bytesOrNil(r.encrypted_key), nil
 	}
 	return nil, nil
