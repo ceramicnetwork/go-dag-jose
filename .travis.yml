@@ -1,2 +1,7 @@
 language: go
 
+script:
+  - go get -t ./...
+  - diff -u <(echo -n) <(gofmt -d -s dagjose)
+  - go test ./...
+
