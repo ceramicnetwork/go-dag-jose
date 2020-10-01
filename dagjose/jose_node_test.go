@@ -179,8 +179,7 @@ func signatureGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) JOSESignature {
 		return JOSESignature{
 			protected: sliceOfBytes().Draw(t, "signature protected bytes").([]byte),
-			header:    rapid.MapOf(rapid.String(), rapid.String()).Draw(t, "signature header").(map[string]string),
-			//header: stringKeyedIPLDMapGen(4).Draw(t, "signature header").(map[string]ipld.Node),
+			header:    stringKeyedIPLDMapGen(4).Draw(t, "signature header").(map[string]ipld.Node),
 			signature: sliceOfBytes().Draw(t, "signature bytes").([]byte),
 		}
 	})
@@ -189,8 +188,7 @@ func signatureGen() *rapid.Generator {
 func recipientGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) JWERecipient {
 		return JWERecipient{
-			header: rapid.MapOf(rapid.String(), rapid.String()).Draw(t, "recipient header").(map[string]string),
-			//header: stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
+			header:        stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
 			encrypted_key: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
 		}
 	})

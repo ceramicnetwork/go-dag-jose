@@ -18,7 +18,7 @@ var joseRecipientMixin = mixins.MapAssembler{TypeName: "JOSERecipient"}
 
 func (j *joseRecipientAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
 	if j.state == maState_midValue && *j.key == "header" {
-		j.recipient.header = make(map[string]string)
+		j.recipient.header = make(map[string]ipld.Node)
 		j.state = maState_initial
 		return &headerAssembler{
 			header: j.recipient.header,

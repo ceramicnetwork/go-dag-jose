@@ -18,7 +18,7 @@ var joseSignatureMixin = mixins.MapAssembler{TypeName: "JOSESignature"}
 
 func (j *joseSignatureAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
 	if j.state == maState_midValue && *j.key == "header" {
-		j.signature.header = make(map[string]string)
+		j.signature.header = make(map[string]ipld.Node)
 		j.state = maState_initial
 		return &headerAssembler{
 			header: j.signature.header,

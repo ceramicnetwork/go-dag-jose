@@ -126,7 +126,7 @@ func (d *JOSESignature) LookupByString(key string) (ipld.Node, error) {
 			len(d.header),
 			func(ma fluent.MapAssembler) {
 				for key, value := range d.header {
-					ma.AssembleEntry(key).AssignString(value)
+					ma.AssembleEntry(key).AssignNode(value)
 				}
 			},
 		), nil

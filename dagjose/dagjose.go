@@ -4,18 +4,18 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	//ipld "github.com/ipld/go-ipld-prime"
+	ipld "github.com/ipld/go-ipld-prime"
 )
 
 type JOSESignature struct {
 	protected []byte
-	header    map[string]string
+	header    map[string]ipld.Node
 	signature []byte
 }
 
 type JWERecipient struct {
-	//header        map[string]ipld.Node
-	header        map[string]string
+	header map[string]ipld.Node
+	//header        map[string]string
 	encrypted_key []byte
 }
 
