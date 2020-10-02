@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"sort"
 	"testing"
 
 	"github.com/ipfs/go-cid"
@@ -69,7 +70,27 @@ func validJWSGen() *rapid.Generator {
 	})
 }
 
+func sliceOfSignatures() *rapid.Generator {
+	return rapid.Custom(func(t *rapid.T) []JOSESignature {
+		isNil := rapid.Bool().Draw(t, "").(bool)
+		if isNil {
+			return nil
+		}
+		return rapid.SliceOf(signatureGen()).Draw(t, "A nillable slice of bytes").([]JOSESignature)
+	})
+}
+
 func sliceOfBytes() *rapid.Generator {
+	return rapid.Custom(func(t *rapid.T) []byte {
+		isNil := rapid.Bool().Draw(t, "").(bool)
+		if isNil {
+			return nil
+		}
+		return rapid.SliceOf(rapid.Byte()).Draw(t, "A nillable slice of bytes").([]byte)
+	})
+}
+
+func nonNilSliceOfBytes() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) []byte {
 		return rapid.SliceOf(rapid.Byte()).Draw(t, "A slice of bytes").([]byte)
 	})
@@ -147,6 +168,10 @@ func ipldMapGen(depth int) *rapid.Generator {
 
 func stringKeyedIPLDMapGen(depth int) *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) map[string]ipld.Node {
+		isNil := rapid.Bool().Draw(t, "whether the map is nil").(bool)
+		if isNil {
+			return nil
+		}
 		keys := rapid.SliceOf(rapid.String()).Draw(t, "IPLD map keys").([]string)
 		result := make(map[string]ipld.Node)
 		for _, key := range keys {
@@ -180,7 +205,7 @@ func signatureGen() *rapid.Generator {
 		return JOSESignature{
 			protected: sliceOfBytes().Draw(t, "signature protected bytes").([]byte),
 			header:    stringKeyedIPLDMapGen(4).Draw(t, "signature header").(map[string]ipld.Node),
-			signature: sliceOfBytes().Draw(t, "signature bytes").([]byte),
+			signature: nonNilSliceOfBytes().Draw(t, "signature bytes").([]byte),
 		}
 	})
 }
@@ -198,7 +223,7 @@ func arbitraryJoseGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) DagJOSE {
 		return DagJOSE{
 			payload:     sliceOfBytes().Draw(t, "jose payload").([]byte),
-			signatures:  rapid.SliceOf(signatureGen()).Draw(t, "jose signatures").([]JOSESignature),
+			signatures:  sliceOfSignatures().Draw(t, "jose signatures").([]JOSESignature),
 			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
 			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
 			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
@@ -206,6 +231,17 @@ func arbitraryJoseGen() *rapid.Generator {
 			ciphertext:  sliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			recipients:  rapid.SliceOf(recipientGen()).Draw(t, "JOSE recipients").([]JWERecipient),
+		}
+	})
+}
+
+func singleSigJWSGen() *rapid.Generator {
+	return rapid.Custom(func(t *rapid.T) DagJOSE {
+		return DagJOSE{
+			payload: sliceOfBytes().Draw(t, "jose payload").([]byte),
+			signatures: []JOSESignature{
+				signatureGen().Draw(t, "").(JOSESignature),
+			},
 		}
 	})
 }
@@ -225,6 +261,34 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 		require.Equal(t, jose, *roundTripped)
 	})
 }
+
+func TestGeneralJSONSerialization(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(DagJOSE)
+		generalSerialization := jose.GeneralJSONSerialization()
+		parsedJose, err := NewDagJWS(generalSerialization)
+		normalizeJoseForJsonComparison(&jose)
+		if err != nil {
+			t.Errorf("error parsing full serialization: %v", err)
+		}
+		require.Equal(t, &jose, parsedJose)
+	})
+}
+
+//func TestFlattenedSerialization(t *testing.T) {
+//rapid.Check(t, func(t *rapid.T) {
+//jose := arbitraryJoseGen().Draw(t, "").(DagJOSE)
+//flattenedSerialization, err := jose.FlattenedSerialization()
+//if err != nil {
+//t.Errorf("error creating flattened serialization: %v", err)
+//}
+//parsedJose, err := NewDagJWS(flattenedSerialization)
+//if err != nil {
+//t.Errorf("error parsing flattenedSerialization: %v", err)
+//}
+//require.Equal(t, &jose, parsedJose)
+//})
+//}
 
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
@@ -259,4 +323,91 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	}
 	n := nodeBuilder.Build()
 	return n.(*DagJOSE)
+}
+
+// Normalize json values contained in the unprotected headers of signatures
+// and recipients
+//
+// Unprotected headers can contain arbitrary JSON. There are two things we have
+// to normalise for comparison:
+// - Integer values will end up as float values after serialization -> deserialization
+//   so we convert all integer values to floats
+// - Maps don't have a defined order in JSON, so we modify all maps so that
+//   they are ordered by key
+func normalizeJoseForJsonComparison(d *DagJOSE) {
+	for _, recipient := range d.recipients {
+		for key, value := range recipient.header {
+			recipient.header[key] = normalizeIpldNode(value)
+		}
+	}
+	for _, sig := range d.signatures {
+		for key, value := range sig.header {
+			sig.header[key] = normalizeIpldNode(value)
+		}
+	}
+}
+
+func normalizeIpldNode(n ipld.Node) ipld.Node {
+	switch n.ReprKind() {
+	case ipld.ReprKind_Int:
+		asInt, err := n.AsInt()
+		if err != nil {
+			panic(fmt.Errorf("normalizeIpldNode error calling AsInt: %v", err))
+		}
+		return basicnode.NewFloat(float64(asInt))
+	case ipld.ReprKind_Map:
+		mapIterator := n.MapIterator()
+		if mapIterator == nil {
+			panic(fmt.Errorf("normalizeIpldNode nil MapIterator returned from map node"))
+		}
+		return fluent.MustBuildMap(
+			basicnode.Prototype.Map,
+			0,
+			func(ma fluent.MapAssembler) {
+				type kv struct {
+					key   string
+					value ipld.Node
+				}
+				kvs := make([]kv, 0)
+				for !mapIterator.Done() {
+					key, val, err := mapIterator.Next()
+					if err != nil {
+						panic(fmt.Errorf("normalizeIpldNode error calling Next on mapiterator: %v", err))
+					}
+					keyString, err := key.AsString()
+					if err != nil {
+						panic(fmt.Errorf("normalizeIpldNode: error converting key to string: %v", err))
+					}
+					kvs = append(kvs, kv{key: keyString, value: normalizeIpldNode(val)})
+				}
+				sort.SliceStable(kvs, func(i int, j int) bool {
+					return kvs[i].key < kvs[j].key
+				})
+				for _, kv := range kvs {
+					ma.AssembleKey().AssignString(kv.key)
+					ma.AssembleValue().AssignNode(kv.value)
+				}
+			},
+		)
+	case ipld.ReprKind_List:
+		listIterator := n.ListIterator()
+		if listIterator == nil {
+			panic(fmt.Errorf("convertIntNodesToFlaot nil ListIterator returned from list node"))
+		}
+		return fluent.MustBuildList(
+			basicnode.Prototype.List,
+			0,
+			func(la fluent.ListAssembler) {
+				for !listIterator.Done() {
+					_, val, err := listIterator.Next()
+					if err != nil {
+						panic(fmt.Errorf("convertIntNodesToFlaot error calling Next on listiterator: %v", err))
+					}
+					la.AssembleValue().AssignNode(normalizeIpldNode(val))
+				}
+			},
+		)
+	default:
+		return n
+	}
 }
