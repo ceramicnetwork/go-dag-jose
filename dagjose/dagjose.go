@@ -41,7 +41,7 @@ type DagJOSE struct {
 	recipients  []JWERecipient
 }
 
-// If this jose object is a JWS then this will return a DagJWS, if it is a 
+// If this jose object is a JWS then this will return a DagJWS, if it is a
 // JWE then AsJWS will return nil
 func (d *DagJOSE) AsJWS() *DagJWS {
 	if d.payload != nil {
@@ -50,7 +50,7 @@ func (d *DagJOSE) AsJWS() *DagJWS {
 	return nil
 }
 
-// If this jose object is a JWE then this will return a DagJWE, if it is a 
+// If this jose object is a JWE then this will return a DagJWE, if it is a
 // JWS then AsJWE will return nil
 func (d *DagJOSE) AsJWE() *DagJWE {
 	if d.ciphertext != nil {
@@ -75,7 +75,7 @@ func (d *DagJWE) AsJOSE() *DagJOSE {
 	return d.dagjose
 }
 
-// Given a JSON string reresenting a JWS in either general or compact serialization this 
+// Given a JSON string reresenting a JWS in either general or compact serialization this
 // will return a DagJWS
 func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	var rawJws struct {
@@ -175,7 +175,7 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	return &DagJWS{&result}, nil
 }
 
-// Given a JSON string reresenting a JWE in either general or compact serialization this 
+// Given a JSON string reresenting a JWE in either general or compact serialization this
 // will return a DagJWE
 func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 	var rawJwe struct {
@@ -574,22 +574,22 @@ func BuildJOSELink(ctx context.Context, linkContext ipld.LinkContext, jose *DagJ
 		MhLength: 48,   // sha3-224 hash has a 48-byte sum.
 	}}
 	return lb.Build(
-        ctx,
+		ctx,
 		linkContext,
-        jose,
-        storer,
+		jose,
+		storer,
 	)
 }
 
-// LoadJOSE is a convenience function which wraps ipld.Link.Load. This will provide the dagjose.NodeBuilder 
+// LoadJOSE is a convenience function which wraps ipld.Link.Load. This will provide the dagjose.NodeBuilder
 // to the link and attempt to cast the result to a DagJOSE object
-func LoadJOSE(lnk ipld.Link, ctx context.Context, linkContext ipld.LinkContext, loader ipld.Loader) (*DagJOSE,  error) {
+func LoadJOSE(lnk ipld.Link, ctx context.Context, linkContext ipld.LinkContext, loader ipld.Loader) (*DagJOSE, error) {
 	builder := NewBuilder()
 	err := lnk.Load(
-        ctx,
+		ctx,
 		linkContext,
 		builder,
-        loader,
+		loader,
 	)
 	if err != nil {
 		return nil, err

@@ -301,14 +301,15 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 	})
 }
 
-func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) { rapid.Check(t, func(t *rapid.T) { jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
 		roundTripped := roundTripJose(jose)
-        if roundTripped.AsJWE() == nil {
-            require.NotNil(t, roundTripped.AsJWS())
-        }
-    })
+		if roundTripped.AsJWE() == nil {
+			require.NotNil(t, roundTripped.AsJWS())
+		}
+	})
 }
-
 
 func TestJSONSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
@@ -420,8 +421,8 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error storing DagJOSE: %v", err))
 	}
-    jose, err := LoadJOSE(
-        link,
+	jose, err := LoadJOSE(
+		link,
 		context.Background(),
 		ipld.LinkContext{},
 		func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
@@ -431,7 +432,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error reading data from datastore: %v", err))
 	}
-    return jose
+	return jose
 }
 
 // Normalize json values contained in the unprotected headers of signatures
