@@ -59,7 +59,7 @@ func validJWSGen() *rapid.Generator {
 		if err != nil {
 			panic(fmt.Errorf("Error signing ValidJWS: %v", err))
 		}
-		dagJose, err := ParseJWS(gojoseJws.FullSerialize())
+		dagJose, err := ParseJWS([]byte(gojoseJws.FullSerialize()))
 		if err != nil {
 			panic(fmt.Errorf("error creating dagjose: %v", err))
 		}
@@ -72,11 +72,17 @@ func validJWSGen() *rapid.Generator {
 
 func sliceOfSignatures() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) []JWSSignature {
-		isNil := rapid.Bool().Draw(t, "").(bool)
-		if isNil {
-			return nil
-		}
-		return rapid.SliceOf(signatureGen()).Draw(t, "A nillable slice of signatures").([]JWSSignature)
+		return rapid.SliceOf(signatureGen()).Filter(func(sigs interface{}) bool {
+			return len(sigs.([]JWSSignature)) > 0
+		}).Draw(t, "A nillable slice of signatures").([]JWSSignature)
+	})
+}
+
+func sliceOfRecipients() *rapid.Generator {
+	return rapid.Custom(func(t *rapid.T) []JWERecipient {
+		return rapid.SliceOf(recipientGen()).Filter(func(recipients interface{}) bool {
+			return len(recipients.([]JWERecipient)) > 0
+		}).Draw(t, "A nillable slice of signatures").([]JWERecipient)
 	})
 }
 
@@ -216,51 +222,67 @@ func recipientGen() *rapid.Generator {
 			header:        stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
 			encrypted_key: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
 		}
+	}).Filter(func(recipient JWERecipient) bool {
+		return recipient.encrypted_key != nil || recipient.header != nil
 	})
 }
 
 func jwsGen() *rapid.Generator {
-    return rapid.Custom(func(t *rapid.T) *DagJWS {
-        return (&DagJOSE{
-			payload:     nonNilSliceOfBytes().Draw(t, "jose payload").([]byte),
-			signatures:  sliceOfSignatures().Draw(t, "jose signatures").([]JWSSignature),
-        }).AsJWS()
-    })
+	return rapid.Custom(func(t *rapid.T) *DagJWS {
+		return (&DagJOSE{
+			payload:    nonNilSliceOfBytes().Draw(t, "jose payload").([]byte),
+			signatures: sliceOfSignatures().Draw(t, "jose signatures").([]JWSSignature),
+		}).AsJWS()
+	})
 }
 
 func jweGen() *rapid.Generator {
-    return rapid.Custom(func(t *rapid.T) *DagJWE {
-        return (&DagJOSE{ 
-            protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
-            unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
-            iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-            aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-            ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
-            tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-            recipients:  rapid.SliceOf(recipientGen()).Draw(t, "JOSE recipients").([]JWERecipient),
-        }).AsJWE()
-    })
+	return rapid.Custom(func(t *rapid.T) *DagJWE {
+		return (&DagJOSE{
+			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
+			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
+			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			recipients:  sliceOfRecipients().Draw(t, "JOSE recipients").([]JWERecipient),
+		}).AsJWE()
+	})
 }
 
 func arbitraryJoseGen() *rapid.Generator {
-    return rapid.Custom(func(t *rapid.T) *DagJOSE {
-        isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
-        if isJwe {
-            return jweGen().Draw(t, "an arbitrary JWE").(*DagJWE).AsJOSE()
-        } else {
-            return jwsGen().Draw(t, "an arbitrary JWS").(*DagJWS).AsJOSE()
-        }
-    })
+	return rapid.Custom(func(t *rapid.T) *DagJOSE {
+		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
+		if isJwe {
+			return jweGen().Draw(t, "an arbitrary JWE").(*DagJWE).AsJOSE()
+		} else {
+			return jwsGen().Draw(t, "an arbitrary JWS").(*DagJWS).AsJOSE()
+		}
+	})
 }
 
 func singleSigJWSGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) DagJOSE {
-		return DagJOSE{
-			payload: sliceOfBytes().Draw(t, "jose payload").([]byte),
+	return rapid.Custom(func(t *rapid.T) *DagJWS {
+		return (&DagJOSE{
+			payload: nonNilSliceOfBytes().Draw(t, "jose payload").([]byte),
 			signatures: []JWSSignature{
 				signatureGen().Draw(t, "").(JWSSignature),
 			},
-		}
+		}).AsJWS()
+	})
+}
+
+func singleRecipientJWEGen() *rapid.Generator {
+	return rapid.Custom(func(t *rapid.T) *DagJWE {
+		return (&DagJOSE{
+			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
+			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
+			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+			recipients:  []JWERecipient{recipientGen().Draw(t, "JWE recipient").(JWERecipient)},
+		}).AsJWE()
 	})
 }
 
@@ -307,33 +329,75 @@ func TestJSONSerializationJWE(t *testing.T) {
 }
 
 func TestMissingPayloadErrorParsingJWS(t *testing.T) {
-    jsonStr := "{\"signatures\": []}"
-    jws, err := ParseJWS(jsonStr)
-    require.NotNil(t, err)
-    require.Nil(t, jws)
+	jsonStr := "{\"signatures\": []}"
+	jws, err := ParseJWS([]byte(jsonStr))
+	require.NotNil(t, err)
+	require.Nil(t, jws)
 }
 
 func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
-    jsonStr := "{\"header\": {}}"
-    jwe, err := ParseJWE(jsonStr)
-    require.NotNil(t, err)
-    require.Nil(t, jwe)
+	jsonStr := "{\"header\": {}}"
+	jwe, err := ParseJWE([]byte(jsonStr))
+	require.NotNil(t, err)
+	require.Nil(t, jwe)
 }
 
-//func TestFlattenedSerialization(t *testing.T) {
-//rapid.Check(t, func(t *rapid.T) {
-//jose := arbitraryJoseGen().Draw(t, "").(DagJOSE)
-//flattenedSerialization, err := jose.FlattenedSerialization()
-//if err != nil {
-//t.Errorf("error creating flattened serialization: %v", err)
-//}
-//parsedJose, err := NewDagJWS(flattenedSerialization)
-//if err != nil {
-//t.Errorf("error parsing flattenedSerialization: %v", err)
-//}
-//require.Equal(t, &jose, parsedJose)
-//})
-//}
+func TestFlattenedSerializationJWS(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		jws := singleSigJWSGen().Draw(t, "a JWS").(*DagJWS)
+		flattenedSerialization, err := jws.FlattenedSerialization()
+		if err != nil {
+			t.Errorf("error creating flattened serialization: %v", err)
+			return
+		}
+		parsedJose, err := ParseJWS([]byte(flattenedSerialization))
+		if err != nil {
+			t.Errorf("error parsing flattenedSerialization: %v", err)
+			return
+		}
+		normalizeJoseForJsonComparison(jws.AsJOSE())
+		require.Equal(t, jws, parsedJose)
+	})
+}
+
+func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
+	jsonStr := "{\"signature\": \"\", \"signatures\": [], \"payload\": \"\"}"
+	jws, err := ParseJWS([]byte(jsonStr))
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "cannot contain both a 'signature' and a 'signatures'")
+	require.Nil(t, jws)
+}
+
+func TestFlattenedSerializationJWE(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		jwe := singleRecipientJWEGen().Draw(t, "a JWE with one recipient").(*DagJWE)
+		flattenedSerialization, err := jwe.FlattenedSerialization()
+		if err != nil {
+			t.Errorf("error creating flattened serialization: %v", err)
+			return
+		}
+		parsedJose, err := ParseJWE([]byte(flattenedSerialization))
+		if err != nil {
+			t.Errorf("error parsing flattenedSerialization: %v", err)
+			return
+		}
+		normalizeJoseForJsonComparison(jwe.AsJOSE())
+		require.Equal(t, jwe, parsedJose)
+	})
+}
+
+func TestFlattenedJWEErrorIfEncryptedKeyOrHeaderAndRecipientsDefined(t *testing.T) {
+	scenarios := [][]byte{
+		[]byte("{\"ciphertext\": \"\", \"encrypted_key\": \"\", \"recipients\": []}"),
+		[]byte("{\"ciphertext\": \"\", \"header\": {}, \"recipients\": []}"),
+	}
+	for _, scenario := range scenarios {
+		jwe, err := ParseJWE(scenario)
+		require.NotNil(t, err)
+		require.Contains(t, err.Error(), "cannot contain 'recipients' and either 'encrypted_key' or 'header'")
+		require.Nil(t, jwe)
+	}
+}
 
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
@@ -406,7 +470,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 			panic(fmt.Errorf("normalizeIpldNode nil MapIterator returned from map node"))
 		}
 		return fluent.MustBuildMap(
-            n.Prototype(),
+			n.Prototype(),
 			0,
 			func(ma fluent.MapAssembler) {
 				type kv struct {
@@ -440,7 +504,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 			panic(fmt.Errorf("convertIntNodesToFlaot nil ListIterator returned from list node"))
 		}
 		return fluent.MustBuildList(
-            n.Prototype(),
+			n.Prototype(),
 			0,
 			func(la fluent.ListAssembler) {
 				for !listIterator.Done() {
