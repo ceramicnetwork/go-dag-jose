@@ -22,6 +22,8 @@ type JWERecipient struct {
 	encrypted_key []byte
 }
 
+// This is a union of the DagJWE and DagJWS types. Typically you will want to
+// as AsJWE and AsJWS to get a concrete JOSE object.
 type DagJOSE struct {
 	// JWS top level keys
 	payload    []byte
@@ -36,89 +38,63 @@ type DagJOSE struct {
 	recipients  []JWERecipient
 }
 
-func NewDagJWS(jsonSerialization string) (*DagJOSE, error) {
-	result, err := parseGeneralSerialization(jsonSerialization)
-	if err != nil {
-		return nil, err
-	}
-	if result != nil {
-		return result, nil
-	}
-	var rawJws struct {
-		Payload   string `json:"payload"`
-		Protected string `json:"protected"`
-		Signature string `json:"signature"`
-	}
-	err = json.Unmarshal([]byte(jsonSerialization), &rawJws)
-	if err != nil {
-		return nil, fmt.Errorf("error deserializing json: %v", err)
-	}
-	payloadBytes, err := base64.RawURLEncoding.DecodeString(rawJws.Payload)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding payload bytes: %v", err)
-	}
-	protectedBytes, err := base64.RawURLEncoding.DecodeString(rawJws.Protected)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding protected bytes: %v", err)
-	}
-	signatureBytes, err := base64.RawURLEncoding.DecodeString(rawJws.Signature)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding signature bytes: %v", err)
-	}
-	return &DagJOSE{
-		payload: payloadBytes,
-		signatures: []JWSSignature{
-			{
-				protected: protectedBytes,
-				signature: signatureBytes,
-				header:    nil,
-			},
-		},
-	}, nil
+func (d *DagJOSE) AsJWS() *DagJWS {
+    if d.payload != nil {
+        return &DagJWS{dagjose: d}
+    }
+    return nil
 }
 
-func parseGeneralSerialization(jsonStr string) (*DagJOSE, error) {
-	var rawJose struct {
+func (d *DagJOSE) AsJWE() *DagJWE {
+    if d.ciphertext != nil {
+        return &DagJWE{dagjose: d}
+    }
+    return nil
+}
+
+
+type DagJWS struct { dagjose *DagJOSE }
+
+// Returns a DagJOSE object that implements ipld.Node and can be passed to 
+// ipld related infrastructure
+func (d *DagJWS) AsJOSE() *DagJOSE {
+    return d.dagjose
+}
+
+type DagJWE struct { dagjose *DagJOSE }
+
+// Returns a DagJOSE object that implements ipld.Node and can be passed to 
+// ipld related infrastructure
+func (d *DagJWE) AsJOSE() *DagJOSE {
+    return d.dagjose
+}
+
+func ParseJWS(jsonStr string) (*DagJWS, error) {
+	var rawJws struct {
 		Payload    *string `json:"payload"`
-		Protected  *string `json:"protected"`
 		Signatures []struct {
 			Protected *string                `json:"protected"`
 			Signature string                 `json:"signature"`
 			Header    map[string]interface{} `json:"header"`
 		} `json:"signatures"`
-		Unprotected *string `json:"unprotected"`
-		Iv          *string `json:"iv"`
-		Aad         *string `json:"aad"`
-		Ciphertext  *string `json:"ciphertext"`
-		Tag         *string `json:"tag"`
-		Recipients  []struct {
-			Header       map[string]interface{} `json:"header"`
-			EncryptedKey *string                `json:"encrypted_key"`
-		} `json:"recipients"`
 	}
-	if err := json.Unmarshal([]byte(jsonStr), &rawJose); err != nil {
-		return nil, fmt.Errorf("error parsing for general serialization: %v", err)
+	if err := json.Unmarshal([]byte(jsonStr), &rawJws); err != nil {
+		return nil, fmt.Errorf("error parsing jws json: %v", err)
 	}
 	result := DagJOSE{}
-	if rawJose.Payload != nil {
-		payloadBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Payload)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing payload: %v", err)
-		}
-		result.payload = payloadBytes
-	}
+    if rawJws.Payload == nil {
+        return nil, fmt.Errorf("JWS has no payload property")
+    }
 
-	if rawJose.Protected != nil {
-		protectedBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Protected)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing protected: %v", err)
-		}
-		result.protected = protectedBytes
-	}
+    payloadBytes, err := base64.RawURLEncoding.DecodeString(*rawJws.Payload)
+    if err != nil {
+        return nil, fmt.Errorf("error parsing payload: %v", err)
+    }
+    result.payload = payloadBytes
 
-	if rawJose.Signatures != nil {
-		sigs := make([]JWSSignature, 0, len(rawJose.Signatures))
-		for idx, rawSig := range rawJose.Signatures {
+	if rawJws.Signatures != nil {
+		sigs := make([]JWSSignature, 0, len(rawJws.Signatures))
+		for idx, rawSig := range rawJws.Signatures {
 			sig := JWSSignature{}
 			if rawSig.Protected != nil {
 				protectedBytes, err := base64.RawURLEncoding.DecodeString(*rawSig.Protected)
@@ -150,9 +126,50 @@ func parseGeneralSerialization(jsonStr string) (*DagJOSE, error) {
 		result.signatures = sigs
 	}
 
-	if rawJose.Recipients != nil {
-		recipients := make([]JWERecipient, 0, len(rawJose.Recipients))
-		for idx, rawRecipient := range rawJose.Recipients {
+	return &DagJWS{&result}, nil
+}
+
+func ParseJWE(jsonStr string) (*DagJWE, error) {
+	var rawJwe struct {
+		Protected  *string `json:"protected"`
+		Unprotected *string `json:"unprotected"`
+		Iv          *string `json:"iv"`
+		Aad         *string `json:"aad"`
+		Ciphertext  *string `json:"ciphertext"`
+		Tag         *string `json:"tag"`
+		Recipients  []struct {
+			Header       map[string]interface{} `json:"header"`
+			EncryptedKey *string                `json:"encrypted_key"`
+		} `json:"recipients"`
+	}
+
+	if err := json.Unmarshal([]byte(jsonStr), &rawJwe); err != nil {
+		return nil, fmt.Errorf("error parsing JWE json: %v", err)
+	}
+
+    resultJose := DagJOSE{}
+
+    if rawJwe.Ciphertext == nil {
+        return nil, fmt.Errorf("JWE has no ciphertext property")
+    }
+    ciphertextBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.Ciphertext)
+    if err != nil {
+        return nil, fmt.Errorf("error parsing ciphertext: %v", err)
+    }
+    resultJose.ciphertext = ciphertextBytes
+
+
+	if rawJwe.Protected != nil {
+		protectedBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.Protected)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing protected: %v", err)
+		}
+		resultJose.protected = protectedBytes
+	}
+
+	if rawJwe.Recipients != nil {
+		recipients := make([]JWERecipient, 0, len(rawJwe.Recipients))
+		for idx, rawRecipient := range rawJwe.Recipients {
 			recipient := JWERecipient{}
 			if rawRecipient.EncryptedKey != nil {
 				keyBytes, err := base64.RawURLEncoding.DecodeString(*rawRecipient.EncryptedKey)
@@ -175,50 +192,51 @@ func parseGeneralSerialization(jsonStr string) (*DagJOSE, error) {
 			}
 			recipients = append(recipients, recipient)
 		}
-		result.recipients = recipients
+		resultJose.recipients = recipients
 	}
 
-	if rawJose.Unprotected != nil {
-		unprotectedBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Unprotected)
+	if rawJwe.Unprotected != nil {
+		unprotectedBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.Unprotected)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing unprotected: %v", err)
 		}
-		result.unprotected = unprotectedBytes
+		resultJose.unprotected = unprotectedBytes
 	}
 
-	if rawJose.Iv != nil {
-		ivBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Iv)
+	if rawJwe.Iv != nil {
+		ivBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.Iv)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing iv: %v", err)
 		}
-		result.iv = ivBytes
+		resultJose.iv = ivBytes
 	}
 
-	if rawJose.Aad != nil {
-		aadBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Aad)
+	if rawJwe.Aad != nil {
+		aadBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.Aad)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing aad: %v", err)
 		}
-		result.aad = aadBytes
+		resultJose.aad = aadBytes
 	}
 
-	if rawJose.Ciphertext != nil {
-		ciphertextBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Ciphertext)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing ciphertext: %v", err)
-		}
-		result.ciphertext = ciphertextBytes
-	}
 
-	if rawJose.Tag != nil {
-		tagBytes, err := base64.RawURLEncoding.DecodeString(*rawJose.Tag)
+	if rawJwe.Tag != nil {
+		tagBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.Tag)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing tag: %v", err)
 		}
-		result.tag = tagBytes
+		resultJose.tag = tagBytes
 	}
 
-	return &result, nil
+    return &DagJWE{&resultJose}, nil
+}
+
+func (d *DagJWS) GeneralJSONSerialization() string {
+    return d.dagjose.GeneralJSONSerialization()
+}
+
+func (d *DagJWE) GeneralJSONSerialization() string {
+    return d.dagjose.GeneralJSONSerialization()
 }
 
 func (d *DagJOSE) GeneralJSONSerialization() string {

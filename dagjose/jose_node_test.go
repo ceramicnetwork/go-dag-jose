@@ -39,7 +39,7 @@ func ed25518PrivateKeyGen() *rapid.Generator {
 }
 
 type ValidJWS struct {
-	dagJose *DagJOSE
+	dagJose *DagJWS
 	key     ed25519.PrivateKey
 }
 
@@ -59,7 +59,7 @@ func validJWSGen() *rapid.Generator {
 		if err != nil {
 			panic(fmt.Errorf("Error signing ValidJWS: %v", err))
 		}
-		dagJose, err := NewDagJWS(gojoseJws.FullSerialize())
+		dagJose, err := ParseJWS(gojoseJws.FullSerialize())
 		if err != nil {
 			panic(fmt.Errorf("error creating dagjose: %v", err))
 		}
@@ -76,7 +76,7 @@ func sliceOfSignatures() *rapid.Generator {
 		if isNil {
 			return nil
 		}
-		return rapid.SliceOf(signatureGen()).Draw(t, "A nillable slice of bytes").([]JWSSignature)
+		return rapid.SliceOf(signatureGen()).Draw(t, "A nillable slice of signatures").([]JWSSignature)
 	})
 }
 
@@ -219,20 +219,38 @@ func recipientGen() *rapid.Generator {
 	})
 }
 
-func arbitraryJoseGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) DagJOSE {
-		return DagJOSE{
-			payload:     sliceOfBytes().Draw(t, "jose payload").([]byte),
+func jwsGen() *rapid.Generator {
+    return rapid.Custom(func(t *rapid.T) *DagJWS {
+        return (&DagJOSE{
+			payload:     nonNilSliceOfBytes().Draw(t, "jose payload").([]byte),
 			signatures:  sliceOfSignatures().Draw(t, "jose signatures").([]JWSSignature),
-			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
-			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
-			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-			aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-			ciphertext:  sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-			tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-			recipients:  rapid.SliceOf(recipientGen()).Draw(t, "JOSE recipients").([]JWERecipient),
-		}
-	})
+        }).AsJWS()
+    })
+}
+
+func jweGen() *rapid.Generator {
+    return rapid.Custom(func(t *rapid.T) *DagJWE {
+        return (&DagJOSE{ 
+            protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
+            unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
+            iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+            aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+            ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
+            tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
+            recipients:  rapid.SliceOf(recipientGen()).Draw(t, "JOSE recipients").([]JWERecipient),
+        }).AsJWE()
+    })
+}
+
+func arbitraryJoseGen() *rapid.Generator {
+    return rapid.Custom(func(t *rapid.T) *DagJOSE {
+        isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
+        if isJwe {
+            return jweGen().Draw(t, "an arbitrary JWE").(*DagJWE).AsJOSE()
+        } else {
+            return jwsGen().Draw(t, "an arbitrary JWS").(*DagJWS).AsJOSE()
+        }
+    })
 }
 
 func singleSigJWSGen() *rapid.Generator {
@@ -249,30 +267,57 @@ func singleSigJWSGen() *rapid.Generator {
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		validJws := validJWSGen().Draw(t, "valid JWS").(ValidJWS)
-		roundTripped := roundTripJose(validJws.dagJose)
+		roundTripped := roundTripJose(validJws.dagJose.AsJOSE()).AsJWS()
 		require.Equal(t, validJws.dagJose, roundTripped)
 	})
 }
 
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(DagJOSE)
-		roundTripped := roundTripJose(&jose)
-		require.Equal(t, jose, *roundTripped)
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		roundTripped := roundTripJose(jose)
+		require.Equal(t, jose, roundTripped)
 	})
 }
 
-func TestGeneralJSONSerialization(t *testing.T) {
+func TestJSONSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(DagJOSE)
-		generalSerialization := jose.GeneralJSONSerialization()
-		parsedJose, err := NewDagJWS(generalSerialization)
-		normalizeJoseForJsonComparison(&jose)
+		dagJws := jwsGen().Draw(t, "An arbitrary JWS").(*DagJWS)
+		generalSerialization := dagJws.GeneralJSONSerialization()
+		parsedJose, err := ParseJWS(generalSerialization)
+		normalizeJoseForJsonComparison(dagJws.AsJOSE())
 		if err != nil {
 			t.Errorf("error parsing full serialization: %v", err)
 		}
-		require.Equal(t, &jose, parsedJose)
+		require.Equal(t, dagJws, parsedJose)
 	})
+}
+
+func TestJSONSerializationJWE(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		dagJwe := jweGen().Draw(t, "An arbitrary JOSE object").(*DagJWE)
+		generalSerialization := dagJwe.GeneralJSONSerialization()
+		parsedJose, err := ParseJWE(generalSerialization)
+		normalizeJoseForJsonComparison(dagJwe.AsJOSE())
+		if err != nil {
+			t.Errorf("error parsing full serialization: %v", err)
+		}
+		require.Equal(t, dagJwe, parsedJose)
+	})
+}
+
+func TestMissingPayloadErrorParsingJWS(t *testing.T) {
+    jsonStr := "{\"signatures\": []}"
+    jws, err := ParseJWS(jsonStr)
+    require.NotNil(t, err)
+    require.Nil(t, jws)
+}
+
+func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
+    jsonStr := "{\"header\": {}}"
+    jwe, err := ParseJWE(jsonStr)
+    require.NotNil(t, err)
+    require.Nil(t, jwe)
 }
 
 //func TestFlattenedSerialization(t *testing.T) {
@@ -329,7 +374,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 // and recipients
 //
 // Unprotected headers can contain arbitrary JSON. There are two things we have
-// to normalise for comparison:
+// to normalise for comparison in tests:
 // - Integer values will end up as float values after serialization -> deserialization
 //   so we convert all integer values to floats
 // - Maps don't have a defined order in JSON, so we modify all maps so that
@@ -361,7 +406,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 			panic(fmt.Errorf("normalizeIpldNode nil MapIterator returned from map node"))
 		}
 		return fluent.MustBuildMap(
-			basicnode.Prototype.Map,
+            n.Prototype(),
 			0,
 			func(ma fluent.MapAssembler) {
 				type kv struct {
@@ -395,7 +440,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 			panic(fmt.Errorf("convertIntNodesToFlaot nil ListIterator returned from list node"))
 		}
 		return fluent.MustBuildList(
-			basicnode.Prototype.List,
+            n.Prototype(),
 			0,
 			func(la fluent.ListAssembler) {
 				for !listIterator.Done() {
