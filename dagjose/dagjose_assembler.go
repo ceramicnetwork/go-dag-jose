@@ -20,6 +20,10 @@ func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 	return &DagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
+// Returns an instance of the DagJOSENodeBuilder which can be passed to
+// ipld.Link.Load and will build a dagjose.DagJOSE object. This should only be
+// neccesary in reasonably advanced situations, most of the time you should be
+// able to use dagjose.LoadJOSE
 func NewBuilder() ipld.NodeBuilder {
 	return &DagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
@@ -34,6 +38,9 @@ const (
 	maState_finished                   // finised
 )
 
+// An implementation of `ipld.NodeBuilder` which builds a `dagjose.DagJOSE`
+// object. This builder will throw an error if the IPLD data it is building
+// does not match the schema specified in the spec
 type DagJOSENodeBuilder struct {
 	dagJose DagJOSE
 	state   maState

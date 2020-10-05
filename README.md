@@ -43,7 +43,7 @@ dagJws, err := dagjose.ParseJWS("<the general JSON serialization of a JWS>")
 if err != nil {
     panic(err)
 }
-err = dagjose.BuildJOSELink(
+link, err := dagjose.BuildJOSELink(
     context.Background(),
     ipld.LinkContext{},
     dagJws,
@@ -52,4 +52,5 @@ err = dagjose.BuildJOSELink(
 if err != nil {
     panic(err)
 }
+fmt.Printf("Link is: %v", link)
 ```
