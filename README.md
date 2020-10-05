@@ -21,36 +21,29 @@ if err != nil {
 // cidlink.Link is an implementation of `ipld.Link` backed by a CID
 jwsLnk := cidlink.Link{Cid: jwsCid}
 
-
-// This is the `NodeBuilder` which knows how to build a `dagjose.DagJOSE` object
-builder := dagjose.NewBuilder()
-err = lnk.Load(
+jose, err := dagjose.LoadJOSE(
+    jwsLnk,
     context.Background(),
     ipld.LinkContext{},
-    builder,
     <an implementation of ipld.Loader, which knows how to get the block data from IPFS>,
 )
 if err != nil {
     panic(err)
 }
-n := builder.Build()
-jwsNode := n.(*dagjose.DagJOSE), nil
+if jose.AsJWS() != nil {
+    // We have a JWS object, print the general serialization of it
+    print(jose.AsJWS().GeneralJSONSerialization())
+}
 ```
 
 To write a JWS to IPFS
 
 ```go
-dagJws, err := dagjose.NewDagJWS("<the general JSON serialization of a JWS>")
+dagJws, err := dagjose.ParseJWS("<the general JSON serialization of a JWS>")
 if err != nil {
     panic(err)
 }
-linkBuilder := cidlink.LinkBuilder{Prefix: cid.Prefix{
-    Version:  1,    // Usually '1'.
-    Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-    MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-    MhLength: 48,   // sha3-224 hash has a 48-byte sum.
-}}
-link, err := linkBuilder.Build(
+err = dagjose.BuildJOSELink(
     context.Background(),
     ipld.LinkContext{},
     dagJws,
