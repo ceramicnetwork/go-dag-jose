@@ -11,7 +11,6 @@ import (
 	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/require"
@@ -302,9 +301,7 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 	})
 }
 
-func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
-    rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) { rapid.Check(t, func(t *rapid.T) { jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
 		roundTripped := roundTripJose(jose)
         if roundTripped.AsJWE() == nil {
             require.NotNil(t, roundTripped.AsJWS())
@@ -412,13 +409,7 @@ func TestFlattenedJWEErrorIfEncryptedKeyOrHeaderAndRecipientsDefined(t *testing.
 
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
-	linkBuilder := cidlink.LinkBuilder{Prefix: cid.Prefix{
-		Version:  1,
-		Codec:    0x85,
-		MhType:   multihash.SHA3_384,
-		MhLength: 48,
-	}}
-	link, err := linkBuilder.Build(
+	link, err := BuildJOSELink(
 		context.Background(),
 		ipld.LinkContext{},
 		j,
@@ -429,11 +420,10 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error storing DagJOSE: %v", err))
 	}
-	nodeBuilder := NewBuilder()
-	err = link.Load(
+    jose, err := LoadJOSE(
+        link,
 		context.Background(),
 		ipld.LinkContext{},
-		nodeBuilder,
 		func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
 			return bytes.NewBuffer(buf.Bytes()), nil
 		},
@@ -441,8 +431,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error reading data from datastore: %v", err))
 	}
-	n := nodeBuilder.Build()
-	return n.(*DagJOSE)
+    return jose
 }
 
 // Normalize json values contained in the unprotected headers of signatures

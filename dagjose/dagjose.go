@@ -1,13 +1,16 @@
 package dagjose
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"sort"
 
+	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
+	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
@@ -38,6 +41,8 @@ type DagJOSE struct {
 	recipients  []JWERecipient
 }
 
+// If this jose object is a JWS then this will return a DagJWS, if it is a 
+// JWE then AsJWS will return nil
 func (d *DagJOSE) AsJWS() *DagJWS {
 	if d.payload != nil {
 		return &DagJWS{dagjose: d}
@@ -45,6 +50,8 @@ func (d *DagJOSE) AsJWS() *DagJWS {
 	return nil
 }
 
+// If this jose object is a JWE then this will return a DagJWE, if it is a 
+// JWS then AsJWE will return nil
 func (d *DagJOSE) AsJWE() *DagJWE {
 	if d.ciphertext != nil {
 		return &DagJWE{dagjose: d}
@@ -68,6 +75,8 @@ func (d *DagJWE) AsJOSE() *DagJOSE {
 	return d.dagjose
 }
 
+// Given a JSON string reresenting a JWS in either general or compact serialization this 
+// will return a DagJWS
 func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	var rawJws struct {
 		Payload    *string `json:"payload"`
@@ -166,6 +175,8 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	return &DagJWS{&result}, nil
 }
 
+// Given a JSON string reresenting a JWE in either general or compact serialization this 
+// will return a DagJWE
 func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 	var rawJwe struct {
 		Protected   *string `json:"protected"`
@@ -327,6 +338,7 @@ func (d *DagJWS) asJson() map[string]interface{} {
 	return jsonJose
 }
 
+// Return the general json serialization of this JWS
 func (d *DagJWS) GeneralJSONSerialization() []byte {
 	jsonRep := d.asJson()
 	result, err := json.Marshal(jsonRep)
@@ -336,6 +348,7 @@ func (d *DagJWS) GeneralJSONSerialization() []byte {
 	return result
 }
 
+// Return the flattened json serialization of this JWS
 func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
 	if len(d.dagjose.signatures) != 1 {
 		return nil, fmt.Errorf("Cannot create a flattened serialization for a JWS with more than one signature")
@@ -353,6 +366,7 @@ func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
 	return result, nil
 }
 
+// Return the general json serialization of this JWE
 func (d *DagJWE) GeneralJSONSerialization() []byte {
 	jsonRep := d.asJson()
 	result, err := json.Marshal(jsonRep)
@@ -362,6 +376,7 @@ func (d *DagJWE) GeneralJSONSerialization() []byte {
 	return result
 }
 
+// Return the flattened json serialization of this JWE
 func (d *DagJWE) FlattenedSerialization() ([]byte, error) {
 	jsonRep := d.asJson()
 	jsonRecipient := jsonRep["recipients"].([]map[string]interface{})[0]
@@ -547,4 +562,39 @@ func ipldNodeToGo(node ipld.Node) (interface{}, error) {
 	default:
 		return nil, fmt.Errorf("ipldNodeToGo: Unknown ipld node reprkind: %s", node.ReprKind().String())
 	}
+}
+
+// This exposes a similar interface to the cidlink.LinkBuilder from go-ipld-prime. It's primarily a convenience
+// function so you don't have to specify the codec version yourself
+func BuildJOSELink(ctx context.Context, linkContext ipld.LinkContext, jose *DagJOSE, storer ipld.Storer) (ipld.Link, error) {
+	lb := cidlink.LinkBuilder{Prefix: cid.Prefix{
+		Version:  1,    // Usually '1'.
+		Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
+		MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
+		MhLength: 48,   // sha3-224 hash has a 48-byte sum.
+	}}
+	return lb.Build(
+        ctx,
+		linkContext,
+        jose,
+        storer,
+	)
+}
+
+// LoadJOSE is a convenience function which wraps ipld.Link.Load. This will provide the dagjose.NodeBuilder 
+// to the link and attempt to cast the result to a DagJOSE object
+func LoadJOSE(lnk ipld.Link, ctx context.Context, linkContext ipld.LinkContext, loader ipld.Loader) (*DagJOSE,  error) {
+	builder := NewBuilder()
+	err := lnk.Load(
+        ctx,
+		linkContext,
+		builder,
+        loader,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	n := builder.Build()
+	return n.(*DagJOSE), nil
 }
