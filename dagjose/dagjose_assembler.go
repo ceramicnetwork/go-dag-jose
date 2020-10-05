@@ -55,7 +55,7 @@ func (d *DagJOSENodeBuilder) BeginList(sizeHint int) (ipld.ListAssembler, error)
 		return &joseRecipientListAssembler{&d.dagJose}, nil
 	}
 	if d.state == maState_midValue && *d.key == "signatures" {
-		d.dagJose.signatures = make([]JOSESignature, 0, sizeHint)
+		d.dagJose.signatures = make([]JWSSignature, 0, sizeHint)
 		d.state = maState_initial
 		return &joseSignatureListAssembler{&d.dagJose}, nil
 	}

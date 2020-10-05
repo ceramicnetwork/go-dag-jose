@@ -9,7 +9,7 @@ import (
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
-type joseSignaturesNode struct{ sigs []JOSESignature }
+type joseSignaturesNode struct{ sigs []JWSSignature }
 
 // joseSignatures Node implementation
 
@@ -86,7 +86,7 @@ func (d *joseSignaturesNode) Prototype() ipld.NodePrototype {
 // joseSignaturesNode ListIterator implementation
 
 type joseSignaturesIterator struct {
-	sigs  []JOSESignature
+	sigs  []JWSSignature
 	index int
 }
 
@@ -107,10 +107,10 @@ func (j *joseSignaturesIterator) Done() bool {
 
 // JOSESignature Node implementation
 
-func (d *JOSESignature) ReprKind() ipld.ReprKind {
+func (d *JWSSignature) ReprKind() ipld.ReprKind {
 	return ipld.ReprKind_Map
 }
-func (d *JOSESignature) LookupByString(key string) (ipld.Node, error) {
+func (d *JWSSignature) LookupByString(key string) (ipld.Node, error) {
 	if key == "signature" {
 		return basicnode.NewBytes(d.signature), nil
 	}
@@ -133,61 +133,61 @@ func (d *JOSESignature) LookupByString(key string) (ipld.Node, error) {
 	}
 	return nil, nil
 }
-func (d *JOSESignature) LookupByNode(key ipld.Node) (ipld.Node, error) {
+func (d *JWSSignature) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	keyString, err := key.AsString()
 	if err != nil {
 		return nil, err
 	}
 	return d.LookupByString(keyString)
 }
-func (d *JOSESignature) LookupByIndex(idx int) (ipld.Node, error) {
+func (d *JWSSignature) LookupByIndex(idx int) (ipld.Node, error) {
 	return nil, nil
 }
 
-func (d *JOSESignature) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
+func (d *JWSSignature) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
 }
-func (d *JOSESignature) MapIterator() ipld.MapIterator {
+func (d *JWSSignature) MapIterator() ipld.MapIterator {
 	return &joseSignatureMapIterator{sig: d, index: 0}
 }
-func (d *JOSESignature) ListIterator() ipld.ListIterator {
+func (d *JWSSignature) ListIterator() ipld.ListIterator {
 	return nil
 }
-func (d *JOSESignature) Length() int {
+func (d *JWSSignature) Length() int {
 	return len((&joseSignatureMapIterator{sig: d, index: 0}).presentKeys())
 }
-func (d *JOSESignature) IsAbsent() bool {
+func (d *JWSSignature) IsAbsent() bool {
 	return false
 }
-func (d *JOSESignature) IsNull() bool {
+func (d *JWSSignature) IsNull() bool {
 	return false
 }
-func (d *JOSESignature) AsBool() (bool, error) {
+func (d *JWSSignature) AsBool() (bool, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsBool()
 }
-func (d *JOSESignature) AsInt() (int, error) {
+func (d *JWSSignature) AsInt() (int, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsInt()
 }
-func (d *JOSESignature) AsFloat() (float64, error) {
+func (d *JWSSignature) AsFloat() (float64, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsFloat()
 }
-func (d *JOSESignature) AsString() (string, error) {
+func (d *JWSSignature) AsString() (string, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsString()
 }
-func (d *JOSESignature) AsBytes() ([]byte, error) {
+func (d *JWSSignature) AsBytes() ([]byte, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsBytes()
 }
-func (d *JOSESignature) AsLink() (ipld.Link, error) {
+func (d *JWSSignature) AsLink() (ipld.Link, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsLink()
 }
-func (d *JOSESignature) Prototype() ipld.NodePrototype {
+func (d *JWSSignature) Prototype() ipld.NodePrototype {
 	return nil
 }
 
 // end JOSESignature ipld.Node implementation
 
 type joseSignatureMapIterator struct {
-	sig   *JOSESignature
+	sig   *JWSSignature
 	index int
 }
 

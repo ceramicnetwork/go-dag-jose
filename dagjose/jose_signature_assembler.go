@@ -9,7 +9,7 @@ import (
 )
 
 type joseSignatureAssembler struct {
-	signature *JOSESignature
+	signature *JWSSignature
 	key       *string
 	state     maState
 }

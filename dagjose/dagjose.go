@@ -11,7 +11,7 @@ import (
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
-type JOSESignature struct {
+type JWSSignature struct {
 	protected []byte
 	header    map[string]ipld.Node
 	signature []byte
@@ -25,7 +25,7 @@ type JWERecipient struct {
 type DagJOSE struct {
 	// JWS top level keys
 	payload    []byte
-	signatures []JOSESignature
+	signatures []JWSSignature
 	// JWE top level keys
 	protected   []byte
 	unprotected []byte
@@ -67,7 +67,7 @@ func NewDagJWS(jsonSerialization string) (*DagJOSE, error) {
 	}
 	return &DagJOSE{
 		payload: payloadBytes,
-		signatures: []JOSESignature{
+		signatures: []JWSSignature{
 			{
 				protected: protectedBytes,
 				signature: signatureBytes,
@@ -117,9 +117,9 @@ func parseGeneralSerialization(jsonStr string) (*DagJOSE, error) {
 	}
 
 	if rawJose.Signatures != nil {
-		sigs := make([]JOSESignature, 0, len(rawJose.Signatures))
+		sigs := make([]JWSSignature, 0, len(rawJose.Signatures))
 		for idx, rawSig := range rawJose.Signatures {
-			sig := JOSESignature{}
+			sig := JWSSignature{}
 			if rawSig.Protected != nil {
 				protectedBytes, err := base64.RawURLEncoding.DecodeString(*rawSig.Protected)
 				if err != nil {

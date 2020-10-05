@@ -71,12 +71,12 @@ func validJWSGen() *rapid.Generator {
 }
 
 func sliceOfSignatures() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) []JOSESignature {
+	return rapid.Custom(func(t *rapid.T) []JWSSignature {
 		isNil := rapid.Bool().Draw(t, "").(bool)
 		if isNil {
 			return nil
 		}
-		return rapid.SliceOf(signatureGen()).Draw(t, "A nillable slice of bytes").([]JOSESignature)
+		return rapid.SliceOf(signatureGen()).Draw(t, "A nillable slice of bytes").([]JWSSignature)
 	})
 }
 
@@ -201,8 +201,8 @@ func ipldNodeGen(depth int) *rapid.Generator {
 }
 
 func signatureGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) JOSESignature {
-		return JOSESignature{
+	return rapid.Custom(func(t *rapid.T) JWSSignature {
+		return JWSSignature{
 			protected: sliceOfBytes().Draw(t, "signature protected bytes").([]byte),
 			header:    stringKeyedIPLDMapGen(4).Draw(t, "signature header").(map[string]ipld.Node),
 			signature: nonNilSliceOfBytes().Draw(t, "signature bytes").([]byte),
@@ -223,7 +223,7 @@ func arbitraryJoseGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) DagJOSE {
 		return DagJOSE{
 			payload:     sliceOfBytes().Draw(t, "jose payload").([]byte),
-			signatures:  sliceOfSignatures().Draw(t, "jose signatures").([]JOSESignature),
+			signatures:  sliceOfSignatures().Draw(t, "jose signatures").([]JWSSignature),
 			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
 			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
 			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
@@ -239,8 +239,8 @@ func singleSigJWSGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) DagJOSE {
 		return DagJOSE{
 			payload: sliceOfBytes().Draw(t, "jose payload").([]byte),
-			signatures: []JOSESignature{
-				signatureGen().Draw(t, "").(JOSESignature),
+			signatures: []JWSSignature{
+				signatureGen().Draw(t, "").(JWSSignature),
 			},
 		}
 	})

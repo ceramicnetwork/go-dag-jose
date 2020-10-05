@@ -8,7 +8,7 @@ import (
 type joseSignatureListAssembler struct{ d *DagJOSE }
 
 func (l *joseSignatureListAssembler) AssembleValue() ipld.NodeAssembler {
-	l.d.signatures = append(l.d.signatures, JOSESignature{})
+	l.d.signatures = append(l.d.signatures, JWSSignature{})
 	sigRef := &l.d.signatures[len(l.d.signatures)-1]
 	return &joseSignatureAssembler{
 		signature: sigRef,
