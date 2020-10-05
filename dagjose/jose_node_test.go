@@ -302,6 +302,17 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 	})
 }
 
+func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
+    rapid.Check(t, func(t *rapid.T) {
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		roundTripped := roundTripJose(jose)
+        if roundTripped.AsJWE() == nil {
+            require.NotNil(t, roundTripped.AsJWS())
+        }
+    })
+}
+
+
 func TestJSONSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		dagJws := jwsGen().Draw(t, "An arbitrary JWS").(*DagJWS)
