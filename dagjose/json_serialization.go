@@ -46,7 +46,7 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	}
 	_, cid, err := cid.CidFromBytes(payloadBytes)
 	if err != nil {
-		panic(fmt.Errorf("payload is not a CID"))
+		panic(fmt.Errorf("error parsing payload: payload is not a CID"))
 	}
 	result.payload = &cid
 
