@@ -29,7 +29,7 @@ type JWERecipient struct {
 // as AsJWE and AsJWS to get a concrete JOSE object.
 type DagJOSE struct {
 	// JWS top level keys
-	payload    []byte
+	payload    *cid.Cid
 	signatures []JWSSignature
 	// JWE top level keys
 	protected   []byte
@@ -106,7 +106,11 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing payload: %v", err)
 	}
-	result.payload = payloadBytes
+    _, cid, err := cid.CidFromBytes(payloadBytes)
+    if err != nil {
+        panic(fmt.Errorf("payload is not a CID"))
+    }
+	result.payload = &cid
 
 	var sigs []JWSSignature
 	if rawJws.Signature != nil {
@@ -308,7 +312,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 
 func (d *DagJWS) asJson() map[string]interface{} {
 	jsonJose := make(map[string]interface{})
-	jsonJose["payload"] = base64.RawURLEncoding.EncodeToString(d.dagjose.payload)
+	jsonJose["payload"] = base64.RawURLEncoding.EncodeToString(d.dagjose.payload.Bytes())
 
 	if d.dagjose.signatures != nil {
 		sigs := make([]map[string]interface{}, 0, len(d.dagjose.signatures))
@@ -364,6 +368,10 @@ func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
 		panic(fmt.Errorf("error marshaling flattened JWS serialization to JSON: %v", err))
 	}
 	return result, nil
+}
+
+func (d *DagJWS) PayloadLink() ipld.Link {
+    return cidlink.Link{Cid: *d.dagjose.payload}
 }
 
 // Return the general json serialization of this JWE

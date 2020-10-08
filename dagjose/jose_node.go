@@ -11,7 +11,7 @@ func (d *DagJOSE) ReprKind() ipld.ReprKind {
 }
 func (d *DagJOSE) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
-		return ipldBasicNode.NewBytes(d.payload), nil
+		return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
 	}
 	if key == "signatures" {
 		return &joseSignaturesNode{d.signatures}, nil

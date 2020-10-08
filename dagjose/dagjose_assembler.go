@@ -3,6 +3,7 @@ package dagjose
 import (
 	"fmt"
 
+	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
@@ -121,7 +122,11 @@ func (d *DagJOSENodeBuilder) AssignBytes(b []byte) error {
 	if d.state == maState_midValue {
 		switch *d.key {
 		case "payload":
-			d.dagJose.payload = b
+            _, cid, err := cid.CidFromBytes(b)
+            if err != nil {
+                return fmt.Errorf("payload is not a valid CID: %v", err)
+            }
+			d.dagJose.payload = &cid
 		case "protected":
 			d.dagJose.protected = b
 		case "unprotected":
