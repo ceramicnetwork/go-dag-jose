@@ -6,15 +6,17 @@ import (
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
-func (d *DagJOSE) ReprKind() ipld.ReprKind {
+type dagJOSENode struct{ *DagJOSE }
+
+func (d dagJOSENode) ReprKind() ipld.ReprKind {
 	return ipld.ReprKind_Map
 }
-func (d *DagJOSE) LookupByString(key string) (ipld.Node, error) {
+func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
 		return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
 	}
 	if key == "signatures" {
-		return &joseSignaturesNode{d.signatures}, nil
+		return &jwsSignaturesNode{d.signatures}, nil
 	}
 	if key == "protected" {
 		return bytesOrNil(d.protected), nil
@@ -41,7 +43,7 @@ func (d *DagJOSE) LookupByString(key string) (ipld.Node, error) {
 				len(d.recipients),
 				func(la fluent.ListAssembler) {
 					for i := range d.recipients {
-						la.AssembleValue().AssignNode(&d.recipients[i])
+						la.AssembleValue().AssignNode(jweRecipientNode{&d.recipients[i]})
 					}
 				},
 			), nil
@@ -50,56 +52,56 @@ func (d *DagJOSE) LookupByString(key string) (ipld.Node, error) {
 	}
 	return nil, nil
 }
-func (d *DagJOSE) LookupByNode(key ipld.Node) (ipld.Node, error) {
+func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	ks, err := key.AsString()
 	if err != nil {
 		return nil, err
 	}
 	return d.LookupByString(ks)
 }
-func (d *DagJOSE) LookupByIndex(idx int) (ipld.Node, error) {
+func (d dagJOSENode) LookupByIndex(idx int) (ipld.Node, error) {
 	return nil, nil
 }
-func (d *DagJOSE) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
+func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
 }
-func (d *DagJOSE) MapIterator() ipld.MapIterator {
-	return &DagJOSEMapIterator{
+func (d dagJOSENode) MapIterator() ipld.MapIterator {
+	return &dagJOSEMapIterator{
 		d:     d,
 		index: 0,
 	}
 }
-func (d *DagJOSE) ListIterator() ipld.ListIterator {
+func (d dagJOSENode) ListIterator() ipld.ListIterator {
 	return nil
 }
-func (d *DagJOSE) Length() int {
-	return len((&DagJOSEMapIterator{d: d, index: 0}).presentKeys())
+func (d dagJOSENode) Length() int {
+	return len((&dagJOSEMapIterator{d: d, index: 0}).presentKeys())
 }
-func (d *DagJOSE) IsAbsent() bool {
+func (d dagJOSENode) IsAbsent() bool {
 	return false
 }
-func (d *DagJOSE) IsNull() bool {
+func (d dagJOSENode) IsNull() bool {
 	return false
 }
-func (d *DagJOSE) AsBool() (bool, error) {
+func (d dagJOSENode) AsBool() (bool, error) {
 	return false, nil
 }
-func (d *DagJOSE) AsInt() (int, error) {
+func (d dagJOSENode) AsInt() (int, error) {
 	return 0, nil
 }
-func (d *DagJOSE) AsFloat() (float64, error) {
+func (d dagJOSENode) AsFloat() (float64, error) {
 	return 0, nil
 }
-func (d *DagJOSE) AsString() (string, error) {
+func (d dagJOSENode) AsString() (string, error) {
 	return "", nil
 }
-func (d *DagJOSE) AsBytes() ([]byte, error) {
+func (d dagJOSENode) AsBytes() ([]byte, error) {
 	return nil, nil
 }
-func (d *DagJOSE) AsLink() (ipld.Link, error) {
+func (d dagJOSENode) AsLink() (ipld.Link, error) {
 	return nil, nil
 }
-func (d *DagJOSE) Prototype() ipld.NodePrototype {
+func (d dagJOSENode) Prototype() ipld.NodePrototype {
 	return nil
 }
 
@@ -113,12 +115,12 @@ func bytesOrNil(value []byte) ipld.Node {
 	}
 }
 
-type DagJOSEMapIterator struct {
-	d     *DagJOSE
+type dagJOSEMapIterator struct {
+	d     dagJOSENode
 	index int
 }
 
-func (d *DagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
+func (d *dagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	if d.Done() {
 		return nil, nil, ipld.ErrIteratorOverread{}
 	}
@@ -129,11 +131,11 @@ func (d *DagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	return ipldBasicNode.NewString(key), value, nil
 }
 
-func (d *DagJOSEMapIterator) Done() bool {
+func (d *dagJOSEMapIterator) Done() bool {
 	return d.index >= len(d.presentKeys())
 }
 
-func (d *DagJOSEMapIterator) presentKeys() []string {
+func (d *dagJOSEMapIterator) presentKeys() []string {
 	result := make([]string, 0)
 	if d.d.payload != nil {
 		result = append(result, "payload")

@@ -8,15 +8,15 @@ import (
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
-type joseSignatureAssembler struct {
-	signature *JWSSignature
+type jwsSignatureAssembler struct {
+	signature *jwsSignature
 	key       *string
 	state     maState
 }
 
-var joseSignatureMixin = mixins.MapAssembler{TypeName: "JOSESignature"}
+var jwsSignatureMixin = mixins.MapAssembler{TypeName: "JWSSignature"}
 
-func (j *joseSignatureAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
+func (j *jwsSignatureAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
 	if j.state == maState_midValue && *j.key == "header" {
 		j.signature.header = make(map[string]ipld.Node)
 		j.state = maState_initial
@@ -31,10 +31,10 @@ func (j *joseSignatureAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, erro
 	}
 	return j, nil
 }
-func (j *joseSignatureAssembler) BeginList(sizeHint int) (ipld.ListAssembler, error) {
-	return joseSignatureMixin.BeginList(sizeHint)
+func (j *jwsSignatureAssembler) BeginList(sizeHint int) (ipld.ListAssembler, error) {
+	return jwsSignatureMixin.BeginList(sizeHint)
 }
-func (j *joseSignatureAssembler) AssignNull() error {
+func (j *jwsSignatureAssembler) AssignNull() error {
 	if j.state == maState_midValue {
 		switch *j.key {
 		case "header":
@@ -48,29 +48,29 @@ func (j *joseSignatureAssembler) AssignNull() error {
 		}
 		return nil
 	}
-	return joseSignatureMixin.AssignNull()
+	return jwsSignatureMixin.AssignNull()
 }
-func (j *joseSignatureAssembler) AssignBool(b bool) error {
-	return joseSignatureMixin.AssignBool(b)
+func (j *jwsSignatureAssembler) AssignBool(b bool) error {
+	return jwsSignatureMixin.AssignBool(b)
 }
-func (j *joseSignatureAssembler) AssignInt(i int) error {
-	return joseSignatureMixin.AssignInt(i)
+func (j *jwsSignatureAssembler) AssignInt(i int) error {
+	return jwsSignatureMixin.AssignInt(i)
 }
-func (j *joseSignatureAssembler) AssignFloat(f float64) error {
-	return joseSignatureMixin.AssignFloat(f)
+func (j *jwsSignatureAssembler) AssignFloat(f float64) error {
+	return jwsSignatureMixin.AssignFloat(f)
 }
-func (j *joseSignatureAssembler) AssignString(s string) error {
+func (j *jwsSignatureAssembler) AssignString(s string) error {
 	if j.state == maState_midKey {
-		if !isValidJoseSignatureKey(s) {
-			return fmt.Errorf("%s is not a vliad jose signature key", s)
+		if !isValidJWSSignatureKey(s) {
+			return fmt.Errorf("%s is not a vliad JWS signature key", s)
 		}
 		j.key = &s
 		j.state = maState_expectValue
 		return nil
 	}
-	return joseSignatureMixin.AssignString(s)
+	return jwsSignatureMixin.AssignString(s)
 }
-func (j *joseSignatureAssembler) AssignBytes(b []byte) error {
+func (j *jwsSignatureAssembler) AssignBytes(b []byte) error {
 	if j.state == maState_midValue {
 		if *j.key == "protected" {
 			j.signature.protected = b
@@ -84,19 +84,19 @@ func (j *joseSignatureAssembler) AssignBytes(b []byte) error {
 		}
 		panic("should not be possible due to validation in map assembler")
 	}
-	return joseSignatureMixin.AssignBytes(b)
+	return jwsSignatureMixin.AssignBytes(b)
 }
-func (j *joseSignatureAssembler) AssignLink(l ipld.Link) error {
-	return joseSignatureMixin.AssignLink(l)
+func (j *jwsSignatureAssembler) AssignLink(l ipld.Link) error {
+	return jwsSignatureMixin.AssignLink(l)
 }
-func (j *joseSignatureAssembler) AssignNode(n ipld.Node) error {
+func (j *jwsSignatureAssembler) AssignNode(n ipld.Node) error {
 	return fmt.Errorf("not implemented")
 }
-func (j *joseSignatureAssembler) Prototype() ipld.NodePrototype {
+func (j *jwsSignatureAssembler) Prototype() ipld.NodePrototype {
 	return basicnode.Prototype.Map
 }
 
-func (j *joseSignatureAssembler) AssembleKey() ipld.NodeAssembler {
+func (j *jwsSignatureAssembler) AssembleKey() ipld.NodeAssembler {
 	if j.state != maState_initial {
 		panic("misuse")
 	}
@@ -104,14 +104,14 @@ func (j *joseSignatureAssembler) AssembleKey() ipld.NodeAssembler {
 	return j
 }
 
-func (j *joseSignatureAssembler) AssembleValue() ipld.NodeAssembler {
+func (j *jwsSignatureAssembler) AssembleValue() ipld.NodeAssembler {
 	if j.state != maState_expectValue {
 		panic("misuse")
 	}
 	j.state = maState_midValue
 	return j
 }
-func (j *joseSignatureAssembler) AssembleEntry(k string) (ipld.NodeAssembler, error) {
+func (j *jwsSignatureAssembler) AssembleEntry(k string) (ipld.NodeAssembler, error) {
 	if j.state != maState_initial {
 		panic("misuse")
 	}
@@ -120,14 +120,14 @@ func (j *joseSignatureAssembler) AssembleEntry(k string) (ipld.NodeAssembler, er
 	return j, nil
 }
 
-func (j *joseSignatureAssembler) KeyPrototype() ipld.NodePrototype {
+func (j *jwsSignatureAssembler) KeyPrototype() ipld.NodePrototype {
 	return basicnode.Prototype.String
 }
-func (j *joseSignatureAssembler) ValuePrototype(k string) ipld.NodePrototype {
+func (j *jwsSignatureAssembler) ValuePrototype(k string) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }
 
-func (j *joseSignatureAssembler) Finish() error {
+func (j *jwsSignatureAssembler) Finish() error {
 	if j.state != maState_initial {
 		panic("misuse")
 	}
@@ -135,6 +135,6 @@ func (j *joseSignatureAssembler) Finish() error {
 	return nil
 }
 
-func isValidJoseSignatureKey(key string) bool {
+func isValidJWSSignatureKey(key string) bool {
 	return key == "protected" || key == "header" || key == "signature"
 }

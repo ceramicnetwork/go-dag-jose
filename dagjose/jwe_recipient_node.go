@@ -7,10 +7,12 @@ import (
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
-func (r *JWERecipient) ReprKind() ipld.ReprKind {
+type jweRecipientNode struct{ *jweRecipient }
+
+func (r jweRecipientNode) ReprKind() ipld.ReprKind {
 	return ipld.ReprKind_Map
 }
-func (r *JWERecipient) LookupByString(key string) (ipld.Node, error) {
+func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "header" {
 		return fluent.MustBuildMap(
 			basicnode.Prototype.Map,
@@ -27,26 +29,26 @@ func (r *JWERecipient) LookupByString(key string) (ipld.Node, error) {
 	}
 	return nil, nil
 }
-func (r *JWERecipient) LookupByNode(key ipld.Node) (ipld.Node, error) {
+func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	str, err := key.AsString()
 	if err != nil {
 		return nil, nil
 	}
 	return r.LookupByString(str)
 }
-func (r *JWERecipient) LookupByIndex(idx int) (ipld.Node, error) {
+func (r jweRecipientNode) LookupByIndex(idx int) (ipld.Node, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.LookupByIndex(idx)
 }
-func (r *JWERecipient) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
+func (r jweRecipientNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return r.LookupByString(seg.String())
 }
-func (r *JWERecipient) MapIterator() ipld.MapIterator {
+func (r jweRecipientNode) MapIterator() ipld.MapIterator {
 	return &jweRecipientMapIterator{r: r, index: 0}
 }
-func (r *JWERecipient) ListIterator() ipld.ListIterator {
+func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
-func (r *JWERecipient) Length() int {
+func (r jweRecipientNode) Length() int {
 	if r.encrypted_key == nil && r.header == nil {
 		return 0
 	}
@@ -55,36 +57,36 @@ func (r *JWERecipient) Length() int {
 	}
 	return 1
 }
-func (r *JWERecipient) IsAbsent() bool {
+func (r jweRecipientNode) IsAbsent() bool {
 	return false
 }
-func (r *JWERecipient) IsNull() bool {
+func (r jweRecipientNode) IsNull() bool {
 	return false
 }
-func (r *JWERecipient) AsBool() (bool, error) {
+func (r jweRecipientNode) AsBool() (bool, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBool()
 }
-func (r *JWERecipient) AsInt() (int, error) {
+func (r jweRecipientNode) AsInt() (int, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsInt()
 }
-func (r *JWERecipient) AsFloat() (float64, error) {
+func (r jweRecipientNode) AsFloat() (float64, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsFloat()
 }
-func (r *JWERecipient) AsString() (string, error) {
+func (r jweRecipientNode) AsString() (string, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsString()
 }
-func (r *JWERecipient) AsBytes() ([]byte, error) {
+func (r jweRecipientNode) AsBytes() ([]byte, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBytes()
 }
-func (r *JWERecipient) AsLink() (ipld.Link, error) {
+func (r jweRecipientNode) AsLink() (ipld.Link, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsLink()
 }
-func (r *JWERecipient) Prototype() ipld.NodePrototype {
+func (r jweRecipientNode) Prototype() ipld.NodePrototype {
 	return nil
 }
 
 type jweRecipientMapIterator struct {
-	r     *JWERecipient
+	r     jweRecipientNode
 	index int
 }
 

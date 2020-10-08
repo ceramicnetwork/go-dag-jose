@@ -10,15 +10,15 @@ import (
 )
 
 var (
-	_ ipld.Node          = &DagJOSE{}
+	_ ipld.Node          = dagJOSENode{}
 	_ ipld.NodePrototype = &DagJOSENodePrototype{}
-	_ ipld.NodeAssembler = &DagJOSENodeBuilder{}
+	_ ipld.NodeAssembler = &dagJOSENodeBuilder{}
 )
 
 type DagJOSENodePrototype struct{}
 
 func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
-	return &DagJOSENodeBuilder{dagJose: DagJOSE{}}
+	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
 // Returns an instance of the DagJOSENodeBuilder which can be passed to
@@ -26,7 +26,7 @@ func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 // neccesary in reasonably advanced situations, most of the time you should be
 // able to use dagjose.LoadJOSE
 func NewBuilder() ipld.NodeBuilder {
-	return &DagJOSENodeBuilder{dagJose: DagJOSE{}}
+	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
 type maState uint8
@@ -42,7 +42,7 @@ const (
 // An implementation of `ipld.NodeBuilder` which builds a `dagjose.DagJOSE`
 // object. This builder will throw an error if the IPLD data it is building
 // does not match the schema specified in the spec
-type DagJOSENodeBuilder struct {
+type dagJOSENodeBuilder struct {
 	dagJose DagJOSE
 	state   maState
 	key     *string
@@ -50,26 +50,26 @@ type DagJOSENodeBuilder struct {
 
 var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
 
-func (d *DagJOSENodeBuilder) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
+func (d *dagJOSENodeBuilder) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
 	return d, nil
 }
-func (d *DagJOSENodeBuilder) BeginList(sizeHint int) (ipld.ListAssembler, error) {
+func (d *dagJOSENodeBuilder) BeginList(sizeHint int) (ipld.ListAssembler, error) {
 	if d.state == maState_midValue && *d.key == "recipients" {
-		d.dagJose.recipients = make([]JWERecipient, 0, sizeHint)
+		d.dagJose.recipients = make([]jweRecipient, 0, sizeHint)
 		d.state = maState_initial
-		return &joseRecipientListAssembler{&d.dagJose}, nil
+		return &jweRecipientListAssembler{&d.dagJose}, nil
 	}
 	if d.state == maState_midValue && *d.key == "signatures" {
-		d.dagJose.signatures = make([]JWSSignature, 0, sizeHint)
+		d.dagJose.signatures = make([]jwsSignature, 0, sizeHint)
 		d.state = maState_initial
-		return &joseSignatureListAssembler{&d.dagJose}, nil
+		return &jwsSignatureListAssembler{&d.dagJose}, nil
 	}
 	return dagJoseMixin.BeginList(sizeHint)
 }
-func (d *DagJOSENodeBuilder) AssignNull() error {
+func (d *dagJOSENodeBuilder) AssignNull() error {
 	if d.state == maState_midValue {
 		switch *d.key {
 		case "payload":
@@ -98,16 +98,16 @@ func (d *DagJOSENodeBuilder) AssignNull() error {
 	}
 	return dagJoseMixin.AssignNull()
 }
-func (d *DagJOSENodeBuilder) AssignBool(b bool) error {
+func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
 	return dagJoseMixin.AssignBool(b)
 }
-func (d *DagJOSENodeBuilder) AssignInt(i int) error {
+func (d *dagJOSENodeBuilder) AssignInt(i int) error {
 	return dagJoseMixin.AssignInt(i)
 }
-func (d *DagJOSENodeBuilder) AssignFloat(f float64) error {
+func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
 	return dagJoseMixin.AssignFloat(f)
 }
-func (d *DagJOSENodeBuilder) AssignString(s string) error {
+func (d *dagJOSENodeBuilder) AssignString(s string) error {
 	if d.state == maState_midKey {
 		if !isValidJOSEKey(s) {
 			return fmt.Errorf("Attempted to assign an invalid JOSE key: %v", s)
@@ -118,7 +118,7 @@ func (d *DagJOSENodeBuilder) AssignString(s string) error {
 	}
 	return dagJoseMixin.AssignString(s)
 }
-func (d *DagJOSENodeBuilder) AssignBytes(b []byte) error {
+func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	if d.state == maState_midValue {
 		switch *d.key {
 		case "payload":
@@ -151,10 +151,10 @@ func (d *DagJOSENodeBuilder) AssignBytes(b []byte) error {
 	}
 	return dagJoseMixin.AssignBytes(b)
 }
-func (d *DagJOSENodeBuilder) AssignLink(l ipld.Link) error {
+func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
 	return dagJoseMixin.AssignLink(l)
 }
-func (d *DagJOSENodeBuilder) AssignNode(n ipld.Node) error {
+func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
@@ -176,30 +176,30 @@ func (d *DagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 	}
 	return d.Finish()
 }
-func (d *DagJOSENodeBuilder) Prototype() ipld.NodePrototype {
+func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}
 }
-func (d *DagJOSENodeBuilder) Build() ipld.Node {
-	return &d.dagJose
+func (d *dagJOSENodeBuilder) Build() ipld.Node {
+	return dagJOSENode{&d.dagJose}
 }
-func (d *DagJOSENodeBuilder) Reset() {
+func (d *dagJOSENodeBuilder) Reset() {
 }
 
-func (d *DagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
+func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
 	d.state = maState_midKey
 	return d
 }
-func (d *DagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
+func (d *dagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
 	if d.state != maState_expectValue {
 		panic("misuse")
 	}
 	d.state = maState_midValue
 	return d
 }
-func (d *DagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error) {
+func (d *dagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error) {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
@@ -207,17 +207,17 @@ func (d *DagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error)
 	d.state = maState_midValue
 	return d, nil
 }
-func (d *DagJOSENodeBuilder) Finish() error {
+func (d *dagJOSENodeBuilder) Finish() error {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
 	d.state = maState_finished
 	return nil
 }
-func (d *DagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {
+func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {
 	return basicnode.Prototype.String
 }
-func (d *DagJOSENodeBuilder) ValuePrototype(k string) ipld.NodePrototype {
+func (d *dagJOSENodeBuilder) ValuePrototype(k string) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }
 

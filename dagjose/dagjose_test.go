@@ -88,19 +88,19 @@ func validJWSGen() *rapid.Generator {
 // Generate a non-empty slice of JWSSignatures. Note that the signatures are
 // not valid, they are just arbitrary byte sequences.
 func sliceOfSignatures() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) []JWSSignature {
+	return rapid.Custom(func(t *rapid.T) []jwsSignature {
 		return rapid.SliceOf(signatureGen()).Filter(func(sigs interface{}) bool {
-			return len(sigs.([]JWSSignature)) > 0
-		}).Draw(t, "A non empty slice of signatures").([]JWSSignature)
+			return len(sigs.([]jwsSignature)) > 0
+		}).Draw(t, "A non empty slice of signatures").([]jwsSignature)
 	})
 }
 
 // Generate a non empty slice of JWERecipients
 func sliceOfRecipients() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) []JWERecipient {
+	return rapid.Custom(func(t *rapid.T) []jweRecipient {
 		return rapid.SliceOf(recipientGen()).Filter(func(recipients interface{}) bool {
-			return len(recipients.([]JWERecipient)) > 0
-		}).Draw(t, "A nillable slice of signatures").([]JWERecipient)
+			return len(recipients.([]jweRecipient)) > 0
+		}).Draw(t, "A nillable slice of signatures").([]jweRecipient)
 	})
 }
 
@@ -241,8 +241,8 @@ func ipldNodeGen(depth int) *rapid.Generator {
 
 // Generate an arbitrary JWSSignature, note that the signature is not valid
 func signatureGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) JWSSignature {
-		return JWSSignature{
+	return rapid.Custom(func(t *rapid.T) jwsSignature {
+		return jwsSignature{
 			protected: sliceOfBytes().Draw(t, "signature protected bytes").([]byte),
 			header:    stringKeyedIPLDMapGen(4).Draw(t, "signature header").(map[string]ipld.Node),
 			signature: nonNilSliceOfBytes().Draw(t, "signature bytes").([]byte),
@@ -252,12 +252,12 @@ func signatureGen() *rapid.Generator {
 
 // Generate an arbitrary JWERecipient
 func recipientGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) JWERecipient {
-		return JWERecipient{
+	return rapid.Custom(func(t *rapid.T) jweRecipient {
+		return jweRecipient{
 			header:        stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
 			encrypted_key: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
 		}
-	}).Filter(func(recipient JWERecipient) bool {
+	}).Filter(func(recipient jweRecipient) bool {
 		return recipient.encrypted_key != nil || recipient.header != nil
 	})
 }
@@ -267,7 +267,7 @@ func jwsGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJWS {
 		return (&DagJOSE{
 			payload:    cidGen().Draw(t, "a JWS CID").(*cid.Cid),
-			signatures: sliceOfSignatures().Draw(t, "jose signatures").([]JWSSignature),
+			signatures: sliceOfSignatures().Draw(t, "jose signatures").([]jwsSignature),
 		}).AsJWS()
 	})
 }
@@ -283,7 +283,7 @@ func jweGen() *rapid.Generator {
 			aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-			recipients:  sliceOfRecipients().Draw(t, "JOSE recipients").([]JWERecipient),
+			recipients:  sliceOfRecipients().Draw(t, "JOSE recipients").([]jweRecipient),
 		}).AsJWE()
 	})
 }
@@ -305,8 +305,8 @@ func singleSigJWSGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJWS {
 		return (&DagJOSE{
 			payload: cidGen().Draw(t, "a JWS CID").(*cid.Cid),
-			signatures: []JWSSignature{
-				signatureGen().Draw(t, "").(JWSSignature),
+			signatures: []jwsSignature{
+				signatureGen().Draw(t, "").(jwsSignature),
 			},
 		}).AsJWS()
 	})
@@ -322,7 +322,7 @@ func singleRecipientJWEGen() *rapid.Generator {
 			aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			tag:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
-			recipients:  []JWERecipient{recipientGen().Draw(t, "JWE recipient").(JWERecipient)},
+			recipients:  []jweRecipient{recipientGen().Draw(t, "JWE recipient").(jweRecipient)},
 		}).AsJWE()
 	})
 }

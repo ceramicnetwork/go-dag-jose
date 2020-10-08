@@ -13,7 +13,7 @@ import (
 type DagJOSE struct {
 	// JWS top level keys
 	payload    *cid.Cid
-	signatures []JWSSignature
+	signatures []jwsSignature
 	// JWE top level keys
 	protected   []byte
 	unprotected []byte
@@ -21,18 +21,22 @@ type DagJOSE struct {
 	aad         []byte
 	ciphertext  []byte
 	tag         []byte
-	recipients  []JWERecipient
+	recipients  []jweRecipient
 }
 
-type JWSSignature struct {
+type jwsSignature struct {
 	protected []byte
 	header    map[string]ipld.Node
 	signature []byte
 }
 
-type JWERecipient struct {
+type jweRecipient struct {
 	header        map[string]ipld.Node
 	encrypted_key []byte
+}
+
+func (d *DagJOSE) AsNode() ipld.Node {
+	return dagJOSENode{d}
 }
 
 // If this jose object is a JWS then this will return a DagJWS, if it is a
@@ -85,7 +89,7 @@ func BuildJOSELink(ctx context.Context, linkContext ipld.LinkContext, jose *DagJ
 	return lb.Build(
 		ctx,
 		linkContext,
-		jose,
+		jose.AsNode(),
 		storer,
 	)
 }
@@ -105,5 +109,5 @@ func LoadJOSE(lnk ipld.Link, ctx context.Context, linkContext ipld.LinkContext, 
 	}
 
 	n := builder.Build()
-	return n.(*DagJOSE), nil
+	return n.(dagJOSENode).DagJOSE, nil
 }

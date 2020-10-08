@@ -50,9 +50,9 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	}
 	result.payload = &cid
 
-	var sigs []JWSSignature
+	var sigs []jwsSignature
 	if rawJws.Signature != nil {
-		sig := JWSSignature{}
+		sig := jwsSignature{}
 
 		sigBytes, err := base64.RawURLEncoding.DecodeString(*rawJws.Signature)
 		if err != nil {
@@ -81,9 +81,9 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 		}
 		sigs = append(sigs, sig)
 	} else if rawJws.Signatures != nil {
-		sigs = make([]JWSSignature, 0, len(rawJws.Signatures))
+		sigs = make([]jwsSignature, 0, len(rawJws.Signatures))
 		for idx, rawSig := range rawJws.Signatures {
-			sig := JWSSignature{}
+			sig := jwsSignature{}
 			if rawSig.Protected != nil {
 				protectedBytes, err := base64.RawURLEncoding.DecodeString(*rawSig.Protected)
 				if err != nil {
@@ -162,9 +162,9 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 		resultJose.protected = protectedBytes
 	}
 
-	var recipients []JWERecipient
+	var recipients []jweRecipient
 	if rawJwe.Header != nil || rawJwe.EncryptedKey != nil {
-		recipient := JWERecipient{}
+		recipient := jweRecipient{}
 		if rawJwe.EncryptedKey != nil {
 			keyBytes, err := base64.RawURLEncoding.DecodeString(*rawJwe.EncryptedKey)
 			if err != nil {
@@ -186,9 +186,9 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 		}
 		recipients = append(recipients, recipient)
 	} else if rawJwe.Recipients != nil {
-		recipients = make([]JWERecipient, 0, len(rawJwe.Recipients))
+		recipients = make([]jweRecipient, 0, len(rawJwe.Recipients))
 		for idx, rawRecipient := range rawJwe.Recipients {
-			recipient := JWERecipient{}
+			recipient := jweRecipient{}
 			if rawRecipient.EncryptedKey != nil {
 				keyBytes, err := base64.RawURLEncoding.DecodeString(*rawRecipient.EncryptedKey)
 				if err != nil {
