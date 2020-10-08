@@ -106,10 +106,10 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing payload: %v", err)
 	}
-    _, cid, err := cid.CidFromBytes(payloadBytes)
-    if err != nil {
-        panic(fmt.Errorf("payload is not a CID"))
-    }
+	_, cid, err := cid.CidFromBytes(payloadBytes)
+	if err != nil {
+		panic(fmt.Errorf("payload is not a CID"))
+	}
 	result.payload = &cid
 
 	var sigs []JWSSignature
@@ -371,7 +371,7 @@ func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
 }
 
 func (d *DagJWS) PayloadLink() ipld.Link {
-    return cidlink.Link{Cid: *d.dagjose.payload}
+	return cidlink.Link{Cid: *d.dagjose.payload}
 }
 
 // Return the general json serialization of this JWE

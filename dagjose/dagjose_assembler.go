@@ -122,10 +122,10 @@ func (d *DagJOSENodeBuilder) AssignBytes(b []byte) error {
 	if d.state == maState_midValue {
 		switch *d.key {
 		case "payload":
-            _, cid, err := cid.CidFromBytes(b)
-            if err != nil {
-                return fmt.Errorf("payload is not a valid CID: %v", err)
-            }
+			_, cid, err := cid.CidFromBytes(b)
+			if err != nil {
+				return fmt.Errorf("payload is not a valid CID: %v", err)
+			}
 			d.dagJose.payload = &cid
 		case "protected":
 			d.dagJose.protected = b

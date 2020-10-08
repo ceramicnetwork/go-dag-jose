@@ -38,8 +38,8 @@ func cidGen() *rapid.Generator {
 		if err != nil {
 			panic(err)
 		}
-        result := cid.NewCidV1(cid.Raw, mh)
-        return &result
+		result := cid.NewCidV1(cid.Raw, mh)
+		return &result
 	})
 }
 
@@ -85,7 +85,7 @@ func validJWSGen() *rapid.Generator {
 	})
 }
 
-// Generate a non-empty slice of JWSSignatures. Note that the signatures are 
+// Generate a non-empty slice of JWSSignatures. Note that the signatures are
 // not valid, they are just arbitrary byte sequences.
 func sliceOfSignatures() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) []JWSSignature {
@@ -200,7 +200,7 @@ func ipldMapGen(depth int) *rapid.Generator {
 	})
 }
 
-// Generate a map of ipld nodes with string keys. This is used for the top 
+// Generate a map of ipld nodes with string keys. This is used for the top
 // level of the unprotected header of JOSE objects.
 func stringKeyedIPLDMapGen(depth int) *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) map[string]ipld.Node {
@@ -304,7 +304,7 @@ func arbitraryJoseGen() *rapid.Generator {
 func singleSigJWSGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJWS {
 		return (&DagJOSE{
-			payload:    cidGen().Draw(t, "a JWS CID").(*cid.Cid),
+			payload: cidGen().Draw(t, "a JWS CID").(*cid.Cid),
 			signatures: []JWSSignature{
 				signatureGen().Draw(t, "").(JWSSignature),
 			},
@@ -364,8 +364,8 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 		if mapIterator == nil {
 			panic(fmt.Errorf("normalizeIpldNode nil MapIterator returned from map node"))
 		}
-        // For a map we normalize such that the map keys are in sorted order,
-        // this order is maintained by the basicnode.Map implementation
+		// For a map we normalize such that the map keys are in sorted order,
+		// this order is maintained by the basicnode.Map implementation
 		return fluent.MustBuildMap(
 			n.Prototype(),
 			0,
@@ -446,8 +446,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	return jose
 }
 
-
-// Check that if we encode and decode a valid JWS object then the 
+// Check that if we encode and decode a valid JWS object then the
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
@@ -457,7 +456,7 @@ func TestRoundTripValidJWS(t *testing.T) {
 	})
 }
 
-// Check that if we encode and decode an arbitrary JOSE object then the 
+// Check that if we encode and decode an arbitrary JOSE object then the
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
@@ -524,7 +523,7 @@ func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
 	require.Nil(t, jwe)
 }
 
-// If we parse the flattened serialization of a JWS then the input should 
+// If we parse the flattened serialization of a JWS then the input should
 // equal the output
 func TestFlattenedSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
@@ -544,7 +543,7 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 	})
 }
 
-// Trying to serialize a JWS with more than one signature to a flattened 
+// Trying to serialize a JWS with more than one signature to a flattened
 // serialization should throw an error
 func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
 	jsonStr := "{\"signature\": \"\", \"signatures\": [], \"payload\": \"\"}"
@@ -554,7 +553,7 @@ func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
 	require.Nil(t, jws)
 }
 
-// If we parse the flattened serialization of a JWE then the input should 
+// If we parse the flattened serialization of a JWE then the input should
 // equal the output
 func TestFlattenedSerializationJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
@@ -574,54 +573,54 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 	})
 }
 
-// If the incoming IPLD data contains a payload which is not a valid CID we 
+// If the incoming IPLD data contains a payload which is not a valid CID we
 // should raise an error
 func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
-    rapid.Check(t, func(t *rapid.T) {
-        payload := nonNilSliceOfBytes().Filter(func(payloadBytes []byte) bool {
-            _, _, err := cid.CidFromBytes(payloadBytes)
-            return err != nil
-        }).Draw(t, "A slice of bytes which is not a valid CID").([]byte)
-        node := fluent.MustBuildMap(
-            basicnode.Prototype.Map,
-            2,
-            func(ma fluent.MapAssembler) {
-                ma.AssembleEntry("payload").AssignBytes(payload)
-            },
-        )
-        buf := bytes.Buffer{}
-        lb := cidlink.LinkBuilder{Prefix: cid.Prefix{
-            Version:  1,    // Usually '1'.
-            Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-            MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-            MhLength: 48,   // sha3-224 hash has a 48-byte sum.
-        }}
-        link, err := lb.Build(
-            context.Background(),
-            ipld.LinkContext{},
-            node,
-            func(ipld.LinkContext) (io.Writer, ipld.StoreCommitter, error) {
-                return &buf, func(l ipld.Link) error { return nil }, nil
-            },
-        )
-        if err != nil {
-            t.Errorf("Error creating link to invalid payload node: %v", err)
-            return
-        }
-        _, err = LoadJOSE(
-            link,
-            context.Background(),
-            ipld.LinkContext{},
-            func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
-                return bytes.NewBuffer(buf.Bytes()), nil
-            },
-        )
-        require.NotNil(t, err)
-        require.Contains(t, err.Error(), "payload is not a valid CID")
-    })
+	rapid.Check(t, func(t *rapid.T) {
+		payload := nonNilSliceOfBytes().Filter(func(payloadBytes []byte) bool {
+			_, _, err := cid.CidFromBytes(payloadBytes)
+			return err != nil
+		}).Draw(t, "A slice of bytes which is not a valid CID").([]byte)
+		node := fluent.MustBuildMap(
+			basicnode.Prototype.Map,
+			2,
+			func(ma fluent.MapAssembler) {
+				ma.AssembleEntry("payload").AssignBytes(payload)
+			},
+		)
+		buf := bytes.Buffer{}
+		lb := cidlink.LinkBuilder{Prefix: cid.Prefix{
+			Version:  1,    // Usually '1'.
+			Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
+			MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
+			MhLength: 48,   // sha3-224 hash has a 48-byte sum.
+		}}
+		link, err := lb.Build(
+			context.Background(),
+			ipld.LinkContext{},
+			node,
+			func(ipld.LinkContext) (io.Writer, ipld.StoreCommitter, error) {
+				return &buf, func(l ipld.Link) error { return nil }, nil
+			},
+		)
+		if err != nil {
+			t.Errorf("Error creating link to invalid payload node: %v", err)
+			return
+		}
+		_, err = LoadJOSE(
+			link,
+			context.Background(),
+			ipld.LinkContext{},
+			func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
+				return bytes.NewBuffer(buf.Bytes()), nil
+			},
+		)
+		require.NotNil(t, err)
+		require.Contains(t, err.Error(), "payload is not a valid CID")
+	})
 }
 
-// Trying to serialize a JWE with more than one recipient to a flattened 
+// Trying to serialize a JWE with more than one recipient to a flattened
 // serialization should throw an error
 func TestFlattenedJWEErrorIfEncryptedKeyOrHeaderAndRecipientsDefined(t *testing.T) {
 	scenarios := [][]byte{
@@ -635,4 +634,3 @@ func TestFlattenedJWEErrorIfEncryptedKeyOrHeaderAndRecipientsDefined(t *testing.
 		require.Nil(t, jwe)
 	}
 }
-
