@@ -64,7 +64,7 @@ func (d *DagJOSE) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
 }
 func (d *DagJOSE) MapIterator() ipld.MapIterator {
-	return &dagJoseMapIterator{
+	return &DagJOSEMapIterator{
 		d:     d,
 		index: 0,
 	}
@@ -73,7 +73,7 @@ func (d *DagJOSE) ListIterator() ipld.ListIterator {
 	return nil
 }
 func (d *DagJOSE) Length() int {
-	return len((&dagJoseMapIterator{d: d, index: 0}).presentKeys())
+	return len((&DagJOSEMapIterator{d: d, index: 0}).presentKeys())
 }
 func (d *DagJOSE) IsAbsent() bool {
 	return false
@@ -113,12 +113,12 @@ func bytesOrNil(value []byte) ipld.Node {
 	}
 }
 
-type dagJoseMapIterator struct {
+type DagJOSEMapIterator struct {
 	d     *DagJOSE
 	index int
 }
 
-func (d *dagJoseMapIterator) Next() (ipld.Node, ipld.Node, error) {
+func (d *DagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	if d.Done() {
 		return nil, nil, ipld.ErrIteratorOverread{}
 	}
@@ -129,11 +129,11 @@ func (d *dagJoseMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	return ipldBasicNode.NewString(key), value, nil
 }
 
-func (d *dagJoseMapIterator) Done() bool {
+func (d *DagJOSEMapIterator) Done() bool {
 	return d.index >= len(d.presentKeys())
 }
 
-func (d *dagJoseMapIterator) presentKeys() []string {
+func (d *DagJOSEMapIterator) presentKeys() []string {
 	result := make([]string, 0)
 	if d.d.payload != nil {
 		result = append(result, "payload")

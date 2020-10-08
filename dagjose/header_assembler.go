@@ -61,7 +61,7 @@ func (h *headerAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
 		}
 		return &hvam, nil
 	}
-	return mixins.StringAssembler{"string"}.BeginMap(0)
+	return mixins.StringAssembler{TypeName: "string"}.BeginMap(0)
 }
 func (h *headerAssembler) BeginList(sizeHint int) (ipld.ListAssembler, error) {
 	if h.state == maState_midValue {
