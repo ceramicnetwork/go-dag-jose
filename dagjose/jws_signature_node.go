@@ -13,15 +13,15 @@ type jwsSignaturesNode struct{ sigs []jwsSignature }
 
 // jwsSignatures Node implementation
 
-func (d *jwsSignaturesNode) ReprKind() ipld.ReprKind {
-	return ipld.ReprKind_List
+func (d *jwsSignaturesNode) Kind() ipld.Kind {
+	return ipld.Kind_List
 }
 func (d *jwsSignaturesNode) LookupByString(key string) (ipld.Node, error) {
 	index, err := strconv.Atoi(key)
 	if err != nil {
 		return nil, nil
 	}
-	return d.LookupByIndex(index)
+	return d.LookupByIndex(int64(index))
 }
 func (d *jwsSignaturesNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	index, err := key.AsInt()
@@ -30,8 +30,8 @@ func (d *jwsSignaturesNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	}
 	return d.LookupByIndex(index)
 }
-func (d *jwsSignaturesNode) LookupByIndex(idx int) (ipld.Node, error) {
-	if len(d.sigs) > idx {
+func (d *jwsSignaturesNode) LookupByIndex(idx int64) (ipld.Node, error) {
+	if int64(len(d.sigs)) > idx {
 		return jwsSignatureNode{&d.sigs[idx]}, nil
 	}
 	return nil, nil
@@ -52,8 +52,8 @@ func (d *jwsSignaturesNode) ListIterator() ipld.ListIterator {
 		index: 0,
 	}
 }
-func (d *jwsSignaturesNode) Length() int {
-	return len(d.sigs)
+func (d *jwsSignaturesNode) Length() int64 {
+	return int64(len(d.sigs))
 }
 func (d *jwsSignaturesNode) IsAbsent() bool {
 	return false
@@ -64,7 +64,7 @@ func (d *jwsSignaturesNode) IsNull() bool {
 func (d *jwsSignaturesNode) AsBool() (bool, error) {
 	return mixins.List{TypeName: "jose.JWSSignature"}.AsBool()
 }
-func (d *jwsSignaturesNode) AsInt() (int, error) {
+func (d *jwsSignaturesNode) AsInt() (int64, error) {
 	return mixins.List{TypeName: "jose.JWSSignature"}.AsInt()
 }
 func (d *jwsSignaturesNode) AsFloat() (float64, error) {
@@ -90,13 +90,13 @@ type jwsSignaturesIterator struct {
 	index int
 }
 
-func (j *jwsSignaturesIterator) Next() (idx int, value ipld.Node, err error) {
+func (j *jwsSignaturesIterator) Next() (idx int64, value ipld.Node, err error) {
 	if j.Done() {
 		return 0, nil, ipld.ErrIteratorOverread{}
 	}
 	result := &j.sigs[j.index]
 	j.index += 1
-	return j.index, jwsSignatureNode{result}, nil
+	return int64(j.index), jwsSignatureNode{result}, nil
 }
 
 func (j *jwsSignaturesIterator) Done() bool {
@@ -109,8 +109,8 @@ func (j *jwsSignaturesIterator) Done() bool {
 
 type jwsSignatureNode struct{ *jwsSignature }
 
-func (d jwsSignatureNode) ReprKind() ipld.ReprKind {
-	return ipld.ReprKind_Map
+func (d jwsSignatureNode) Kind() ipld.Kind {
+	return ipld.Kind_Map
 }
 func (d jwsSignatureNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "signature" {
@@ -125,7 +125,7 @@ func (d jwsSignatureNode) LookupByString(key string) (ipld.Node, error) {
 		}
 		return fluent.MustBuildMap(
 			basicnode.Prototype.Map,
-			len(d.header),
+			int64(len(d.header)),
 			func(ma fluent.MapAssembler) {
 				for key, value := range d.header {
 					ma.AssembleEntry(key).AssignNode(value)
@@ -142,7 +142,7 @@ func (d jwsSignatureNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	}
 	return d.LookupByString(keyString)
 }
-func (d jwsSignatureNode) LookupByIndex(idx int) (ipld.Node, error) {
+func (d jwsSignatureNode) LookupByIndex(idx int64) (ipld.Node, error) {
 	return nil, nil
 }
 
@@ -155,8 +155,8 @@ func (d jwsSignatureNode) MapIterator() ipld.MapIterator {
 func (d jwsSignatureNode) ListIterator() ipld.ListIterator {
 	return nil
 }
-func (d jwsSignatureNode) Length() int {
-	return len((&jwsSignatureMapIterator{sig: d, index: 0}).presentKeys())
+func (d jwsSignatureNode) Length() int64 {
+	return int64(len((&jwsSignatureMapIterator{sig: d, index: 0}).presentKeys()))
 }
 func (d jwsSignatureNode) IsAbsent() bool {
 	return false
@@ -167,7 +167,7 @@ func (d jwsSignatureNode) IsNull() bool {
 func (d jwsSignatureNode) AsBool() (bool, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsBool()
 }
-func (d jwsSignatureNode) AsInt() (int, error) {
+func (d jwsSignatureNode) AsInt() (int64, error) {
 	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsInt()
 }
 func (d jwsSignatureNode) AsFloat() (float64, error) {

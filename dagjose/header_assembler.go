@@ -48,7 +48,7 @@ func (h *headerAssembler) ValuePrototype(k string) ipld.NodePrototype {
 
 var headerMixin = mixins.MapAssembler{TypeName: "header"}
 
-func (h *headerAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
+func (h *headerAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if h.state == maState_midValue {
 		h.valueBuilder = basicnode.Prototype.Map.NewBuilder()
 		ma, err := h.valueBuilder.BeginMap(sizeHint)
@@ -63,7 +63,7 @@ func (h *headerAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
 	}
 	return mixins.StringAssembler{TypeName: "string"}.BeginMap(0)
 }
-func (h *headerAssembler) BeginList(sizeHint int) (ipld.ListAssembler, error) {
+func (h *headerAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
 	if h.state == maState_midValue {
 		h.state = maState_initial
 		h.valueBuilder = basicnode.Prototype.List.NewBuilder()
@@ -91,7 +91,7 @@ func (h *headerAssembler) AssignBool(b bool) error {
 	}
 	return headerMixin.AssignBool(b)
 }
-func (h *headerAssembler) AssignInt(i int) error {
+func (h *headerAssembler) AssignInt(i int64) error {
 	if h.state == maState_midValue {
 		return h.AssignNode(basicnode.NewInt(i))
 	}
@@ -205,6 +205,6 @@ func (hval *headerValueAssemblerList) Finish() error {
 	return nil
 }
 
-func (hval *headerValueAssemblerList) ValuePrototype(idx int) ipld.NodePrototype {
+func (hval *headerValueAssemblerList) ValuePrototype(idx int64) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }

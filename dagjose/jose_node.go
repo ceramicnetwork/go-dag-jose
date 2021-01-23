@@ -8,8 +8,8 @@ import (
 
 type dagJOSENode struct{ *DagJOSE }
 
-func (d dagJOSENode) ReprKind() ipld.ReprKind {
-	return ipld.ReprKind_Map
+func (d dagJOSENode) Kind() ipld.Kind {
+	return ipld.Kind_Map
 }
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
@@ -40,7 +40,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 		if d.recipients != nil {
 			return fluent.MustBuildList(
 				ipldBasicNode.Prototype.List,
-				len(d.recipients),
+				int64(len(d.recipients)),
 				func(la fluent.ListAssembler) {
 					for i := range d.recipients {
 						la.AssembleValue().AssignNode(jweRecipientNode{&d.recipients[i]})
@@ -59,7 +59,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	}
 	return d.LookupByString(ks)
 }
-func (d dagJOSENode) LookupByIndex(idx int) (ipld.Node, error) {
+func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
 	return nil, nil
 }
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
@@ -74,8 +74,8 @@ func (d dagJOSENode) MapIterator() ipld.MapIterator {
 func (d dagJOSENode) ListIterator() ipld.ListIterator {
 	return nil
 }
-func (d dagJOSENode) Length() int {
-	return len((&dagJOSEMapIterator{d: d, index: 0}).presentKeys())
+func (d dagJOSENode) Length() int64 {
+	return int64(len((&dagJOSEMapIterator{d: d, index: 0}).presentKeys()))
 }
 func (d dagJOSENode) IsAbsent() bool {
 	return false
@@ -86,7 +86,7 @@ func (d dagJOSENode) IsNull() bool {
 func (d dagJOSENode) AsBool() (bool, error) {
 	return false, nil
 }
-func (d dagJOSENode) AsInt() (int, error) {
+func (d dagJOSENode) AsInt() (int64, error) {
 	return 0, nil
 }
 func (d dagJOSENode) AsFloat() (float64, error) {

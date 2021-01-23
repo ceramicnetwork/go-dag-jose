@@ -140,7 +140,7 @@ func ipldFloatGen() *rapid.Generator {
 
 func ipldIntGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) ipld.Node {
-		return basicnode.NewInt(rapid.Int().Draw(t, "an IPLD integer").(int))
+		return basicnode.NewInt(rapid.Int64().Draw(t, "an IPLD integer").(int64))
 	})
 }
 
@@ -167,7 +167,7 @@ func ipldListGen(depth int) *rapid.Generator {
 		elems := rapid.SliceOf(ipldNodeGen(depth-1)).Draw(t, "elements of an IPLD list").([]ipld.Node)
 		return fluent.MustBuildList(
 			basicnode.Prototype.List,
-			len(elems),
+			int64(len(elems)),
 			func(la fluent.ListAssembler) {
 				for _, elem := range elems {
 					la.AssembleValue().AssignNode(elem)
@@ -189,7 +189,7 @@ func ipldMapGen(depth int) *rapid.Generator {
 		).Draw(t, "IPLD map keys").([]string)
 		return fluent.MustBuildMap(
 			basicnode.Prototype.Map,
-			len(keys),
+			int64(len(keys)),
 			func(ma fluent.MapAssembler) {
 				for _, key := range keys {
 					value := ipldNodeGen(depth-1).Draw(t, "an IPLD map value").(ipld.Node)
@@ -352,14 +352,14 @@ func normalizeJoseForJsonComparison(d *DagJOSE) {
 // This is used by the `normalizeJoseForJsonComparison` function to normalize
 // the arbitrary IPLD structures in the headers of JWE and JWS objects
 func normalizeIpldNode(n ipld.Node) ipld.Node {
-	switch n.ReprKind() {
-	case ipld.ReprKind_Int:
+	switch n.Kind() {
+	case ipld.Kind_Int:
 		asInt, err := n.AsInt()
 		if err != nil {
 			panic(fmt.Errorf("normalizeIpldNode error calling AsInt: %v", err))
 		}
 		return basicnode.NewFloat(float64(asInt))
-	case ipld.ReprKind_Map:
+	case ipld.Kind_Map:
 		mapIterator := n.MapIterator()
 		if mapIterator == nil {
 			panic(fmt.Errorf("normalizeIpldNode nil MapIterator returned from map node"))
@@ -395,7 +395,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 				}
 			},
 		)
-	case ipld.ReprKind_List:
+	case ipld.Kind_List:
 		listIterator := n.ListIterator()
 		if listIterator == nil {
 			panic(fmt.Errorf("convertIntNodesToFlaot nil ListIterator returned from list node"))

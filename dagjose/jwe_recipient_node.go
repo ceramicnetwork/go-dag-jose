@@ -9,14 +9,14 @@ import (
 
 type jweRecipientNode struct{ *jweRecipient }
 
-func (r jweRecipientNode) ReprKind() ipld.ReprKind {
-	return ipld.ReprKind_Map
+func (r jweRecipientNode) Kind() ipld.Kind {
+	return ipld.Kind_Map
 }
 func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "header" {
 		return fluent.MustBuildMap(
 			basicnode.Prototype.Map,
-			len(r.header),
+			int64(len(r.header)),
 			func(ma fluent.MapAssembler) {
 				for key, value := range r.header {
 					ma.AssembleEntry(key).AssignNode(value)
@@ -36,7 +36,7 @@ func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	}
 	return r.LookupByString(str)
 }
-func (r jweRecipientNode) LookupByIndex(idx int) (ipld.Node, error) {
+func (r jweRecipientNode) LookupByIndex(idx int64) (ipld.Node, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.LookupByIndex(idx)
 }
 func (r jweRecipientNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
@@ -48,7 +48,7 @@ func (r jweRecipientNode) MapIterator() ipld.MapIterator {
 func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
-func (r jweRecipientNode) Length() int {
+func (r jweRecipientNode) Length() int64 {
 	if r.encrypted_key == nil && r.header == nil {
 		return 0
 	}
@@ -66,7 +66,7 @@ func (r jweRecipientNode) IsNull() bool {
 func (r jweRecipientNode) AsBool() (bool, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBool()
 }
-func (r jweRecipientNode) AsInt() (int, error) {
+func (r jweRecipientNode) AsInt() (int64, error) {
 	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsInt()
 }
 func (r jweRecipientNode) AsFloat() (float64, error) {

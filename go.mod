@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/google/go-cmp v0.5.2 // indirect
 	github.com/ipfs/go-cid v0.0.7
-	github.com/ipld/go-ipld-prime v0.5.0
+	github.com/ipld/go-ipld-prime v0.7.0
 	github.com/multiformats/go-multihash v0.0.13
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.6.1

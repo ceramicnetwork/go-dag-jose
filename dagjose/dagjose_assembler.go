@@ -50,13 +50,13 @@ type dagJOSENodeBuilder struct {
 
 var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
 
-func (d *dagJOSENodeBuilder) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
+func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
 	return d, nil
 }
-func (d *dagJOSENodeBuilder) BeginList(sizeHint int) (ipld.ListAssembler, error) {
+func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
 	if d.state == maState_midValue && *d.key == "recipients" {
 		d.dagJose.recipients = make([]jweRecipient, 0, sizeHint)
 		d.state = maState_initial
@@ -101,7 +101,7 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
 	return dagJoseMixin.AssignBool(b)
 }
-func (d *dagJOSENodeBuilder) AssignInt(i int) error {
+func (d *dagJOSENodeBuilder) AssignInt(i int64) error {
 	return dagJoseMixin.AssignInt(i)
 }
 func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
@@ -158,8 +158,8 @@ func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 	if d.state != maState_initial {
 		panic("misuse")
 	}
-	if n.ReprKind() != ipld.ReprKind_Map {
-		return ipld.ErrWrongKind{TypeName: "map", MethodName: "AssignNode", AppropriateKind: ipld.ReprKindSet_JustMap, ActualKind: n.ReprKind()}
+	if n.Kind() != ipld.Kind_Map {
+		return ipld.ErrWrongKind{TypeName: "map", MethodName: "AssignNode", AppropriateKind: ipld.KindSet_JustMap, ActualKind: n.Kind()}
 	}
 	itr := n.MapIterator()
 	for !itr.Done() {

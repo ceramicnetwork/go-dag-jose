@@ -380,7 +380,7 @@ func (d *DagJWE) asJson() map[string]interface{} {
 func goPrimitiveToIpldBasicNode(value interface{}) (ipld.Node, error) {
 	switch v := value.(type) {
 	case int:
-		return basicnode.NewInt(v), nil
+		return basicnode.NewInt(int64(v)), nil
 	case float32:
 		return basicnode.NewFloat(float64(v)), nil
 	case float64:
@@ -396,7 +396,7 @@ func goPrimitiveToIpldBasicNode(value interface{}) (ipld.Node, error) {
 		// be meaningful in IPLD, so we specify that the map is in key order
 		return fluent.MustBuildMap(
 			basicnode.Prototype.Map,
-			len(v),
+			int64(len(v)),
 			func(ma fluent.MapAssembler) {
 				type kv struct {
 					key   string
@@ -421,7 +421,7 @@ func goPrimitiveToIpldBasicNode(value interface{}) (ipld.Node, error) {
 	case []interface{}:
 		return fluent.MustBuildList(
 			basicnode.Prototype.List,
-			len(v),
+			int64(len(v)),
 			func(la fluent.ListAssembler) {
 				for _, v := range v {
 					value, err := goPrimitiveToIpldBasicNode(v)
@@ -440,26 +440,26 @@ func goPrimitiveToIpldBasicNode(value interface{}) (ipld.Node, error) {
 }
 
 func ipldNodeToGo(node ipld.Node) (interface{}, error) {
-	switch node.ReprKind() {
-	case ipld.ReprKind_Bool:
+	switch node.Kind() {
+	case ipld.Kind_Bool:
 		return node.AsBool()
-	case ipld.ReprKind_Bytes:
+	case ipld.Kind_Bytes:
 		return node.AsBytes()
-	case ipld.ReprKind_Int:
+	case ipld.Kind_Int:
 		return node.AsInt()
-	case ipld.ReprKind_Float:
+	case ipld.Kind_Float:
 		return node.AsFloat()
-	case ipld.ReprKind_String:
+	case ipld.Kind_String:
 		return node.AsString()
-	case ipld.ReprKind_Link:
+	case ipld.Kind_Link:
 		lnk, err := node.AsLink()
 		if err != nil {
-			return nil, fmt.Errorf("ipldNodeToGo: error parsing node as link even thought reprkind is link: %v", err)
+			return nil, fmt.Errorf("ipldNodeToGo: error parsing node as link even thought kind is link: %v", err)
 		}
 		return map[string]string{
 			"/": lnk.String(),
 		}, nil
-	case ipld.ReprKind_Map:
+	case ipld.Kind_Map:
 		mapIterator := node.MapIterator()
 		if mapIterator == nil {
 			return nil, fmt.Errorf("ipldNodeToGo: nil MapIterator returned from map node")
@@ -481,10 +481,10 @@ func ipldNodeToGo(node ipld.Node) (interface{}, error) {
 			result[key] = goVal
 		}
 		return result, nil
-	case ipld.ReprKind_List:
+	case ipld.Kind_List:
 		listIterator := node.ListIterator()
 		if listIterator == nil {
-			return nil, fmt.Errorf("ipldNodeToGo: nil listiterator returned from node with list reprkind")
+			return nil, fmt.Errorf("ipldNodeToGo: nil listiterator returned from node with list kind")
 		}
 		result := make([]interface{}, 0)
 		for !listIterator.Done() {
@@ -499,9 +499,9 @@ func ipldNodeToGo(node ipld.Node) (interface{}, error) {
 			result = append(result, val)
 		}
 		return result, nil
-	case ipld.ReprKind_Null:
+	case ipld.Kind_Null:
 		return nil, nil
 	default:
-		return nil, fmt.Errorf("ipldNodeToGo: Unknown ipld node reprkind: %s", node.ReprKind().String())
+		return nil, fmt.Errorf("ipldNodeToGo: Unknown ipld node kind: %s", node.Kind().String())
 	}
 }

@@ -16,7 +16,7 @@ type jwsSignatureAssembler struct {
 
 var jwsSignatureMixin = mixins.MapAssembler{TypeName: "JWSSignature"}
 
-func (j *jwsSignatureAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error) {
+func (j *jwsSignatureAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if j.state == maState_midValue && *j.key == "header" {
 		j.signature.header = make(map[string]ipld.Node)
 		j.state = maState_initial
@@ -31,7 +31,7 @@ func (j *jwsSignatureAssembler) BeginMap(sizeHint int) (ipld.MapAssembler, error
 	}
 	return j, nil
 }
-func (j *jwsSignatureAssembler) BeginList(sizeHint int) (ipld.ListAssembler, error) {
+func (j *jwsSignatureAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
 	return jwsSignatureMixin.BeginList(sizeHint)
 }
 func (j *jwsSignatureAssembler) AssignNull() error {
@@ -53,7 +53,7 @@ func (j *jwsSignatureAssembler) AssignNull() error {
 func (j *jwsSignatureAssembler) AssignBool(b bool) error {
 	return jwsSignatureMixin.AssignBool(b)
 }
-func (j *jwsSignatureAssembler) AssignInt(i int) error {
+func (j *jwsSignatureAssembler) AssignInt(i int64) error {
 	return jwsSignatureMixin.AssignInt(i)
 }
 func (j *jwsSignatureAssembler) AssignFloat(f float64) error {
