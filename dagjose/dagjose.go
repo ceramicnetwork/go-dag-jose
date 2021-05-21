@@ -74,4 +74,3 @@ func (d *DagJWE) AsJOSE() *DagJOSE {
 func (d *DagJWS) PayloadLink() ipld.Link {
 	return cidlink.Link{Cid: *d.dagjose.payload}
 }
-
