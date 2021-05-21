@@ -1,4 +1,4 @@
-module github.com/alexjg/go-dag-jose
+module github.com/Geo25rey/go-dag-jose
 
 go 1.14
 
