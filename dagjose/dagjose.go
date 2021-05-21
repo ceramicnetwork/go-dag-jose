@@ -1,8 +1,6 @@
 package dagjose
 
 import (
-	"context"
-
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
@@ -77,37 +75,3 @@ func (d *DagJWS) PayloadLink() ipld.Link {
 	return cidlink.Link{Cid: *d.dagjose.payload}
 }
 
-// This exposes a similar interface to the cidlink.LinkBuilder from go-ipld-prime. It's primarily a convenience
-// function so you don't have to specify the codec version yourself
-func BuildJOSELink(ctx context.Context, linkContext ipld.LinkContext, jose *DagJOSE, storer ipld.Storer) (ipld.Link, error) {
-	lb := cidlink.LinkBuilder{Prefix: cid.Prefix{
-		Version:  1,    // Usually '1'.
-		Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-		MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-		MhLength: 48,   // sha3-224 hash has a 48-byte sum.
-	}}
-	return lb.Build(
-		ctx,
-		linkContext,
-		jose.AsNode(),
-		storer,
-	)
-}
-
-// LoadJOSE is a convenience function which wraps ipld.Link.Load. This will provide the dagjose.NodeBuilder
-// to the link and attempt to cast the result to a DagJOSE object
-func LoadJOSE(lnk ipld.Link, ctx context.Context, linkContext ipld.LinkContext, loader ipld.Loader) (*DagJOSE, error) {
-	builder := NewBuilder()
-	err := lnk.Load(
-		ctx,
-		linkContext,
-		builder,
-		loader,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	n := builder.Build()
-	return n.(dagJOSENode).DagJOSE, nil
-}
