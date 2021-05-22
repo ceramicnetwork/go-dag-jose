@@ -1,17 +1,13 @@
 package dagjose
 
 import (
-	"bytes"
-	"context"
 	"fmt"
-	"io"
 	"sort"
 	"testing"
 
 	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/require"
@@ -418,65 +414,6 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 	}
 }
 
-// Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
-func roundTripJose(j *DagJOSE) *DagJOSE {
-	buf := bytes.Buffer{}
-	link, err := BuildJOSELink(
-		context.Background(),
-		ipld.LinkContext{},
-		j,
-		func(ipld.LinkContext) (io.Writer, ipld.StoreCommitter, error) {
-			return &buf, func(l ipld.Link) error { return nil }, nil
-		},
-	)
-	if err != nil {
-		panic(fmt.Errorf("error storing DagJOSE: %v", err))
-	}
-	jose, err := LoadJOSE(
-		link,
-		context.Background(),
-		ipld.LinkContext{},
-		func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
-			return bytes.NewBuffer(buf.Bytes()), nil
-		},
-	)
-	if err != nil {
-		panic(fmt.Errorf("error reading data from datastore: %v", err))
-	}
-	return jose
-}
-
-// Check that if we encode and decode a valid JWS object then the
-// output is equal to the input (up to ipld normalization)
-func TestRoundTripValidJWS(t *testing.T) {
-	rapid.Check(t, func(t *rapid.T) {
-		validJws := validJWSGen().Draw(t, "valid JWS").(ValidJWS)
-		roundTripped := roundTripJose(validJws.dagJose.AsJOSE()).AsJWS()
-		require.Equal(t, validJws.dagJose, roundTripped)
-	})
-}
-
-// Check that if we encode and decode an arbitrary JOSE object then the
-// output is equal to the input (up to ipld normalization)
-func TestRoundTripArbitraryJOSE(t *testing.T) {
-	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
-		roundTripped := roundTripJose(jose)
-		require.Equal(t, jose, roundTripped)
-	})
-}
-
-// Decoding should always return either a JWS or a JWE if the input is valid
-func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
-	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
-		roundTripped := roundTripJose(jose)
-		if roundTripped.AsJWE() == nil {
-			require.NotNil(t, roundTripped.AsJWS())
-		}
-	})
-}
-
 // If we parse the JSON serialization of a JWS then the output should equal
 // the input
 func TestJSONSerializationJWS(t *testing.T) {
@@ -570,53 +507,6 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 		}
 		normalizeJoseForJsonComparison(jwe.AsJOSE())
 		require.Equal(t, jwe, parsedJose)
-	})
-}
-
-// If the incoming IPLD data contains a payload which is not a valid CID we
-// should raise an error
-func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
-	rapid.Check(t, func(t *rapid.T) {
-		payload := nonNilSliceOfBytes().Filter(func(payloadBytes []byte) bool {
-			_, _, err := cid.CidFromBytes(payloadBytes)
-			return err != nil
-		}).Draw(t, "A slice of bytes which is not a valid CID").([]byte)
-		node := fluent.MustBuildMap(
-			basicnode.Prototype.Map,
-			2,
-			func(ma fluent.MapAssembler) {
-				ma.AssembleEntry("payload").AssignBytes(payload)
-			},
-		)
-		buf := bytes.Buffer{}
-		lb := cidlink.LinkBuilder{Prefix: cid.Prefix{
-			Version:  1,    // Usually '1'.
-			Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-			MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-			MhLength: 48,   // sha3-224 hash has a 48-byte sum.
-		}}
-		link, err := lb.Build(
-			context.Background(),
-			ipld.LinkContext{},
-			node,
-			func(ipld.LinkContext) (io.Writer, ipld.StoreCommitter, error) {
-				return &buf, func(l ipld.Link) error { return nil }, nil
-			},
-		)
-		if err != nil {
-			t.Errorf("Error creating link to invalid payload node: %v", err)
-			return
-		}
-		_, err = LoadJOSE(
-			link,
-			context.Background(),
-			ipld.LinkContext{},
-			func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
-				return bytes.NewBuffer(buf.Bytes()), nil
-			},
-		)
-		require.NotNil(t, err)
-		require.Contains(t, err.Error(), "payload is not a valid CID")
 	})
 }
 
