@@ -2,10 +2,10 @@ package dagjose
 
 import (
 	dagcbor "github.com/ipld/go-ipld-prime/codec/dagcbor"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
+	multicodec "github.com/ipld/go-ipld-prime/multicodec"
 )
 
 func init() {
-	cidlink.RegisterMulticodecDecoder(0x85, dagcbor.Decoder)
-	cidlink.RegisterMulticodecEncoder(0x85, dagcbor.Encoder)
+	multicodec.RegisterDecoder(0x85, dagcbor.Decode)
+	multicodec.RegisterEncoder(0x85, dagcbor.Encode)
 }

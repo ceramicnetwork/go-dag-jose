@@ -1,7 +1,6 @@
 package dagjose_test
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/alexjg/go-dag-jose/dagjose"
@@ -19,11 +18,12 @@ func Example_read() {
 	// cidlink.Link is an implementation of `ipld.Link` backed by a CID
 	jwsLnk := cidlink.Link{Cid: jwsCid}
 
+	ls := cidlink.DefaultLinkSystem()
+
 	jose, err := dagjose.LoadJOSE(
 		jwsLnk,
-		context.Background(),
 		ipld.LinkContext{},
-		nil, //<an implementation of ipld.Loader, which knows how to get the block data from IPFS>,
+		ls, //<an implementation of ipld.Loader, which knows how to get the block data from IPFS>,
 	)
 	if err != nil {
 		panic(err)
@@ -41,11 +41,11 @@ func Example_write() {
 	if err != nil {
 		panic(err)
 	}
-	link, err := dagjose.BuildJOSELink(
-		context.Background(),
+	ls := cidlink.DefaultLinkSystem()
+	link, err := dagjose.StoreJOSE(
 		ipld.LinkContext{},
 		dagJws.AsJOSE(),
-		nil, // <an implementation of `ipld.Storer` which knows how to store the raw block data>
+		ls,
 	)
 	if err != nil {
 		panic(err)

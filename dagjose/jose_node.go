@@ -102,7 +102,7 @@ func (d dagJOSENode) AsLink() (ipld.Link, error) {
 	return nil, nil
 }
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
-	return nil
+	return &DagJOSENodePrototype{}
 }
 
 // end ipld.Node implementation

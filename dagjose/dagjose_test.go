@@ -2,7 +2,6 @@ package dagjose
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"sort"
@@ -421,24 +420,26 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 // Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
-	link, err := BuildJOSELink(
-		context.Background(),
+	ls := cidlink.DefaultLinkSystem()
+	ls.StorageWriteOpener = func(lnkCtx ipld.LinkContext) (io.Writer, ipld.BlockWriteCommitter, error) {
+		return &buf, func(lnk ipld.Link) error { return nil }, nil
+	}
+	ls.StorageReadOpener = func(lnkCtx ipld.LinkContext, lnk ipld.Link) (io.Reader, error) {
+		return bytes.NewReader(buf.Bytes()), nil
+	}
+
+	link, err := StoreJOSE(
 		ipld.LinkContext{},
 		j,
-		func(ipld.LinkContext) (io.Writer, ipld.StoreCommitter, error) {
-			return &buf, func(l ipld.Link) error { return nil }, nil
-		},
+		ls,
 	)
 	if err != nil {
 		panic(fmt.Errorf("error storing DagJOSE: %v", err))
 	}
 	jose, err := LoadJOSE(
 		link,
-		context.Background(),
 		ipld.LinkContext{},
-		func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
-			return bytes.NewBuffer(buf.Bytes()), nil
-		},
+		ls,
 	)
 	if err != nil {
 		panic(fmt.Errorf("error reading data from datastore: %v", err))
@@ -589,19 +590,17 @@ func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
 			},
 		)
 		buf := bytes.Buffer{}
-		lb := cidlink.LinkBuilder{Prefix: cid.Prefix{
-			Version:  1,    // Usually '1'.
-			Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-			MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-			MhLength: 48,   // sha3-224 hash has a 48-byte sum.
-		}}
-		link, err := lb.Build(
-			context.Background(),
+		ls := cidlink.DefaultLinkSystem()
+		ls.StorageWriteOpener = func(lnkCtx ipld.LinkContext) (io.Writer, ipld.BlockWriteCommitter, error) {
+			return &buf, func(lnk ipld.Link) error { return nil }, nil
+		}
+		ls.StorageReadOpener = func(lnkCtx ipld.LinkContext, lnk ipld.Link) (io.Reader, error) {
+			return bytes.NewReader(buf.Bytes()), nil
+		}
+		link, err := ls.Store(
 			ipld.LinkContext{},
+			LinkPrototype,
 			node,
-			func(ipld.LinkContext) (io.Writer, ipld.StoreCommitter, error) {
-				return &buf, func(l ipld.Link) error { return nil }, nil
-			},
 		)
 		if err != nil {
 			t.Errorf("Error creating link to invalid payload node: %v", err)
@@ -609,11 +608,8 @@ func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
 		}
 		_, err = LoadJOSE(
 			link,
-			context.Background(),
 			ipld.LinkContext{},
-			func(l ipld.Link, _ ipld.LinkContext) (io.Reader, error) {
-				return bytes.NewBuffer(buf.Bytes()), nil
-			},
+			ls,
 		)
 		require.NotNil(t, err)
 		require.Contains(t, err.Error(), "payload is not a valid CID")

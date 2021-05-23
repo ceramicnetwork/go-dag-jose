@@ -6,10 +6,7 @@ An implementation of the [`dag-jose`](https://github.com/ipld/specs/pull/269) mu
 
 To read a JWS from IPFS:
 
-```go
-import (
-    "github.com/alexjg/dagjose" 
-    cidlink "github.com/ipld/go-ipld-prime/linking/cid"
+```go import ( "github.com/alexjg/dagjose" cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 // Here we're creating a `CID` which points to a JWS
 jwsCid, err := cid.Decode(
@@ -54,3 +51,9 @@ if err != nil {
 }
 fmt.Printf("Link is: %v", link)
 ```
+
+## Changelog
+
+This project attempts to stay up to date with changes in `go-ipld-prime`, this
+means somewhat frequent API breakage as `go-ipld-prime` is not yet stable. 
+See [the changelog](./CHANGELOG.md).
