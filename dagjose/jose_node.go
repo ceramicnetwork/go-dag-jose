@@ -1,8 +1,12 @@
 package dagjose
 
 import (
+	"errors"
+	"fmt"
+
 	ipld "github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
+	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
@@ -13,28 +17,34 @@ func (d dagJOSENode) Kind() ipld.Kind {
 }
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
+		if d.payload == nil {
+			return keyOrNotFound(key, nil)
+		}
 		return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
 	}
 	if key == "signatures" {
+		if d.signatures == nil {
+			return keyOrNotFound(key, nil)
+		}
 		return &jwsSignaturesNode{d.signatures}, nil
 	}
 	if key == "protected" {
-		return bytesOrNil(d.protected), nil
+		return bytesOrNotFound(key, d.protected)
 	}
 	if key == "unprotected" {
-		return bytesOrNil(d.unprotected), nil
+		return bytesOrNotFound(key, d.unprotected)
 	}
 	if key == "iv" {
-		return bytesOrNil(d.iv), nil
+		return bytesOrNotFound(key, d.iv)
 	}
 	if key == "aad" {
-		return bytesOrNil(d.aad), nil
+		return bytesOrNotFound(key, d.aad)
 	}
 	if key == "ciphertext" {
-		return bytesOrNil(d.ciphertext), nil
+		return bytesOrNotFound(key, d.ciphertext)
 	}
 	if key == "tag" {
-		return bytesOrNil(d.tag), nil
+		return bytesOrNotFound(key, d.tag)
 	}
 	if key == "recipients" {
 		if d.recipients != nil {
@@ -48,9 +58,9 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 				},
 			), nil
 		}
-		return nil, nil
+		return keyOrNotFound(key, nil)
 	}
-	return nil, nil
+	return nil, fmt.Errorf("the key \"%v\" is not in dag-jose nodes", key)
 }
 func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	ks, err := key.AsString()
@@ -60,7 +70,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(ks)
 }
 func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return nil, nil
+	return nil, errors.New("can not lookup by index in of a map")
 }
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
@@ -107,12 +117,15 @@ func (d dagJOSENode) Prototype() ipld.NodePrototype {
 
 // end ipld.Node implementation
 
-func bytesOrNil(value []byte) ipld.Node {
+func bytesOrNotFound(key string, b []byte) (ipld.Node, error) {
+	return keyOrNotFound(key, ipldBasicNode.NewBytes(b))
+}
+
+func keyOrNotFound(key string, value ipld.Node) (ipld.Node, error) {
 	if value != nil {
-		return ipldBasicNode.NewBytes(value)
-	} else {
-		return ipld.Absent
+		return value, nil
 	}
+	return nil, fmt.Errorf("the key \"%v\" is not in this dag-jose node", key)
 }
 
 type dagJOSEMapIterator struct {
