@@ -6,7 +6,6 @@ import (
 
 	ipld "github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
