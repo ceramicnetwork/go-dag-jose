@@ -22,12 +22,6 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 		}
 		return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
 	}
-	if key == "link" {
-		if d.payload == nil {
-			return keyOrNotFound(key, nil)
-		}
-		return ipldBasicNode.NewLink(cidlink.Link{Cid: *(d.payload)}), nil
-	}
 	if key == "signatures" {
 		if d.signatures == nil {
 			return keyOrNotFound(key, nil)
@@ -158,7 +152,6 @@ func (d *dagJOSEMapIterator) presentKeys() []string {
 	result := make([]string, 0)
 	if d.d.payload != nil {
 		result = append(result, "payload")
-		result = append(result, "link")
 	}
 	if d.d.signatures != nil {
 		result = append(result, "signatures")
