@@ -2,6 +2,7 @@ package dagjose
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
@@ -152,6 +153,11 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	return dagJoseMixin.AssignBytes(b)
 }
 func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
+	if strings.Compare(*d.key, "link") == 0 {
+		// ignore link property
+		d.state = maState_initial
+		return nil
+	}
 	return dagJoseMixin.AssignLink(l)
 }
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
