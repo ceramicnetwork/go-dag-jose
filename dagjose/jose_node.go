@@ -158,7 +158,6 @@ func (d *dagJOSEMapIterator) presentKeys() []string {
 	result := make([]string, 0)
 	if d.d.payload != nil {
 		result = append(result, "payload")
-		result = append(result, "link")
 	}
 	if d.d.signatures != nil {
 		result = append(result, "signatures")
