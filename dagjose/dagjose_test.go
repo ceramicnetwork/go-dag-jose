@@ -463,6 +463,8 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
 		roundTripped := roundTripJose(jose)
+		normalizeJoseForJsonComparison(jose)
+		normalizeJoseForJsonComparison(roundTripped)
 		require.Equal(t, jose, roundTripped)
 	})
 }
