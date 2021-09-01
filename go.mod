@@ -1,6 +1,6 @@
-module github.com/alexjg/go-dag-jose
+module github.com/ceramicnetwork/go-dag-jose
 
-go 1.14
+go 1.16
 
 require (
 	github.com/ipfs/go-cid v0.0.7
