@@ -3,7 +3,7 @@ package dagjose_test
 import (
 	"fmt"
 
-	"github.com/alexjg/go-dag-jose/dagjose"
+	"github.com/ceramicnetwork/go-dag-jose/dagjose"
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
