@@ -8,7 +8,8 @@ To read a JWS from IPFS:
 
 ```go 
 import ( 
-    "github.com/alexjg/dagjose" cidlink "github.com/ipld/go-ipld-prime/linking/cid"
+    "github.com/ceramicnetwork/dagjose"
+    "github.com/ipld/go-ipld-prime/linking/cid"
 )
 // Here we're creating a `CID` which points to a JWS
 jwsCid, err := cid.Decode("some cid")
