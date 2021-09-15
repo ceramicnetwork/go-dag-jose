@@ -6,8 +6,8 @@ import (
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
-// This is a union of the DagJWE and DagJWS types. Typically you will want to
-// use AsJWE and AsJWS to get a concrete JOSE object.
+// DagJOSE is a union of the DagJWE and DagJWS types. Typically, you will want
+// to use AsJWE and AsJWS to get a concrete JOSE object.
 type DagJOSE struct {
 	// JWS top level keys
 	payload    *cid.Cid
@@ -37,8 +37,8 @@ func (d *DagJOSE) AsNode() ipld.Node {
 	return dagJOSENode{d}
 }
 
-// If this jose object is a JWS then this will return a DagJWS, if it is a
-// JWE then AsJWS will return nil
+// AsJWS will return a DagJWS if this jose object is a JWS, or nil if it is a
+// JWE
 func (d *DagJOSE) AsJWS() *DagJWS {
 	if d.payload != nil {
 		return &DagJWS{dagjose: d}
@@ -46,8 +46,8 @@ func (d *DagJOSE) AsJWS() *DagJWS {
 	return nil
 }
 
-// If this jose object is a JWE then this will return a DagJWE, if it is a
-// JWS then AsJWE will return nil
+// AsJWE will return a DagJWE if this jose object is a JWE, or nil if it is a
+// JWS
 func (d *DagJOSE) AsJWE() *DagJWE {
 	if d.ciphertext != nil {
 		return &DagJWE{dagjose: d}
@@ -57,16 +57,16 @@ func (d *DagJOSE) AsJWE() *DagJWE {
 
 type DagJWS struct{ dagjose *DagJOSE }
 
-// Returns a DagJOSE object that implements ipld.Node and can be passed to
-// ipld related infrastructure
+// AsJOSE returns a DagJOSE object that implements ipld.Node and can be passed
+// to ipld related infrastructure
 func (d *DagJWS) AsJOSE() *DagJOSE {
 	return d.dagjose
 }
 
 type DagJWE struct{ dagjose *DagJOSE }
 
-// Returns a DagJOSE object that implements ipld.Node and can be passed to
-// ipld related infrastructure
+// AsJOSE returns a DagJOSE object that implements ipld.Node and can be passed
+// to ipld related infrastructure
 func (d *DagJWE) AsJOSE() *DagJOSE {
 	return d.dagjose
 }
@@ -75,17 +75,17 @@ func (d *DagJWS) PayloadLink() ipld.Link {
 	return cidlink.Link{Cid: *d.dagjose.payload}
 }
 
-// A link prototype which will build CIDs using the dag-jose multicodec and
-// the sha-384 multihash
+// LinkPrototype will build CIDs using the dag-jose multicodec and the sha-384
+// multihash
 var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 	Version:  1,    // Usually '1'.
-	Codec:    0x85, // 0x71 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
+	Codec:    0x85, // 0x85 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
 	MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
 	MhLength: 48,   // sha3-224 hash has a 48-byte sum.
 }}
 
-// A convenience function which passes the correct dagjose.LinkProtoype append
-// jose.AsNode() to ipld.LinkSystem.Store
+// StoreJOSE is a convenience function which passes the correct
+// dagjose.LinkPrototype append jose.AsNode() to ipld.LinkSystem.Store
 func StoreJOSE(linkContext ipld.LinkContext, jose *DagJOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
 	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
 }

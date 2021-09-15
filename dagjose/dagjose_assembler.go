@@ -2,6 +2,7 @@ package dagjose
 
 import (
 	"fmt"
+	"github.com/ipld/go-ipld-prime/datamodel"
 
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
@@ -12,7 +13,7 @@ import (
 var (
 	_ ipld.Node          = dagJOSENode{}
 	_ ipld.NodePrototype = &DagJOSENodePrototype{}
-	_ ipld.NodeAssembler = &dagJOSENodeBuilder{}
+	_ ipld.NodeBuilder   = &dagJOSENodeBuilder{}
 )
 
 type DagJOSENodePrototype struct{}
@@ -21,10 +22,10 @@ func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
-// Returns an instance of the DagJOSENodeBuilder which can be passed to
-// ipld.Link.Load and will build a dagjose.DagJOSE object. This should only be
-// neccesary in reasonably advanced situations, most of the time you should be
-// able to use dagjose.LoadJOSE
+// NewBuilder Returns an instance of the DagJOSENodeBuilder which can be passed
+// to ipld.Link.Load and will build a dagjose.DagJOSE object. This should only
+// be necessary in reasonably advanced situations, most of the time you should
+// be able to use dagjose.LoadJOSE.
 func NewBuilder() ipld.NodeBuilder {
 	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
@@ -36,7 +37,7 @@ const (
 	maState_midKey                     // waiting for a 'finished' state in the KeyAssembler.
 	maState_expectValue                // 'AssembleValue' is the only valid next step
 	maState_midValue                   // waiting for a 'finished' state in the ValueAssembler.
-	maState_finished                   // finised
+	maState_finished                   // finished
 )
 
 // An implementation of `ipld.NodeBuilder` which builds a `dagjose.DagJOSE`
@@ -110,7 +111,7 @@ func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
 	if d.state == maState_midKey {
 		if !isValidJOSEKey(s) {
-			return fmt.Errorf("Attempted to assign an invalid JOSE key: %v", s)
+			return fmt.Errorf("attempted to assign an invalid JOSE key: %v", s)
 		}
 		d.key = &s
 		d.state = maState_expectValue
@@ -122,11 +123,11 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	if d.state == maState_midValue {
 		switch *d.key {
 		case "payload":
-			_, cid, err := cid.CidFromBytes(b)
+			_, c, err := cid.CidFromBytes(b)
 			if err != nil {
 				return fmt.Errorf("payload is not a valid CID: %v", err)
 			}
-			d.dagJose.payload = &cid
+			d.dagJose.payload = &c
 		case "protected":
 			d.dagJose.protected = b
 		case "unprotected":
@@ -155,26 +156,11 @@ func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
 	return dagJoseMixin.AssignLink(l)
 }
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
-	if d.state != maState_initial {
-		panic("misuse")
+	err := datamodel.Copy(n, d)
+	if err != nil {
+		return err
 	}
-	if n.Kind() != ipld.Kind_Map {
-		return ipld.ErrWrongKind{TypeName: "map", MethodName: "AssignNode", AppropriateKind: ipld.KindSet_JustMap, ActualKind: n.Kind()}
-	}
-	itr := n.MapIterator()
-	for !itr.Done() {
-		k, v, err := itr.Next()
-		if err != nil {
-			return err
-		}
-		if err := d.AssembleKey().AssignNode(k); err != nil {
-			return err
-		}
-		if err := d.AssembleValue().AssignNode(v); err != nil {
-			return err
-		}
-	}
-	return d.Finish()
+	return nil
 }
 func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}

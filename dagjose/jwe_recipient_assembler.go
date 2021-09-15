@@ -2,6 +2,7 @@ package dagjose
 
 import (
 	"fmt"
+	"github.com/ipld/go-ipld-prime/datamodel"
 
 	ipld "github.com/ipld/go-ipld-prime"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
@@ -83,7 +84,11 @@ func (j *jweRecipientAssembler) AssignLink(l ipld.Link) error {
 	return jweRecipientMixin.AssignLink(l)
 }
 func (j *jweRecipientAssembler) AssignNode(n ipld.Node) error {
-	return fmt.Errorf("not implemented")
+	err := datamodel.Copy(n, j)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 func (j *jweRecipientAssembler) Prototype() ipld.NodePrototype {
 	return basicnode.Prototype.Map

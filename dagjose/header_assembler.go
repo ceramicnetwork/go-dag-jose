@@ -143,7 +143,7 @@ func (h *headerAssembler) AssignNode(n ipld.Node) error {
 		h.valueBuilder = nil
 		return nil
 	}
-	return fmt.Errorf("Attempted to assign node on header in bad state")
+	return fmt.Errorf("attempted to assign node on header in bad state")
 }
 func (h *headerAssembler) Prototype() ipld.NodePrototype {
 	return basicnode.Prototype.Map
