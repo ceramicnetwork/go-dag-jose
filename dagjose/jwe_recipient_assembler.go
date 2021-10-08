@@ -2,10 +2,10 @@ package dagjose
 
 import (
 	"fmt"
-	"github.com/ipld/go-ipld-prime/datamodel"
 
-	ipld "github.com/ipld/go-ipld-prime"
-	basicnode "github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
+	"github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
@@ -84,11 +84,7 @@ func (j *jweRecipientAssembler) AssignLink(l ipld.Link) error {
 	return jweRecipientMixin.AssignLink(l)
 }
 func (j *jweRecipientAssembler) AssignNode(n ipld.Node) error {
-	err := datamodel.Copy(n, j)
-	if err != nil {
-		return err
-	}
-	return nil
+	return datamodel.Copy(n, j)
 }
 func (j *jweRecipientAssembler) Prototype() ipld.NodePrototype {
 	return basicnode.Prototype.Map

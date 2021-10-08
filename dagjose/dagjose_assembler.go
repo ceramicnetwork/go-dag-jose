@@ -2,11 +2,11 @@ package dagjose
 
 import (
 	"fmt"
-	"github.com/ipld/go-ipld-prime/datamodel"
 
 	"github.com/ipfs/go-cid"
-	ipld "github.com/ipld/go-ipld-prime"
-	basicnode "github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
+	"github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
@@ -156,11 +156,7 @@ func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
 	return dagJoseMixin.AssignLink(l)
 }
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
-	err := datamodel.Copy(n, d)
-	if err != nil {
-		return err
-	}
-	return nil
+	return datamodel.Copy(n, d)
 }
 func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}

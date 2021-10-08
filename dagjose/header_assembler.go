@@ -1,10 +1,9 @@
 package dagjose
 
 import (
-	"fmt"
-
-	ipld "github.com/ipld/go-ipld-prime"
-	basicnode "github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
+	"github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
@@ -127,23 +126,7 @@ func (h *headerAssembler) AssignLink(l ipld.Link) error {
 	return headerMixin.AssignLink(l)
 }
 func (h *headerAssembler) AssignNode(n ipld.Node) error {
-	if h.state == maState_midKey {
-		k, err := n.AsString()
-		if err != nil {
-			return fmt.Errorf("cannot get string from key: %v", err)
-		}
-		h.key = &k
-		h.state = maState_expectValue
-		return nil
-	}
-	if h.state == maState_midValue {
-		h.header[*h.key] = n
-		h.state = maState_initial
-		h.key = nil
-		h.valueBuilder = nil
-		return nil
-	}
-	return fmt.Errorf("attempted to assign node on header in bad state")
+	return datamodel.Copy(n, h)
 }
 func (h *headerAssembler) Prototype() ipld.NodePrototype {
 	return basicnode.Prototype.Map

@@ -1,9 +1,9 @@
 package dagjose
 
 import (
-	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
-	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime/node/basic"
 )
 
 type dagJOSENode struct{ *DagJOSE }
@@ -13,7 +13,7 @@ func (d dagJOSENode) Kind() ipld.Kind {
 }
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
-		return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
+		return basicnode.NewBytes(d.payload.Bytes()), nil
 	}
 	if key == "signatures" {
 		return &jwsSignaturesNode{d.signatures}, nil
@@ -39,7 +39,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "recipients" {
 		if d.recipients != nil {
 			return fluent.MustBuildList(
-				ipldBasicNode.Prototype.List,
+				basicnode.Prototype.List,
 				int64(len(d.recipients)),
 				func(la fluent.ListAssembler) {
 					for i := range d.recipients {
@@ -109,7 +109,7 @@ func (d dagJOSENode) Prototype() ipld.NodePrototype {
 
 func bytesOrNil(value []byte) ipld.Node {
 	if value != nil {
-		return ipldBasicNode.NewBytes(value)
+		return basicnode.NewBytes(value)
 	} else {
 		return ipld.Absent
 	}
@@ -128,7 +128,7 @@ func (d *dagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	key := presentKeys[d.index]
 	value, _ := d.d.LookupByString(key)
 	d.index += 1
-	return ipldBasicNode.NewString(key), value, nil
+	return basicnode.NewString(key), value, nil
 }
 
 func (d *dagJOSEMapIterator) Done() bool {

@@ -6,11 +6,10 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/ipld/go-ipld-prime/fluent"
-	basicnode "github.com/ipld/go-ipld-prime/node/basic"
-
 	"github.com/ipfs/go-cid"
-	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/fluent"
+	"github.com/ipld/go-ipld-prime/node/basic"
 )
 
 // ParseJWS Given a JSON string representing a JWS in either general or compact

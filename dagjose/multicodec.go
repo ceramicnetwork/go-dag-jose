@@ -1,10 +1,11 @@
 package dagjose
 
 import (
+	"io"
+
 	"github.com/ipld/go-ipld-prime/codec/dagcbor"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/multicodec"
-	"io"
 )
 
 func init() {
