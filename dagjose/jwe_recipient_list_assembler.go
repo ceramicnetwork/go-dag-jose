@@ -20,6 +20,7 @@ func (l *jweRecipientListAssembler) AssembleValue() ipld.NodeAssembler {
 func (l *jweRecipientListAssembler) Finish() error {
 	return nil
 }
-func (l *jweRecipientListAssembler) ValuePrototype(idx int64) ipld.NodePrototype {
+
+func (l *jweRecipientListAssembler) ValuePrototype(_ int64) ipld.NodePrototype {
 	return basicnode.Prototype.Map
 }

@@ -20,6 +20,7 @@ func (l *jwsSignatureListAssembler) AssembleValue() ipld.NodeAssembler {
 func (l *jwsSignatureListAssembler) Finish() error {
 	return nil
 }
-func (l *jwsSignatureListAssembler) ValuePrototype(idx int64) ipld.NodePrototype {
+
+func (l *jwsSignatureListAssembler) ValuePrototype(_ int64) ipld.NodePrototype {
 	return basicnode.Prototype.Map
 }

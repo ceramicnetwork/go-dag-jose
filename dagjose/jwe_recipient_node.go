@@ -12,6 +12,7 @@ type jweRecipientNode struct{ *jweRecipient }
 func (r jweRecipientNode) Kind() ipld.Kind {
 	return ipld.Kind_Map
 }
+
 func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "header" {
 		return fluent.MustBuildMap(
@@ -29,25 +30,31 @@ func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 	}
 	return nil, nil
 }
+
 func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	str, err := key.AsString()
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return r.LookupByString(str)
 }
+
 func (r jweRecipientNode) LookupByIndex(idx int64) (ipld.Node, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.LookupByIndex(idx)
 }
+
 func (r jweRecipientNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return r.LookupByString(seg.String())
 }
+
 func (r jweRecipientNode) MapIterator() ipld.MapIterator {
 	return &jweRecipientMapIterator{r: r, index: 0}
 }
+
 func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
+
 func (r jweRecipientNode) Length() int64 {
 	if r.encryptedKey == nil && r.header == nil {
 		return 0
@@ -57,30 +64,38 @@ func (r jweRecipientNode) Length() int64 {
 	}
 	return 1
 }
+
 func (r jweRecipientNode) IsAbsent() bool {
 	return false
 }
+
 func (r jweRecipientNode) IsNull() bool {
 	return false
 }
 func (r jweRecipientNode) AsBool() (bool, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsBool()
 }
+
 func (r jweRecipientNode) AsInt() (int64, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsInt()
 }
+
 func (r jweRecipientNode) AsFloat() (float64, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsFloat()
 }
+
 func (r jweRecipientNode) AsString() (string, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsString()
 }
+
 func (r jweRecipientNode) AsBytes() ([]byte, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsBytes()
 }
+
 func (r jweRecipientNode) AsLink() (ipld.Link, error) {
 	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsLink()
 }
+
 func (r jweRecipientNode) Prototype() ipld.NodePrototype {
 	return nil
 }

@@ -3,6 +3,8 @@ package dagjose
 import (
 	"bytes"
 	"fmt"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"sort"
 	"testing"
@@ -35,7 +37,8 @@ func cidGen() *rapid.Generator {
 		data := rapid.SliceOfN(rapid.Byte(), 10, 100).Draw(t, "cid data bytes").([]byte)
 		mh, err := multihash.Sum(data, multihash.SHA3_384, 48)
 		if err != nil {
-			panic(err)
+			// TODO log err
+			return nil
 		}
 		result := cid.NewCidV1(cid.Raw, mh)
 		return &result
@@ -58,7 +61,7 @@ type ValidJWS struct {
 
 // Generate a signed JWS along with the private key used to sign it
 func validJWSGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) ValidJWS {
+	return rapid.Custom(func(t *rapid.T) (*ValidJWS, error) {
 		link := cidGen().Draw(t, "Valid DAGJOSE payload").(*cid.Cid)
 		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
 
@@ -67,20 +70,20 @@ func validJWSGen() *rapid.Generator {
 			Key:       privateKey,
 		}, nil)
 		if err != nil {
-			panic(fmt.Errorf("error creating signer for ValidJWS: %v", err))
+			return nil, errors.Wrap(err, "error creating signer for ValidJWS")
 		}
-		gojoseJws, err := signer.Sign(link.Bytes())
+		goJOSEJWS, err := signer.Sign(link.Bytes())
 		if err != nil {
-			panic(fmt.Errorf("Error signing ValidJWS: %v", err))
+			return nil, errors.Wrap(err, "Error signing ValidJWS")
 		}
-		dagJose, err := ParseJWS([]byte(gojoseJws.FullSerialize()))
+		dagJOSE, err := ParseJWS([]byte(goJOSEJWS.FullSerialize()))
 		if err != nil {
-			panic(fmt.Errorf("error creating dagJOSE: %v", err))
+			return nil, errors.Wrap(err, "error creating dagJOSE")
 		}
-		return ValidJWS{
-			dagJOSE: dagJose,
+		return &ValidJWS{
+			dagJOSE: dagJOSE,
 			key:     privateKey,
-		}
+		}, nil
 	})
 }
 
@@ -123,7 +126,7 @@ func nonNilSliceOfBytes() *rapid.Generator {
 
 // Below are a series of generators for ipld.Node's. This is required because
 // the unprotected headers of both JWE and JWS objects can contain arbitrary
-// JSON, which we translate into basicnode objects
+// JSON, which we translate into basic node objects
 
 func ipldStringGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) ipld.Node {
@@ -186,6 +189,7 @@ func ipldMapGen(depth int) *rapid.Generator {
 				return k
 			},
 		).Draw(t, "IPLD map keys").([]string)
+
 		return fluent.MustBuildMap(
 			basicnode.Prototype.Map,
 			int64(len(keys)),
@@ -288,10 +292,10 @@ func jweGen() *rapid.Generator {
 }
 
 // Generate an arbitrary JOSE object, i.e either a JWE or a JWS
-func arbitraryJoseGen() *rapid.Generator {
+func arbitraryJOSEGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DAGJOSE {
-		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
-		if isJwe {
+		isJWE := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
+		if isJWE {
 			return jweGen().Draw(t, "an arbitrary JWE").(*DAGJWE).AsJOSE()
 		} else {
 			return jwsGen().Draw(t, "an arbitrary JWS").(*DAGJWS).AsJOSE()
@@ -311,7 +315,7 @@ func singleSigJWSGen() *rapid.Generator {
 	})
 }
 
-// Genreate a JWE with only one recipient
+// Generate a JWE with only one recipient
 func singleRecipientJWEGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DAGJWE {
 		return (&DAGJOSE{
@@ -330,38 +334,47 @@ func singleRecipientJWEGen() *rapid.Generator {
 // and recipients
 //
 // Unprotected headers can contain arbitrary JSON. There are two things we have
-// to normalise for comparison in tests:
+// to normalize for comparison in tests:
 // - Integer values will end up as float values after serialization -> deserialization
 //   so we convert all integer values to floats
 // - Maps don't have a defined order in JSON, so we modify all maps so that
 //   they are ordered by key
-func normalizeJoseForJsonComparison(d *DAGJOSE) {
+func normalizeJoseForJSONComparison(d *DAGJOSE) error {
 	for _, recipient := range d.recipients {
 		for key, value := range recipient.header {
-			recipient.header[key] = normalizeIpldNode(value)
+			node, err := normalizeIPLDNode(value)
+			if err != nil {
+				return err
+			}
+			recipient.header[key] = node
 		}
 	}
 	for _, sig := range d.signatures {
 		for key, value := range sig.header {
-			sig.header[key] = normalizeIpldNode(value)
+			node, err := normalizeIPLDNode(value)
+			if err != nil {
+				return err
+			}
+			sig.header[key] = node
 		}
 	}
+	return nil
 }
 
-// This is used by the `normalizeJoseForJsonComparison` function to normalize
+// This is used by the `normalizeJoseForJSONComparison` function to normalize
 // the arbitrary IPLD structures in the headers of JWE and JWS objects
-func normalizeIpldNode(n ipld.Node) ipld.Node {
+func normalizeIPLDNode(n ipld.Node) (ipld.Node, error) {
 	switch n.Kind() {
 	case ipld.Kind_Int:
 		asInt, err := n.AsInt()
 		if err != nil {
-			panic(fmt.Errorf("normalizeIpldNode error calling AsInt: %v", err))
+			return nil, errors.Wrap(err, "normalizeIPLDNode error calling AsInt")
 		}
-		return basicnode.NewFloat(float64(asInt))
+		return basicnode.NewFloat(float64(asInt)), nil
 	case ipld.Kind_Map:
 		mapIterator := n.MapIterator()
 		if mapIterator == nil {
-			panic(fmt.Errorf("normalizeIpldNode nil MapIterator returned from map node"))
+			return nil, errors.New("normalizeIPLDNode nil MapIterator returned from map node")
 		}
 		// For a map we normalize such that the map keys are in sorted order,
 		// this order is maintained by the basicnode.Map implementation
@@ -373,17 +386,21 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 					key   string
 					value ipld.Node
 				}
-				kvs := make([]kv, 0)
+				var kvs []kv
 				for !mapIterator.Done() {
 					key, val, err := mapIterator.Next()
 					if err != nil {
-						panic(fmt.Errorf("normalizeIpldNode error calling Next on mapiterator: %v", err))
+						panic(fmt.Errorf("normalizeIPLDNode error calling Next on mapiterator: %v", err))
 					}
 					keyString, err := key.AsString()
 					if err != nil {
-						panic(fmt.Errorf("normalizeIpldNode: error converting key to string: %v", err))
+						panic(fmt.Errorf("normalizeIPLDNode: error converting key to string: %v", err))
 					}
-					kvs = append(kvs, kv{key: keyString, value: normalizeIpldNode(val)})
+					node, err := normalizeIPLDNode(val)
+					if err != nil {
+						panic(err)
+					}
+					kvs = append(kvs, kv{key: keyString, value: node})
 				}
 				sort.SliceStable(kvs, func(i int, j int) bool {
 					return kvs[i].key < kvs[j].key
@@ -393,11 +410,11 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 					ma.AssembleValue().AssignNode(kv.value)
 				}
 			},
-		)
+		), nil
 	case ipld.Kind_List:
 		listIterator := n.ListIterator()
 		if listIterator == nil {
-			panic(fmt.Errorf("convertIntNodesToFlaot nil ListIterator returned from list node"))
+			return nil, errors.New("convertIntNodesToFlaot nil ListIterator returned from list node")
 		}
 		return fluent.MustBuildList(
 			n.Prototype(),
@@ -406,19 +423,23 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 				for !listIterator.Done() {
 					_, val, err := listIterator.Next()
 					if err != nil {
-						panic(fmt.Errorf("convertIntNodesToFlaot error calling Next on listiterator: %v", err))
+						panic(errors.Wrap(err, "convertIntNodesToFlaot error calling Next on listiterator"))
 					}
-					la.AssembleValue().AssignNode(normalizeIpldNode(val))
+					node, err := normalizeIPLDNode(val)
+					if err != nil {
+						panic(err)
+					}
+					la.AssembleValue().AssignNode(node)
 				}
 			},
-		)
+		), nil
 	default:
-		return n
+		return n, nil
 	}
 }
 
 // Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
-func roundTripJose(j *DAGJOSE) *DAGJOSE {
+func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
 	buf := bytes.Buffer{}
 	ls := cidlink.DefaultLinkSystem()
 	ls.StorageWriteOpener = func(lnkCtx ipld.LinkContext) (io.Writer, ipld.BlockWriteCommitter, error) {
@@ -442,9 +463,9 @@ func roundTripJose(j *DAGJOSE) *DAGJOSE {
 		ls,
 	)
 	if err != nil {
-		panic(fmt.Errorf("error reading data from datastore: %v", err))
+		return nil, errors.Wrap(err, "error reading data from datastore")
 	}
-	return jose
+	return jose, nil
 }
 
 // Check that if we encode and decode a valid JWS object then the
@@ -452,7 +473,9 @@ func roundTripJose(j *DAGJOSE) *DAGJOSE {
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		validJws := validJWSGen().Draw(t, "valid JWS").(ValidJWS)
-		roundTripped := roundTripJose(validJws.dagJOSE.AsJOSE()).AsJWS()
+		jose, err := roundTripJose(validJws.dagJOSE.AsJOSE())
+		require.NoError(t, err)
+		roundTripped := jose.AsJWS()
 		require.Equal(t, validJws.dagJOSE, roundTripped)
 	})
 }
@@ -461,10 +484,13 @@ func TestRoundTripValidJWS(t *testing.T) {
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
-		roundTripped := roundTripJose(jose)
-		normalizeJoseForJsonComparison(jose)
-		normalizeJoseForJsonComparison(roundTripped)
+		jose := arbitraryJOSEGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
+		roundTripped, err := roundTripJose(jose)
+		require.NoError(t, err)
+		err = normalizeJoseForJSONComparison(jose)
+		require.NoError(t, err)
+		err = normalizeJoseForJSONComparison(roundTripped)
+		require.NoError(t, err)
 		require.Equal(t, jose, roundTripped)
 	})
 }
@@ -472,8 +498,9 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 // Decoding should always return either a JWS or a JWE if the input is valid
 func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
-		roundTripped := roundTripJose(jose)
+		jose := arbitraryJOSEGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
+		roundTripped, err := roundTripJose(jose)
+		require.NoError(t, err)
 		if roundTripped.AsJWE() == nil {
 			require.NotNil(t, roundTripped.AsJWS())
 		}
@@ -484,14 +511,16 @@ func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 // the input
 func TestJSONSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		dagJws := jwsGen().Draw(t, "An arbitrary JWS").(*DAGJWS)
-		generalSerialization := dagJws.GeneralJSONSerialization()
+		dagJWS := jwsGen().Draw(t, "An arbitrary JWS").(*DAGJWS)
+		generalSerialization, err := dagJWS.GeneralJSONSerialization()
+		assert.NoError(t, err)
 		parsedJose, err := ParseJWS(generalSerialization)
-		normalizeJoseForJsonComparison(dagJws.AsJOSE())
 		if err != nil {
 			t.Errorf("error parsing full serialization: %v", err)
 		}
-		require.Equal(t, dagJws, parsedJose)
+		err = normalizeJoseForJSONComparison(dagJWS.AsJOSE())
+		require.NoError(t, err)
+		require.Equal(t, dagJWS, parsedJose)
 	})
 }
 
@@ -499,14 +528,13 @@ func TestJSONSerializationJWS(t *testing.T) {
 // the input
 func TestJSONSerializationJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		dagJwe := jweGen().Draw(t, "An arbitrary JOSE object").(*DAGJWE)
-		generalSerialization := dagJwe.GeneralJSONSerialization()
-		parsedJose, err := ParseJWE(generalSerialization)
-		normalizeJoseForJsonComparison(dagJwe.AsJOSE())
-		if err != nil {
-			t.Errorf("error parsing full serialization: %v", err)
-		}
-		require.Equal(t, dagJwe, parsedJose)
+		dagJWE := jweGen().Draw(t, "An arbitrary JOSE object").(*DAGJWE)
+		generalSerialization, err := dagJWE.GeneralJSONSerialization()
+		parsedJOSE, err := ParseJWE(generalSerialization)
+		require.NoError(t, err)
+		err = normalizeJoseForJSONComparison(dagJWE.AsJOSE())
+		require.NoError(t, err)
+		require.Equal(t, dagJWE, parsedJOSE)
 	})
 }
 
@@ -514,16 +542,16 @@ func TestJSONSerializationJWE(t *testing.T) {
 func TestMissingPayloadErrorParsingJWS(t *testing.T) {
 	jsonStr := "{\"signatures\": []}"
 	jws, err := ParseJWS([]byte(jsonStr))
-	require.NotNil(t, err)
-	require.Nil(t, jws)
+	require.Error(t, err)
+	require.NotEmpty(t, jws)
 }
 
 // A JWE without ciphertext is not valid
 func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
 	jsonStr := "{\"header\": {}}"
 	jwe, err := ParseJWE([]byte(jsonStr))
-	require.NotNil(t, err)
-	require.Nil(t, jwe)
+	require.Error(t, err)
+	require.NotEmpty(t, jwe)
 }
 
 // If we parse the flattened serialization of a JWS then the input should
@@ -536,13 +564,14 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 			t.Errorf("error creating flattened serialization: %v", err)
 			return
 		}
-		parsedJose, err := ParseJWS([]byte(flattenedSerialization))
+		parsedJOSE, err := ParseJWS(flattenedSerialization)
 		if err != nil {
 			t.Errorf("error parsing flattenedSerialization: %v", err)
 			return
 		}
-		normalizeJoseForJsonComparison(jws.AsJOSE())
-		require.Equal(t, jws, parsedJose)
+		err = normalizeJoseForJSONComparison(jws.AsJOSE())
+		require.NoError(t, err)
+		require.Equal(t, jws, parsedJOSE)
 	})
 }
 
@@ -551,9 +580,9 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
 	jsonStr := "{\"signature\": \"\", \"signatures\": [], \"payload\": \"\"}"
 	jws, err := ParseJWS([]byte(jsonStr))
-	require.NotNil(t, err)
+	require.Error(t, err)
 	require.Contains(t, err.Error(), "cannot contain both a 'signature' and a 'signatures'")
-	require.Nil(t, jws)
+	require.NotEmpty(t, jws)
 }
 
 // If we parse the flattened serialization of a JWE then the input should
@@ -566,12 +595,13 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 			t.Errorf("error creating flattened serialization: %v", err)
 			return
 		}
-		parsedJose, err := ParseJWE([]byte(flattenedSerialization))
+		parsedJose, err := ParseJWE(flattenedSerialization)
 		if err != nil {
 			t.Errorf("error parsing flattenedSerialization: %v", err)
 			return
 		}
-		normalizeJoseForJsonComparison(jwe.AsJOSE())
+		err = normalizeJoseForJSONComparison(jwe.AsJOSE())
+		require.NoError(t, err)
 		require.Equal(t, jwe, parsedJose)
 	})
 }
@@ -613,7 +643,7 @@ func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
 			ipld.LinkContext{},
 			ls,
 		)
-		require.NotNil(t, err)
+		require.Error(t, err)
 		require.Contains(t, err.Error(), "payload is not a valid CID")
 	})
 }
@@ -627,8 +657,8 @@ func TestFlattenedJWEErrorIfEncryptedKeyOrHeaderAndRecipientsDefined(t *testing.
 	}
 	for _, scenario := range scenarios {
 		jwe, err := ParseJWE(scenario)
-		require.NotNil(t, err)
+		require.Error(t, err)
 		require.Contains(t, err.Error(), "cannot contain 'recipients' and either 'encrypted_key' or 'header'")
-		require.Nil(t, jwe)
+		require.Empty(t, jwe)
 	}
 }
