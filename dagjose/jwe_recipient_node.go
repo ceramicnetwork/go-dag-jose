@@ -25,7 +25,7 @@ func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 		), nil
 	}
 	if key == "encrypted_key" {
-		return bytesOrNil(r.encrypted_key), nil
+		return bytesOrNil(r.encryptedKey), nil
 	}
 	return nil, nil
 }
@@ -37,7 +37,7 @@ func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return r.LookupByString(str)
 }
 func (r jweRecipientNode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.LookupByIndex(idx)
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.LookupByIndex(idx)
 }
 func (r jweRecipientNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return r.LookupByString(seg.String())
@@ -49,10 +49,10 @@ func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
 func (r jweRecipientNode) Length() int64 {
-	if r.encrypted_key == nil && r.header == nil {
+	if r.encryptedKey == nil && r.header == nil {
 		return 0
 	}
-	if r.encrypted_key != nil && r.header != nil {
+	if r.encryptedKey != nil && r.header != nil {
 		return 2
 	}
 	return 1
@@ -64,22 +64,22 @@ func (r jweRecipientNode) IsNull() bool {
 	return false
 }
 func (r jweRecipientNode) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBool()
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsBool()
 }
 func (r jweRecipientNode) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsInt()
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsInt()
 }
 func (r jweRecipientNode) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsFloat()
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsFloat()
 }
 func (r jweRecipientNode) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsString()
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsString()
 }
 func (r jweRecipientNode) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBytes()
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsBytes()
 }
 func (r jweRecipientNode) AsLink() (ipld.Link, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsLink()
+	return mixins.Map{TypeName: "dagJOSE.JWERecipient"}.AsLink()
 }
 func (r jweRecipientNode) Prototype() ipld.NodePrototype {
 	return nil
@@ -110,7 +110,7 @@ func (j *jweRecipientMapIterator) presentKeys() []string {
 	if j.r.header != nil {
 		result = append(result, "header")
 	}
-	if j.r.encrypted_key != nil {
+	if j.r.encryptedKey != nil {
 		result = append(result, "encrypted_key")
 	}
 	return result

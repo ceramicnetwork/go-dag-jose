@@ -14,8 +14,8 @@ import (
 )
 
 // Given a JSON string reresenting a JWS in either general or compact serialization this
-// will return a DagJWS
-func ParseJWS(jsonStr []byte) (*DagJWS, error) {
+// will return a DAGJWS
+func ParseJWS(jsonStr []byte) (*DAGJWS, error) {
 	var rawJws struct {
 		Payload    *string `json:"payload"`
 		Signatures []struct {
@@ -30,7 +30,7 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	if err := json.Unmarshal(jsonStr, &rawJws); err != nil {
 		return nil, fmt.Errorf("error parsing jws json: %v", err)
 	}
-	result := DagJOSE{}
+	result := DAGJOSE{}
 
 	if rawJws.Payload == nil {
 		return nil, fmt.Errorf("JWS has no payload property")
@@ -114,7 +114,7 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	}
 	result.signatures = sigs
 
-	return &DagJWS{&result}, nil
+	return &DAGJWS{&result}, nil
 }
 
 // Given a JSON string reresenting a JWE in either general or compact serialization this
@@ -143,7 +143,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 		return nil, fmt.Errorf("JWE JSON cannot contain 'recipients' and either 'encrypted_key' or 'header'")
 	}
 
-	resultJose := DagJOSE{}
+	resultJose := DAGJOSE{}
 
 	if rawJwe.Ciphertext == nil {
 		return nil, fmt.Errorf("JWE has no ciphertext property")
@@ -170,7 +170,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error parsing encrypted_key: %v", err)
 			}
-			recipient.encrypted_key = keyBytes
+			recipient.encryptedKey = keyBytes
 		}
 
 		if rawJwe.Header != nil {
@@ -194,7 +194,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 				if err != nil {
 					return nil, fmt.Errorf("error parsing encrypted_key for recipient %d: %v", idx, err)
 				}
-				recipient.encrypted_key = keyBytes
+				recipient.encryptedKey = keyBytes
 			}
 
 			if rawRecipient.Header != nil {
@@ -248,14 +248,14 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 	return &DagJWE{&resultJose}, nil
 }
 
-func (d *DagJWS) asJson() map[string]interface{} {
+func (d *DAGJWS) asJson() map[string]interface{} {
 	jsonJose := make(map[string]interface{})
-	jsonJose["payload"] = base64.RawURLEncoding.EncodeToString(d.dagjose.payload.Bytes())
+	jsonJose["payload"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.payload.Bytes())
 
-	if d.dagjose.signatures != nil {
-		sigs := make([]map[string]interface{}, 0, len(d.dagjose.signatures))
-		for _, sig := range d.dagjose.signatures {
-			jsonSig := make(map[string]interface{}, len(d.dagjose.signatures))
+	if d.dagJOSE.signatures != nil {
+		sigs := make([]map[string]interface{}, 0, len(d.dagJOSE.signatures))
+		for _, sig := range d.dagJOSE.signatures {
+			jsonSig := make(map[string]interface{}, len(d.dagJOSE.signatures))
 			if sig.protected != nil {
 				jsonSig["protected"] = base64.RawURLEncoding.EncodeToString(sig.protected)
 			}
@@ -281,7 +281,7 @@ func (d *DagJWS) asJson() map[string]interface{} {
 }
 
 // Return the general json serialization of this JWS
-func (d *DagJWS) GeneralJSONSerialization() []byte {
+func (d *DAGJWS) GeneralJSONSerialization() []byte {
 	jsonRep := d.asJson()
 	result, err := json.Marshal(jsonRep)
 	if err != nil {
@@ -291,8 +291,8 @@ func (d *DagJWS) GeneralJSONSerialization() []byte {
 }
 
 // Return the flattened json serialization of this JWS
-func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
-	if len(d.dagjose.signatures) != 1 {
+func (d *DAGJWS) FlattenedSerialization() ([]byte, error) {
+	if len(d.dagJOSE.signatures) != 1 {
 		return nil, fmt.Errorf("Cannot create a flattened serialization for a JWS with more than one signature")
 	}
 	jsonRep := d.asJson()
@@ -356,8 +356,8 @@ func (d *DagJWE) asJson() map[string]interface{} {
 		recipients := make([]map[string]interface{}, 0, len(d.dagjose.recipients))
 		for _, r := range d.dagjose.recipients {
 			recipientJson := make(map[string]interface{})
-			if r.encrypted_key != nil {
-				recipientJson["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encrypted_key)
+			if r.encryptedKey != nil {
+				recipientJson["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encryptedKey)
 			}
 			if r.header != nil {
 				jsonHeader := make(map[string]interface{}, len(r.header))

@@ -6,7 +6,7 @@ import (
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
-type dagJOSENode struct{ *DagJOSE }
+type dagJOSENode struct{ *DAGJOSE }
 
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
@@ -102,7 +102,7 @@ func (d dagJOSENode) AsLink() (ipld.Link, error) {
 	return nil, nil
 }
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
-	return &DagJOSENodePrototype{}
+	return &DAGJOSENodePrototype{}
 }
 
 // end ipld.Node implementation

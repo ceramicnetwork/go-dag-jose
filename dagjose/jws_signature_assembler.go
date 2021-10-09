@@ -17,16 +17,16 @@ type jwsSignatureAssembler struct {
 var jwsSignatureMixin = mixins.MapAssembler{TypeName: "JWSSignature"}
 
 func (j *jwsSignatureAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
-	if j.state == maState_midValue && *j.key == "header" {
+	if j.state == maStateMidValue && *j.key == "header" {
 		j.signature.header = make(map[string]ipld.Node)
-		j.state = maState_initial
+		j.state = maStateInitial
 		return &headerAssembler{
 			header: j.signature.header,
 			key:    nil,
-			state:  maState_initial,
+			state:  maStateInitial,
 		}, nil
 	}
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
 	return j, nil
@@ -35,7 +35,7 @@ func (j *jwsSignatureAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, e
 	return jwsSignatureMixin.BeginList(sizeHint)
 }
 func (j *jwsSignatureAssembler) AssignNull() error {
-	if j.state == maState_midValue {
+	if j.state == maStateMidValue {
 		switch *j.key {
 		case "header":
 			j.signature.header = nil
@@ -60,26 +60,26 @@ func (j *jwsSignatureAssembler) AssignFloat(f float64) error {
 	return jwsSignatureMixin.AssignFloat(f)
 }
 func (j *jwsSignatureAssembler) AssignString(s string) error {
-	if j.state == maState_midKey {
+	if j.state == maStateMidKey {
 		if !isValidJWSSignatureKey(s) {
 			return fmt.Errorf("%s is not a vliad JWS signature key", s)
 		}
 		j.key = &s
-		j.state = maState_expectValue
+		j.state = maStateExpectValue
 		return nil
 	}
 	return jwsSignatureMixin.AssignString(s)
 }
 func (j *jwsSignatureAssembler) AssignBytes(b []byte) error {
-	if j.state == maState_midValue {
+	if j.state == maStateMidValue {
 		if *j.key == "protected" {
 			j.signature.protected = b
-			j.state = maState_initial
+			j.state = maStateInitial
 			return nil
 		}
 		if *j.key == "signature" {
 			j.signature.signature = b
-			j.state = maState_initial
+			j.state = maStateInitial
 			return nil
 		}
 		panic("should not be possible due to validation in map assembler")
@@ -97,26 +97,26 @@ func (j *jwsSignatureAssembler) Prototype() ipld.NodePrototype {
 }
 
 func (j *jwsSignatureAssembler) AssembleKey() ipld.NodeAssembler {
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
-	j.state = maState_midKey
+	j.state = maStateMidKey
 	return j
 }
 
 func (j *jwsSignatureAssembler) AssembleValue() ipld.NodeAssembler {
-	if j.state != maState_expectValue {
+	if j.state != maStateExpectValue {
 		panic("misuse")
 	}
-	j.state = maState_midValue
+	j.state = maStateMidValue
 	return j
 }
 func (j *jwsSignatureAssembler) AssembleEntry(k string) (ipld.NodeAssembler, error) {
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
 	j.key = &k
-	j.state = maState_midValue
+	j.state = maStateMidValue
 	return j, nil
 }
 
@@ -128,10 +128,10 @@ func (j *jwsSignatureAssembler) ValuePrototype(k string) ipld.NodePrototype {
 }
 
 func (j *jwsSignatureAssembler) Finish() error {
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
-	j.state = maState_finished
+	j.state = maStateFinished
 	return nil
 }
 

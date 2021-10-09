@@ -5,7 +5,7 @@ import (
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
-type jweRecipientListAssembler struct{ d *DagJOSE }
+type jweRecipientListAssembler struct{ d *DAGJOSE }
 
 func (l *jweRecipientListAssembler) AssembleValue() ipld.NodeAssembler {
 	l.d.recipients = append(l.d.recipients, jweRecipient{})
@@ -13,7 +13,7 @@ func (l *jweRecipientListAssembler) AssembleValue() ipld.NodeAssembler {
 	return &jweRecipientAssembler{
 		recipient: nextRef,
 		key:       nil,
-		state:     maState_initial,
+		state:     maStateInitial,
 	}
 }
 

@@ -6,9 +6,9 @@ import (
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
-// This is a union of the DagJWE and DagJWS types. Typically you will want to
+// DAGJOSE is a union of the DagJWE and DAGJWS types. Typically, you will want to
 // use AsJWE and AsJWS to get a concrete JOSE object.
-type DagJOSE struct {
+type DAGJOSE struct {
 	// JWS top level keys
 	payload    *cid.Cid
 	signatures []jwsSignature
@@ -29,53 +29,53 @@ type jwsSignature struct {
 }
 
 type jweRecipient struct {
-	header        map[string]ipld.Node
-	encrypted_key []byte
+	header       map[string]ipld.Node
+	encryptedKey []byte
 }
 
-func (d *DagJOSE) AsNode() ipld.Node {
+func (d *DAGJOSE) AsNode() ipld.Node {
 	return dagJOSENode{d}
 }
 
-// If this jose object is a JWS then this will return a DagJWS, if it is a
+// AsJWS If this JOSE object is a JWS then this will return a DAGJWS, if it is a
 // JWE then AsJWS will return nil
-func (d *DagJOSE) AsJWS() *DagJWS {
+func (d *DAGJOSE) AsJWS() *DAGJWS {
 	if d.payload != nil {
-		return &DagJWS{dagjose: d}
+		return &DAGJWS{dagJOSE: d}
 	}
 	return nil
 }
 
-// If this jose object is a JWE then this will return a DagJWE, if it is a
+// AsJWE If this jose object is a JWE then this will return a DagJWE, if it is a
 // JWS then AsJWE will return nil
-func (d *DagJOSE) AsJWE() *DagJWE {
+func (d *DAGJOSE) AsJWE() *DagJWE {
 	if d.ciphertext != nil {
 		return &DagJWE{dagjose: d}
 	}
 	return nil
 }
 
-type DagJWS struct{ dagjose *DagJOSE }
+type DAGJWS struct{ dagJOSE *DAGJOSE }
 
-// Returns a DagJOSE object that implements ipld.Node and can be passed to
+// AsJOSE Returns a DAGJOSE object that implements ipld.Node and can be passed to
+// IPLD related infrastructure
+func (d *DAGJWS) AsJOSE() *DAGJOSE {
+	return d.dagJOSE
+}
+
+type DagJWE struct{ dagjose *DAGJOSE }
+
+// AsJOSE Returns a DAGJOSE object that implements ipld.Node and can be passed to
 // ipld related infrastructure
-func (d *DagJWS) AsJOSE() *DagJOSE {
+func (d *DagJWE) AsJOSE() *DAGJOSE {
 	return d.dagjose
 }
 
-type DagJWE struct{ dagjose *DagJOSE }
-
-// Returns a DagJOSE object that implements ipld.Node and can be passed to
-// ipld related infrastructure
-func (d *DagJWE) AsJOSE() *DagJOSE {
-	return d.dagjose
+func (d *DAGJWS) PayloadLink() ipld.Link {
+	return cidlink.Link{Cid: *d.dagJOSE.payload}
 }
 
-func (d *DagJWS) PayloadLink() ipld.Link {
-	return cidlink.Link{Cid: *d.dagjose.payload}
-}
-
-// A link prototype which will build CIDs using the dag-jose multicodec and
+// LinkPrototype A link prototype which will build CIDs using the dag-jose multicodec and
 // the sha-384 multihash
 var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 	Version:  1,    // Usually '1'.
@@ -84,18 +84,18 @@ var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 	MhLength: 48,   // sha3-224 hash has a 48-byte sum.
 }}
 
-// A convenience function which passes the correct dagjose.LinkProtoype append
+// StoreJOSE A convenience function which passes the correct dagJOSE.LinkProtoype append
 // jose.AsNode() to ipld.LinkSystem.Store
-func StoreJOSE(linkContext ipld.LinkContext, jose *DagJOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
+func StoreJOSE(linkContext ipld.LinkContext, jose *DAGJOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
 	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
 }
 
-var NodePrototype = &DagJOSENodePrototype{}
+var NodePrototype = &DAGJOSENodePrototype{}
 
 // LoadJOSE is a convenience function which wraps ipld.LinkSystem.Load. This
 // will provide the dagjose.NodePrototype to the link system and attempt to
-// cast the result to a DagJOSE object
-func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkSystem) (*DagJOSE, error) {
+// cast the result to a DAGJOSE object
+func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkSystem) (*DAGJOSE, error) {
 	n, err := linkSystem.Load(
 		linkContext,
 		lnk,
@@ -105,5 +105,5 @@ func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkS
 		return nil, err
 	}
 
-	return n.(dagJOSENode).DagJOSE, nil
+	return n.(dagJOSENode).DAGJOSE, nil
 }

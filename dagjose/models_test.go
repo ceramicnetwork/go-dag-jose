@@ -50,16 +50,16 @@ func ed25519PrivateKeyGen() *rapid.Generator {
 	})
 }
 
-// Reppresents a JWS which has been signed and the private key used to sign it
+// Represents a JWS which has been signed and the private key used to sign it
 type ValidJWS struct {
-	dagJose *DagJWS
+	dagJOSE *DAGJWS
 	key     ed25519.PrivateKey
 }
 
 // Generate a signed JWS along with the private key used to sign it
 func validJWSGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) ValidJWS {
-		link := cidGen().Draw(t, "Valid DagJOSE payload").(*cid.Cid)
+		link := cidGen().Draw(t, "Valid DAGJOSE payload").(*cid.Cid)
 		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
 
 		signer, err := gojose.NewSigner(gojose.SigningKey{
@@ -75,10 +75,10 @@ func validJWSGen() *rapid.Generator {
 		}
 		dagJose, err := ParseJWS([]byte(gojoseJws.FullSerialize()))
 		if err != nil {
-			panic(fmt.Errorf("error creating dagjose: %v", err))
+			panic(fmt.Errorf("error creating dagJOSE: %v", err))
 		}
 		return ValidJWS{
-			dagJose: dagJose,
+			dagJOSE: dagJose,
 			key:     privateKey,
 		}
 	})
@@ -253,18 +253,18 @@ func signatureGen() *rapid.Generator {
 func recipientGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) jweRecipient {
 		return jweRecipient{
-			header:        stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
-			encrypted_key: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
+			header:       stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
+			encryptedKey: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
 		}
 	}).Filter(func(recipient jweRecipient) bool {
-		return recipient.encrypted_key != nil || recipient.header != nil
+		return recipient.encryptedKey != nil || recipient.header != nil
 	})
 }
 
 // Generate an arbitrary JWS, note that the signatures will not  be valid
 func jwsGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) *DagJWS {
-		return (&DagJOSE{
+	return rapid.Custom(func(t *rapid.T) *DAGJWS {
+		return (&DAGJOSE{
 			payload:    cidGen().Draw(t, "a JWS CID").(*cid.Cid),
 			signatures: sliceOfSignatures().Draw(t, "jose signatures").([]jwsSignature),
 		}).AsJWS()
@@ -275,7 +275,7 @@ func jwsGen() *rapid.Generator {
 // cannot be decrypted to anything
 func jweGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJWE {
-		return (&DagJOSE{
+		return (&DAGJOSE{
 			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
 			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
 			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
@@ -289,20 +289,20 @@ func jweGen() *rapid.Generator {
 
 // Generate an arbitrary JOSE object, i.e either a JWE or a JWS
 func arbitraryJoseGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) *DagJOSE {
+	return rapid.Custom(func(t *rapid.T) *DAGJOSE {
 		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
 		if isJwe {
 			return jweGen().Draw(t, "an arbitrary JWE").(*DagJWE).AsJOSE()
 		} else {
-			return jwsGen().Draw(t, "an arbitrary JWS").(*DagJWS).AsJOSE()
+			return jwsGen().Draw(t, "an arbitrary JWS").(*DAGJWS).AsJOSE()
 		}
 	})
 }
 
 // Generate a JWS with only one signature
 func singleSigJWSGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) *DagJWS {
-		return (&DagJOSE{
+	return rapid.Custom(func(t *rapid.T) *DAGJWS {
+		return (&DAGJOSE{
 			payload: cidGen().Draw(t, "a JWS CID").(*cid.Cid),
 			signatures: []jwsSignature{
 				signatureGen().Draw(t, "").(jwsSignature),
@@ -314,7 +314,7 @@ func singleSigJWSGen() *rapid.Generator {
 // Genreate a JWE with only one recipient
 func singleRecipientJWEGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJWE {
-		return (&DagJOSE{
+		return (&DAGJOSE{
 			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
 			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
 			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
@@ -335,7 +335,7 @@ func singleRecipientJWEGen() *rapid.Generator {
 //   so we convert all integer values to floats
 // - Maps don't have a defined order in JSON, so we modify all maps so that
 //   they are ordered by key
-func normalizeJoseForJsonComparison(d *DagJOSE) {
+func normalizeJoseForJsonComparison(d *DAGJOSE) {
 	for _, recipient := range d.recipients {
 		for key, value := range recipient.header {
 			recipient.header[key] = normalizeIpldNode(value)
@@ -418,7 +418,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 }
 
 // Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
-func roundTripJose(j *DagJOSE) *DagJOSE {
+func roundTripJose(j *DAGJOSE) *DAGJOSE {
 	buf := bytes.Buffer{}
 	ls := cidlink.DefaultLinkSystem()
 	ls.StorageWriteOpener = func(lnkCtx ipld.LinkContext) (io.Writer, ipld.BlockWriteCommitter, error) {
@@ -434,7 +434,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 		ls,
 	)
 	if err != nil {
-		panic(fmt.Errorf("error storing DagJOSE: %v", err))
+		panic(fmt.Errorf("error storing DAGJOSE: %v", err))
 	}
 	jose, err := LoadJOSE(
 		link,
@@ -452,8 +452,8 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		validJws := validJWSGen().Draw(t, "valid JWS").(ValidJWS)
-		roundTripped := roundTripJose(validJws.dagJose.AsJOSE()).AsJWS()
-		require.Equal(t, validJws.dagJose, roundTripped)
+		roundTripped := roundTripJose(validJws.dagJOSE.AsJOSE()).AsJWS()
+		require.Equal(t, validJws.dagJOSE, roundTripped)
 	})
 }
 
@@ -461,7 +461,7 @@ func TestRoundTripValidJWS(t *testing.T) {
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
 		roundTripped := roundTripJose(jose)
 		normalizeJoseForJsonComparison(jose)
 		normalizeJoseForJsonComparison(roundTripped)
@@ -472,7 +472,7 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 // Decoding should always return either a JWS or a JWE if the input is valid
 func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
 		roundTripped := roundTripJose(jose)
 		if roundTripped.AsJWE() == nil {
 			require.NotNil(t, roundTripped.AsJWS())
@@ -484,7 +484,7 @@ func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 // the input
 func TestJSONSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		dagJws := jwsGen().Draw(t, "An arbitrary JWS").(*DagJWS)
+		dagJws := jwsGen().Draw(t, "An arbitrary JWS").(*DAGJWS)
 		generalSerialization := dagJws.GeneralJSONSerialization()
 		parsedJose, err := ParseJWS(generalSerialization)
 		normalizeJoseForJsonComparison(dagJws.AsJOSE())
@@ -530,7 +530,7 @@ func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
 // equal the output
 func TestFlattenedSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jws := singleSigJWSGen().Draw(t, "a JWS").(*DagJWS)
+		jws := singleSigJWSGen().Draw(t, "a JWS").(*DAGJWS)
 		flattenedSerialization, err := jws.FlattenedSerialization()
 		if err != nil {
 			t.Errorf("error creating flattened serialization: %v", err)

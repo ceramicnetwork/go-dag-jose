@@ -165,22 +165,22 @@ func (d jwsSignatureNode) IsNull() bool {
 	return false
 }
 func (d jwsSignatureNode) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsBool()
+	return mixins.Map{TypeName: "dagJOSE.JOSESignature"}.AsBool()
 }
 func (d jwsSignatureNode) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsInt()
+	return mixins.Map{TypeName: "dagJOSE.JOSESignature"}.AsInt()
 }
 func (d jwsSignatureNode) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsFloat()
+	return mixins.Map{TypeName: "dagJOSE.JOSESignature"}.AsFloat()
 }
 func (d jwsSignatureNode) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsString()
+	return mixins.Map{TypeName: "dagJOSE.JOSESignature"}.AsString()
 }
 func (d jwsSignatureNode) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsBytes()
+	return mixins.Map{TypeName: "dagJOSE.JOSESignature"}.AsBytes()
 }
 func (d jwsSignatureNode) AsLink() (ipld.Link, error) {
-	return mixins.Map{TypeName: "dagjose.JOSESignature"}.AsLink()
+	return mixins.Map{TypeName: "dagJOSE.JOSESignature"}.AsLink()
 }
 func (d jwsSignatureNode) Prototype() ipld.NodePrototype {
 	return nil

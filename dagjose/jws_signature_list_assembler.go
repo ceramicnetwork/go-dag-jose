@@ -5,7 +5,7 @@ import (
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
-type jwsSignatureListAssembler struct{ d *DagJOSE }
+type jwsSignatureListAssembler struct{ d *DAGJOSE }
 
 func (l *jwsSignatureListAssembler) AssembleValue() ipld.NodeAssembler {
 	l.d.signatures = append(l.d.signatures, jwsSignature{})
@@ -13,7 +13,7 @@ func (l *jwsSignatureListAssembler) AssembleValue() ipld.NodeAssembler {
 	return &jwsSignatureAssembler{
 		signature: sigRef,
 		key:       nil,
-		state:     maState_initial,
+		state:     maStateInitial,
 	}
 }
 

@@ -1,6 +1,7 @@
 package dagjose
 
 import (
+	"errors"
 	"fmt"
 
 	ipld "github.com/ipld/go-ipld-prime"
@@ -16,32 +17,39 @@ type headerAssembler struct {
 }
 
 func (h *headerAssembler) AssembleKey() ipld.NodeAssembler {
-	if h.state != maState_initial {
-		panic("misuse")
+	if h.state != maStateInitial {
+		// TODO log error
+		return nil
 	}
-	h.state = maState_midKey
+	h.state = maStateMidKey
 	return h
 }
+
 func (h *headerAssembler) AssembleValue() ipld.NodeAssembler {
-	if h.state != maState_expectValue {
-		panic("misuse")
+	if h.state != maStateExpectValue {
+		// TODO log error
+		return nil
 	}
-	h.state = maState_midValue
+	h.state = maStateMidValue
 	h.valueBuilder = basicnode.Prototype.Any.NewBuilder()
 	return h.valueBuilder
 }
+
 func (h *headerAssembler) AssembleEntry(k string) (ipld.NodeAssembler, error) {
-	if h.state != maState_initial {
-		panic("misuse")
+	if h.state != maStateInitial {
+		return nil, errors.New("misuse")
 	}
 	h.key = &k
-	h.state = maState_midValue
+	h.state = maStateMidValue
 	return h, nil
 }
+
 func (h *headerAssembler) Finish() error { return nil }
+
 func (h *headerAssembler) KeyPrototype() ipld.NodePrototype {
 	return basicnode.Prototype.String
 }
+
 func (h *headerAssembler) ValuePrototype(k string) ipld.NodePrototype {
 	return basicnode.Prototype.String
 }
@@ -49,7 +57,7 @@ func (h *headerAssembler) ValuePrototype(k string) ipld.NodePrototype {
 var headerMixin = mixins.MapAssembler{TypeName: "header"}
 
 func (h *headerAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		h.valueBuilder = basicnode.Prototype.Map.NewBuilder()
 		ma, err := h.valueBuilder.BeginMap(sizeHint)
 		if err != nil {
@@ -63,9 +71,10 @@ func (h *headerAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	}
 	return mixins.StringAssembler{TypeName: "string"}.BeginMap(0)
 }
+
 func (h *headerAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	if h.state == maState_midValue {
-		h.state = maState_initial
+	if h.state == maStateMidValue {
+		h.state = maStateInitial
 		h.valueBuilder = basicnode.Prototype.List.NewBuilder()
 		la, err := h.valueBuilder.BeginList(sizeHint)
 		if err != nil {
@@ -79,72 +88,81 @@ func (h *headerAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) 
 	}
 	return headerMixin.BeginList(sizeHint)
 }
+
 func (h *headerAssembler) AssignNull() error {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(ipld.Null)
 	}
 	return headerMixin.AssignNull()
 }
+
 func (h *headerAssembler) AssignBool(b bool) error {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(basicnode.NewBool(b))
 	}
 	return headerMixin.AssignBool(b)
 }
+
 func (h *headerAssembler) AssignInt(i int64) error {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(basicnode.NewInt(i))
 	}
 	return headerMixin.AssignInt(i)
 }
+
 func (h *headerAssembler) AssignFloat(f float64) error {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(basicnode.NewFloat(f))
 	}
 	return headerMixin.AssignFloat(f)
 }
+
 func (h *headerAssembler) AssignString(s string) error {
-	if h.state == maState_midKey {
+	if h.state == maStateMidKey {
 		h.key = &s
-		h.state = maState_expectValue
+		h.state = maStateExpectValue
 		return nil
 	}
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(basicnode.NewString(s))
 	}
 	return headerMixin.AssignString(s)
 }
+
 func (h *headerAssembler) AssignBytes(b []byte) error {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(basicnode.NewBytes(b))
 	}
 	return headerMixin.AssignBytes(b)
 }
+
 func (h *headerAssembler) AssignLink(l ipld.Link) error {
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		return h.AssignNode(basicnode.NewLink(l))
 	}
 	return headerMixin.AssignLink(l)
 }
+
 func (h *headerAssembler) AssignNode(n ipld.Node) error {
-	if h.state == maState_midKey {
+	if h.state == maStateMidKey {
 		k, err := n.AsString()
 		if err != nil {
 			return fmt.Errorf("cannot get string from key: %v", err)
 		}
 		h.key = &k
-		h.state = maState_expectValue
+		h.state = maStateExpectValue
 		return nil
 	}
-	if h.state == maState_midValue {
+	if h.state == maStateMidValue {
 		h.header[*h.key] = n
-		h.state = maState_initial
+		h.state = maStateInitial
 		h.key = nil
 		h.valueBuilder = nil
 		return nil
 	}
-	return fmt.Errorf("Attempted to assign node on header in bad state")
+	return fmt.Errorf("attempted to assign node on header in bad state")
 }
+
 func (h *headerAssembler) Prototype() ipld.NodePrototype {
 	return basicnode.Prototype.Map
 }
@@ -171,7 +189,7 @@ func (hvam *headerValueAssemblerMap) Finish() error {
 		return err
 	}
 	hvam.ha.header[*hvam.ha.key] = hvam.ha.valueBuilder.Build()
-	hvam.ha.state = maState_initial
+	hvam.ha.state = maStateInitial
 	hvam.ha.key = nil
 	hvam.ha.valueBuilder = nil
 	return nil
@@ -199,7 +217,7 @@ func (hval *headerValueAssemblerList) Finish() error {
 		return err
 	}
 	hval.ha.header[*hval.ha.key] = hval.ha.valueBuilder.Build()
-	hval.ha.state = maState_initial
+	hval.ha.state = maStateInitial
 	hval.ha.key = nil
 	hval.ha.valueBuilder = nil
 	return nil
