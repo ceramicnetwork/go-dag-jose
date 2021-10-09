@@ -61,7 +61,7 @@ type ValidJWS struct {
 
 // Generate a signed JWS along with the private key used to sign it
 func validJWSGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) (*ValidJWS, error) {
+	return rapid.Custom(func(t *rapid.T) *ValidJWS {
 		link := cidGen().Draw(t, "Valid DAGJOSE payload").(*cid.Cid)
 		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
 
@@ -70,20 +70,23 @@ func validJWSGen() *rapid.Generator {
 			Key:       privateKey,
 		}, nil)
 		if err != nil {
-			return nil, errors.Wrap(err, "error creating signer for ValidJWS")
+			// "error creating signer for ValidJWS"
+			return nil
 		}
 		goJOSEJWS, err := signer.Sign(link.Bytes())
 		if err != nil {
-			return nil, errors.Wrap(err, "Error signing ValidJWS")
+			// "Error signing ValidJWS"
+			return nil
 		}
 		dagJOSE, err := ParseJWS([]byte(goJOSEJWS.FullSerialize()))
 		if err != nil {
-			return nil, errors.Wrap(err, "error creating dagJOSE")
+			// "error creating dagJOSE"
+			return nil
 		}
 		return &ValidJWS{
 			dagJOSE: dagJOSE,
 			key:     privateKey,
-		}, nil
+		}
 	})
 }
 
@@ -472,7 +475,7 @@ func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		validJws := validJWSGen().Draw(t, "valid JWS").(ValidJWS)
+		validJws := validJWSGen().Draw(t, "valid JWS").(*ValidJWS)
 		jose, err := roundTripJose(validJws.dagJOSE.AsJOSE())
 		require.NoError(t, err)
 		roundTripped := jose.AsJWS()
@@ -514,13 +517,13 @@ func TestJSONSerializationJWS(t *testing.T) {
 		dagJWS := jwsGen().Draw(t, "An arbitrary JWS").(*DAGJWS)
 		generalSerialization, err := dagJWS.GeneralJSONSerialization()
 		assert.NoError(t, err)
-		parsedJose, err := ParseJWS(generalSerialization)
+		parsedJOSE, err := ParseJWS(generalSerialization)
 		if err != nil {
 			t.Errorf("error parsing full serialization: %v", err)
 		}
 		err = normalizeJoseForJSONComparison(dagJWS.AsJOSE())
 		require.NoError(t, err)
-		require.Equal(t, dagJWS, parsedJose)
+		require.Equal(t, *dagJWS, *parsedJOSE)
 	})
 }
 
@@ -534,7 +537,7 @@ func TestJSONSerializationJWE(t *testing.T) {
 		require.NoError(t, err)
 		err = normalizeJoseForJSONComparison(dagJWE.AsJOSE())
 		require.NoError(t, err)
-		require.Equal(t, dagJWE, parsedJOSE)
+		require.EqualValues(t, dagJWE, parsedJOSE)
 	})
 }
 
@@ -543,7 +546,7 @@ func TestMissingPayloadErrorParsingJWS(t *testing.T) {
 	jsonStr := "{\"signatures\": []}"
 	jws, err := ParseJWS([]byte(jsonStr))
 	require.Error(t, err)
-	require.NotEmpty(t, jws)
+	require.Empty(t, jws)
 }
 
 // A JWE without ciphertext is not valid
@@ -551,7 +554,7 @@ func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
 	jsonStr := "{\"header\": {}}"
 	jwe, err := ParseJWE([]byte(jsonStr))
 	require.Error(t, err)
-	require.NotEmpty(t, jwe)
+	require.Empty(t, jwe)
 }
 
 // If we parse the flattened serialization of a JWS then the input should
@@ -571,7 +574,7 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 		}
 		err = normalizeJoseForJSONComparison(jws.AsJOSE())
 		require.NoError(t, err)
-		require.Equal(t, jws, parsedJOSE)
+		require.EqualValues(t, jws, parsedJOSE)
 	})
 }
 
@@ -582,7 +585,7 @@ func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
 	jws, err := ParseJWS([]byte(jsonStr))
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "cannot contain both a 'signature' and a 'signatures'")
-	require.NotEmpty(t, jws)
+	require.Empty(t, jws)
 }
 
 // If we parse the flattened serialization of a JWE then the input should
@@ -602,7 +605,7 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 		}
 		err = normalizeJoseForJSONComparison(jwe.AsJOSE())
 		require.NoError(t, err)
-		require.Equal(t, jwe, parsedJose)
+		require.EqualValues(t, jwe, parsedJose)
 	})
 }
 

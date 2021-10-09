@@ -31,7 +31,7 @@ func ParseJWS(jsonBytes []byte) (*DAGJWS, error) {
 	if err := json.Unmarshal(jsonBytes, &rawJWS); err != nil {
 		return nil, errors.Wrap(err, "error parsing jws json")
 	}
-	result := DAGJOSE{}
+	result := new(DAGJOSE)
 
 	if rawJWS.Payload == nil {
 		return nil, errors.New("JWS has no payload property")
@@ -114,8 +114,7 @@ func ParseJWS(jsonBytes []byte) (*DAGJWS, error) {
 		}
 	}
 	result.signatures = sigs
-
-	return &DAGJWS{dagJOSE: &result}, nil
+	return &DAGJWS{dagJOSE: result}, nil
 }
 
 // ParseJWE Given a JSON string representing a JWE in either general or compact serialization this
