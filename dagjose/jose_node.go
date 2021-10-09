@@ -11,6 +11,7 @@ type dagJOSENode struct{ *DAGJOSE }
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
 }
+
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
 		return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
@@ -43,7 +44,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 				int64(len(d.recipients)),
 				func(la fluent.ListAssembler) {
 					for i := range d.recipients {
-						la.AssembleValue().AssignNode(jweRecipientNode{&d.recipients[i]})
+						la.AssembleValue().AssignNode(jweRecipientNode{jweRecipient: &d.recipients[i]})
 					}
 				},
 			), nil
@@ -52,6 +53,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	}
 	return nil, nil
 }
+
 func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	ks, err := key.AsString()
 	if err != nil {
@@ -59,50 +61,64 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	}
 	return d.LookupByString(ks)
 }
+
 func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
 	return nil, nil
 }
+
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
 }
+
 func (d dagJOSENode) MapIterator() ipld.MapIterator {
 	return &dagJOSEMapIterator{
 		d:     d,
 		index: 0,
 	}
 }
+
 func (d dagJOSENode) ListIterator() ipld.ListIterator {
 	return nil
 }
+
 func (d dagJOSENode) Length() int64 {
 	return int64(len((&dagJOSEMapIterator{d: d, index: 0}).presentKeys()))
 }
+
 func (d dagJOSENode) IsAbsent() bool {
 	return false
 }
+
 func (d dagJOSENode) IsNull() bool {
 	return false
 }
+
 func (d dagJOSENode) AsBool() (bool, error) {
 	return false, nil
 }
+
 func (d dagJOSENode) AsInt() (int64, error) {
 	return 0, nil
 }
+
 func (d dagJOSENode) AsFloat() (float64, error) {
 	return 0, nil
 }
+
 func (d dagJOSENode) AsString() (string, error) {
 	return "", nil
 }
+
 func (d dagJOSENode) AsBytes() ([]byte, error) {
 	return nil, nil
 }
+
 func (d dagJOSENode) AsLink() (ipld.Link, error) {
 	return nil, nil
 }
+
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
-	return &DAGJOSENodePrototype{}
+	return new(DAGJOSENodePrototype)
 }
 
 // end ipld.Node implementation
@@ -136,7 +152,7 @@ func (d *dagJOSEMapIterator) Done() bool {
 }
 
 func (d *dagJOSEMapIterator) presentKeys() []string {
-	result := make([]string, 0)
+	var result []string
 	if d.d.payload != nil {
 		result = append(result, "payload")
 	}

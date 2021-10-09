@@ -6,7 +6,7 @@ import (
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
-// DAGJOSE is a union of the DagJWE and DAGJWS types. Typically, you will want to
+// DAGJOSE is a union of the DAGJWE and DAGJWS types. Typically, you will want to
 // use AsJWE and AsJWS to get a concrete JOSE object.
 type DAGJOSE struct {
 	// JWS top level keys
@@ -46,11 +46,11 @@ func (d *DAGJOSE) AsJWS() *DAGJWS {
 	return nil
 }
 
-// AsJWE If this jose object is a JWE then this will return a DagJWE, if it is a
+// AsJWE If this jose object is a JWE then this will return a DAGJWE, if it is a
 // JWS then AsJWE will return nil
-func (d *DAGJOSE) AsJWE() *DagJWE {
+func (d *DAGJOSE) AsJWE() *DAGJWE {
 	if d.ciphertext != nil {
-		return &DagJWE{dagjose: d}
+		return &DAGJWE{dagjose: d}
 	}
 	return nil
 }
@@ -63,11 +63,11 @@ func (d *DAGJWS) AsJOSE() *DAGJOSE {
 	return d.dagJOSE
 }
 
-type DagJWE struct{ dagjose *DAGJOSE }
+type DAGJWE struct{ dagjose *DAGJOSE }
 
 // AsJOSE Returns a DAGJOSE object that implements ipld.Node and can be passed to
 // ipld related infrastructure
-func (d *DagJWE) AsJOSE() *DAGJOSE {
+func (d *DAGJWE) AsJOSE() *DAGJOSE {
 	return d.dagjose
 }
 

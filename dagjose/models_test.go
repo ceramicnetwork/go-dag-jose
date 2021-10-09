@@ -274,7 +274,7 @@ func jwsGen() *rapid.Generator {
 // Generate an arbitrary JWE, note that the ciphertext is just random bytes and
 // cannot be decrypted to anything
 func jweGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) *DagJWE {
+	return rapid.Custom(func(t *rapid.T) *DAGJWE {
 		return (&DAGJOSE{
 			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
 			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
@@ -292,7 +292,7 @@ func arbitraryJoseGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DAGJOSE {
 		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
 		if isJwe {
-			return jweGen().Draw(t, "an arbitrary JWE").(*DagJWE).AsJOSE()
+			return jweGen().Draw(t, "an arbitrary JWE").(*DAGJWE).AsJOSE()
 		} else {
 			return jwsGen().Draw(t, "an arbitrary JWS").(*DAGJWS).AsJOSE()
 		}
@@ -313,7 +313,7 @@ func singleSigJWSGen() *rapid.Generator {
 
 // Genreate a JWE with only one recipient
 func singleRecipientJWEGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) *DagJWE {
+	return rapid.Custom(func(t *rapid.T) *DAGJWE {
 		return (&DAGJOSE{
 			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
 			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
@@ -499,7 +499,7 @@ func TestJSONSerializationJWS(t *testing.T) {
 // the input
 func TestJSONSerializationJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		dagJwe := jweGen().Draw(t, "An arbitrary JOSE object").(*DagJWE)
+		dagJwe := jweGen().Draw(t, "An arbitrary JOSE object").(*DAGJWE)
 		generalSerialization := dagJwe.GeneralJSONSerialization()
 		parsedJose, err := ParseJWE(generalSerialization)
 		normalizeJoseForJsonComparison(dagJwe.AsJOSE())
@@ -560,7 +560,7 @@ func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
 // equal the output
 func TestFlattenedSerializationJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jwe := singleRecipientJWEGen().Draw(t, "a JWE with one recipient").(*DagJWE)
+		jwe := singleRecipientJWEGen().Draw(t, "a JWE with one recipient").(*DAGJWE)
 		flattenedSerialization, err := jwe.FlattenedSerialization()
 		if err != nil {
 			t.Errorf("error creating flattened serialization: %v", err)
