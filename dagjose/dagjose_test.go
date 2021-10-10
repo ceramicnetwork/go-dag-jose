@@ -2,21 +2,21 @@ package dagjose
 
 import (
 	"bytes"
-	"io"
 	"fmt"
+	"io"
 	"sort"
 	"testing"
 
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
+	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/ed25519"
 	gojose "gopkg.in/square/go-jose.v2"
 	"pgregory.net/rapid"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
 // This test suite is mostly a set of property based tests for the serialization
