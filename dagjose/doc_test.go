@@ -1,9 +1,8 @@
-package dagjose_test
+package dagjose
 
 import (
 	"fmt"
 
-	"github.com/alexjg/go-dag-jose/dagjose"
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
@@ -20,7 +19,7 @@ func Example_read() {
 
 	ls := cidlink.DefaultLinkSystem()
 
-	jose, err := dagjose.LoadJOSE(
+	jose, err := LoadJOSE(
 		jwsLnk,
 		ipld.LinkContext{},
 		ls, //<an implementation of ipld.Loader, which knows how to get the block data from IPFS>,
@@ -37,12 +36,12 @@ func Example_read() {
 }
 
 func Example_write() {
-	dagJws, err := dagjose.ParseJWS([]byte("<the general JSON serialization of a JWS>"))
+	dagJws, err := ParseJWS([]byte("<the general JSON serialization of a JWS>"))
 	if err != nil {
 		panic(err)
 	}
 	ls := cidlink.DefaultLinkSystem()
-	link, err := dagjose.StoreJOSE(
+	link, err := StoreJOSE(
 		ipld.LinkContext{},
 		dagJws.AsJOSE(),
 		ls,
