@@ -2,6 +2,7 @@ package dagjose
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -271,9 +272,9 @@ func recipientGen() *rapid.Generator {
 // Generate an arbitrary JWS, note that the signatures will not  be valid
 func jwsGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DAGJWS {
-		return (&DAGJOSE{
+		return (DAGJOSE{
 			payload:    cidGen().Draw(t, "a JWS CID").(*cid.Cid),
-			signatures: sliceOfSignatures().Draw(t, "jose signatures").([]jwsSignature),
+			signatures: sliceOfSignatures().Draw(t, "JOSE signatures").([]jwsSignature),
 		}).AsJWS()
 	})
 }
@@ -283,8 +284,8 @@ func jwsGen() *rapid.Generator {
 func jweGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DAGJWE {
 		return (&DAGJOSE{
-			protected:   sliceOfBytes().Draw(t, "jose protected").([]byte),
-			unprotected: sliceOfBytes().Draw(t, "jose unprotected").([]byte),
+			protected:   sliceOfBytes().Draw(t, "JOSE protected").([]byte),
+			unprotected: sliceOfBytes().Draw(t, "JOSE unprotected").([]byte),
 			iv:          sliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			aad:         sliceOfBytes().Draw(t, "JOSE iv").([]byte),
 			ciphertext:  nonNilSliceOfBytes().Draw(t, "JOSE iv").([]byte),
@@ -297,7 +298,7 @@ func jweGen() *rapid.Generator {
 // Generate an arbitrary JOSE object, i.e either a JWE or a JWS
 func arbitraryJOSEGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DAGJOSE {
-		isJWE := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
+		isJWE := rapid.Bool().Draw(t, "whether this JOSE is a JWE").(bool)
 		if isJWE {
 			return jweGen().Draw(t, "an arbitrary JWE").(*DAGJWE).AsJOSE()
 		} else {
@@ -523,8 +524,18 @@ func TestJSONSerializationJWS(t *testing.T) {
 		}
 		err = normalizeJoseForJSONComparison(dagJWS.AsJOSE())
 		require.NoError(t, err)
-		require.Equal(t, *dagJWS, *parsedJOSE)
+		require.EqualValues(t, dagJWS, parsedJOSE)
 	})
+}
+
+func testCompareJson(a interface{}, b interface{}) {
+	println("a is: ")
+	abyte, _ := json.Marshal(a)
+	println(string(abyte))
+
+	println("b is: ")
+	bbyte, _ := json.Marshal(b)
+	println(string(bbyte))
 }
 
 // If we parse the JSON serialization of a JWE then the output should equal
@@ -574,7 +585,7 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 		}
 		err = normalizeJoseForJSONComparison(jws.AsJOSE())
 		require.NoError(t, err)
-		require.EqualValues(t, jws, parsedJOSE)
+		require.Equal(t, jws, parsedJOSE)
 	})
 }
 
@@ -605,7 +616,7 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 		}
 		err = normalizeJoseForJSONComparison(jwe.AsJOSE())
 		require.NoError(t, err)
-		require.EqualValues(t, jwe, parsedJose)
+		require.Equal(t, jwe, parsedJose)
 	})
 }
 

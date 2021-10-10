@@ -6,7 +6,7 @@ import (
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
-type dagJOSENode struct{ *DAGJOSE }
+type dagJOSENode struct{ DAGJOSE }
 
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map

@@ -188,7 +188,7 @@ func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
 }
 
 func (d *dagJOSENodeBuilder) Build() ipld.Node {
-	return dagJOSENode{&d.dagJOSE}
+	return dagJOSENode{DAGJOSE: d.dagJOSE}
 }
 
 func (d *dagJOSENodeBuilder) Reset() {}

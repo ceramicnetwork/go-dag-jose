@@ -114,25 +114,25 @@ func ParseJWS(jsonBytes []byte) (*DAGJWS, error) {
 		}
 	}
 	result.signatures = sigs
-	return &DAGJWS{dagJOSE: result}, nil
+	return &DAGJWS{dagJOSE: *result}, nil
 }
 
 // ParseJWE Given a JSON string representing a JWE in either general or compact serialization this
 // will return a DAGJWE
 func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 	var rawJWE struct {
-		Protected   *string `json:"protected"`
-		Unprotected *string `json:"unprotected"`
-		IV          *string `json:"iv"`
-		AAD         *string `json:"aad"`
-		Ciphertext  *string `json:"ciphertext"`
-		Tag         *string `json:"tag"`
+		Protected   *string `json:"protected,omitempty"`
+		Unprotected *string `json:"unprotected,omitempty"`
+		IV          *string `json:"iv,omitempty"`
+		AAD         *string `json:"aad,omitempty"`
+		Ciphertext  *string `json:"ciphertext,omitempty"`
+		Tag         *string `json:"tag,omitempty"`
 		Recipients  []struct {
-			Header       map[string]interface{} `json:"header"`
-			EncryptedKey *string                `json:"encrypted_key"`
-		} `json:"recipients"`
-		Header       map[string]interface{} `json:"header"`
-		EncryptedKey *string                `json:"encrypted_key"`
+			Header       map[string]interface{} `json:"header,omitempty"`
+			EncryptedKey *string                 `json:"encrypted_key,omitempty"`
+		} `json:"recipients,omitempty¬"`
+		Header       map[string]interface{} `json:"header,omitempty"`
+		EncryptedKey *string                `json:"encrypted_key,omitempty"`
 	}
 
 	if err := json.Unmarshal(jsonBytes, &rawJWE); err != nil {
@@ -143,7 +143,7 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 		return nil, errors.New("JWE JSON cannot contain 'recipients' and either 'encrypted_key' or 'header'")
 	}
 
-	resultJOSE := DAGJOSE{}
+	resultJOSE := new(DAGJOSE)
 	if rawJWE.Ciphertext == nil {
 		return nil, fmt.Errorf("JWE has no ciphertext property")
 	}
@@ -244,7 +244,7 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 		resultJOSE.tag = tagBytes
 	}
 
-	return &DAGJWE{dagjose: &resultJOSE}, nil
+	return &DAGJWE{dagJOSE: *resultJOSE}, nil
 }
 
 func (d *DAGJWS) asJSON() (map[string]interface{}, error) {
@@ -346,26 +346,26 @@ func (d *DAGJWE) FlattenedSerialization() ([]byte, error) {
 func (d *DAGJWE) asJSON() (map[string]interface{}, error) {
 	jsonJOSE := make(map[string]interface{})
 
-	if d.dagjose.protected != nil {
-		jsonJOSE["protected"] = base64.RawURLEncoding.EncodeToString(d.dagjose.protected)
+	if d.dagJOSE.protected != nil {
+		jsonJOSE["protected"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.protected)
 	}
-	if d.dagjose.unprotected != nil {
-		jsonJOSE["unprotected"] = base64.RawURLEncoding.EncodeToString(d.dagjose.unprotected)
+	if d.dagJOSE.unprotected != nil {
+		jsonJOSE["unprotected"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.unprotected)
 	}
-	if d.dagjose.iv != nil {
-		jsonJOSE["iv"] = base64.RawURLEncoding.EncodeToString(d.dagjose.iv)
+	if d.dagJOSE.iv != nil {
+		jsonJOSE["iv"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.iv)
 	}
-	if d.dagjose.aad != nil {
-		jsonJOSE["aad"] = base64.RawURLEncoding.EncodeToString(d.dagjose.aad)
+	if d.dagJOSE.aad != nil {
+		jsonJOSE["aad"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.aad)
 	}
-	jsonJOSE["ciphertext"] = base64.RawURLEncoding.EncodeToString(d.dagjose.ciphertext)
-	if d.dagjose.tag != nil {
-		jsonJOSE["tag"] = base64.RawURLEncoding.EncodeToString(d.dagjose.tag)
+	jsonJOSE["ciphertext"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.ciphertext)
+	if d.dagJOSE.tag != nil {
+		jsonJOSE["tag"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.tag)
 	}
 
-	if d.dagjose.recipients != nil {
-		recipients := make([]map[string]interface{}, 0, len(d.dagjose.recipients))
-		for _, r := range d.dagjose.recipients {
+	if d.dagJOSE.recipients != nil {
+		recipients := make([]map[string]interface{}, 0, len(d.dagJOSE.recipients))
+		for _, r := range d.dagJOSE.recipients {
 			recipientJSON := make(map[string]interface{})
 			if r.encryptedKey != nil {
 				recipientJSON["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encryptedKey)

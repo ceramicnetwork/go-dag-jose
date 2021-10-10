@@ -1,8 +1,9 @@
 package dagjose
 
 import (
+	"errors"
 	"github.com/ipfs/go-cid"
-	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime"
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
@@ -33,13 +34,13 @@ type jweRecipient struct {
 	encryptedKey []byte
 }
 
-func (d *DAGJOSE) AsNode() ipld.Node {
-	return dagJOSENode{d}
+func (d DAGJOSE) AsNode() ipld.Node {
+	return dagJOSENode{DAGJOSE: d}
 }
 
 // AsJWS If this JOSE object is a JWS then this will return a DAGJWS, if it is a
 // JWE then AsJWS will return nil
-func (d *DAGJOSE) AsJWS() *DAGJWS {
+func (d DAGJOSE) AsJWS() *DAGJWS {
 	if d.payload != nil {
 		return &DAGJWS{dagJOSE: d}
 	}
@@ -48,30 +49,30 @@ func (d *DAGJOSE) AsJWS() *DAGJWS {
 
 // AsJWE If this jose object is a JWE then this will return a DAGJWE, if it is a
 // JWS then AsJWE will return nil
-func (d *DAGJOSE) AsJWE() *DAGJWE {
+func (d DAGJOSE) AsJWE() *DAGJWE {
 	if d.ciphertext != nil {
-		return &DAGJWE{dagjose: d}
+		return &DAGJWE{dagJOSE: d}
 	}
 	return nil
 }
 
-type DAGJWS struct{ dagJOSE *DAGJOSE }
+type DAGJWS struct{ dagJOSE DAGJOSE }
 
 // AsJOSE Returns a DAGJOSE object that implements ipld.Node and can be passed to
 // IPLD related infrastructure
-func (d *DAGJWS) AsJOSE() *DAGJOSE {
-	return d.dagJOSE
+func (d DAGJWS) AsJOSE() *DAGJOSE {
+	return &d.dagJOSE
 }
 
-type DAGJWE struct{ dagjose *DAGJOSE }
+type DAGJWE struct{ dagJOSE DAGJOSE }
 
 // AsJOSE Returns a DAGJOSE object that implements ipld.Node and can be passed to
 // ipld related infrastructure
-func (d *DAGJWE) AsJOSE() *DAGJOSE {
-	return d.dagjose
+func (d DAGJWE) AsJOSE() *DAGJOSE {
+	return &d.dagJOSE
 }
 
-func (d *DAGJWS) PayloadLink() ipld.Link {
+func (d DAGJWS) PayloadLink() ipld.Link {
 	return cidlink.Link{Cid: *d.dagJOSE.payload}
 }
 
@@ -90,7 +91,7 @@ func StoreJOSE(linkContext ipld.LinkContext, jose *DAGJOSE, linkSystem ipld.Link
 	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
 }
 
-var NodePrototype = &DAGJOSENodePrototype{}
+var NodePrototype = new(DAGJOSENodePrototype)
 
 // LoadJOSE is a convenience function which wraps ipld.LinkSystem.Load. This
 // will provide the dagjose.NodePrototype to the link system and attempt to
@@ -105,5 +106,9 @@ func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkS
 		return nil, err
 	}
 
-	return n.(dagJOSENode).DAGJOSE, nil
+	dagJOSE, ok := n.(dagJOSENode)
+	if !ok {
+		return nil, errors.New("type conversion error")
+	}
+	return &dagJOSE.DAGJOSE, nil
 }
