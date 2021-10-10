@@ -138,7 +138,6 @@ func (d jwsSignatureNode) LookupByString(key string) (ipld.Node, error) {
 	}
 	if key == "header" {
 		if d.header == nil {
-			// TODO is this an error case?
 			return nil, nil
 		}
 		return fluent.MustBuildMap(

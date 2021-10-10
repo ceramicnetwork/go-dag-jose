@@ -2,10 +2,10 @@ package dagjose
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io"
-	"sort"
 	"testing"
 
 	"github.com/ipfs/go-cid"
@@ -155,12 +155,6 @@ func ipldNullGen() *rapid.Generator {
 func ipldBoolGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) ipld.Node {
 		return basicnode.NewBool(rapid.Bool().Draw(t, "an IPLD bool").(bool))
-	})
-}
-
-func ipldBytesGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) ipld.Node {
-		return basicnode.NewBytes(rapid.SliceOf(rapid.Byte()).Draw(t, "some IPLD Bytes").([]byte))
 	})
 }
 
@@ -332,116 +326,8 @@ func singleRecipientJWEGen() *rapid.Generator {
 	})
 }
 
-// Normalize json values contained in the unprotected headers of signatures
-// and recipients
-//
-// Unprotected headers can contain arbitrary JSON. There are two things we have
-// to normalize for comparison in tests:
-// - Integer values will end up as float values after serialization -> deserialization
-//   so we convert all integer values to floats
-// - Maps don't have a defined order in JSON, so we modify all maps so that
-//   they are ordered by key
-func normalizeJoseForJSONComparison(d *DAGJOSE) error {
-	for _, recipient := range d.recipients {
-		for key, value := range recipient.header {
-			node, err := normalizeIPLDNode(value)
-			if err != nil {
-				return err
-			}
-			recipient.header[key] = node
-		}
-	}
-	for _, sig := range d.signatures {
-		for key, value := range sig.header {
-			node, err := normalizeIPLDNode(value)
-			if err != nil {
-				return err
-			}
-			sig.header[key] = node
-		}
-	}
-	return nil
-}
-
-// This is used by the `normalizeJoseForJSONComparison` function to normalize
-// the arbitrary IPLD structures in the headers of JWE and JWS objects
-func normalizeIPLDNode(n ipld.Node) (ipld.Node, error) {
-	switch n.Kind() {
-	case ipld.Kind_Int:
-		asInt, err := n.AsInt()
-		if err != nil {
-			return nil, errors.Wrap(err, "normalizeIPLDNode error calling AsInt")
-		}
-		return basicnode.NewFloat(float64(asInt)), nil
-	case ipld.Kind_Map:
-		mapIterator := n.MapIterator()
-		if mapIterator == nil {
-			return nil, errors.New("normalizeIPLDNode nil MapIterator returned from map node")
-		}
-		// For a map we normalize such that the map keys are in sorted order,
-		// this order is maintained by the basicnode.Map implementation
-		return fluent.MustBuildMap(
-			n.Prototype(),
-			0,
-			func(ma fluent.MapAssembler) {
-				type kv struct {
-					key   string
-					value ipld.Node
-				}
-				var kvs []kv
-				for !mapIterator.Done() {
-					key, val, err := mapIterator.Next()
-					if err != nil {
-						return
-					}
-					keyString, err := key.AsString()
-					if err != nil {
-						return
-					}
-					node, err := normalizeIPLDNode(val)
-					if err != nil {
-						return
-					}
-					kvs = append(kvs, kv{key: keyString, value: node})
-				}
-				sort.SliceStable(kvs, func(i int, j int) bool {
-					return kvs[i].key < kvs[j].key
-				})
-				for _, kv := range kvs {
-					ma.AssembleKey().AssignString(kv.key)
-					ma.AssembleValue().AssignNode(kv.value)
-				}
-			},
-		), nil
-	case ipld.Kind_List:
-		listIterator := n.ListIterator()
-		if listIterator == nil {
-			return nil, errors.New("convertIntNodesToFloat nil ListIterator returned from list node")
-		}
-		return fluent.MustBuildList(
-			n.Prototype(),
-			0,
-			func(la fluent.ListAssembler) {
-				for !listIterator.Done() {
-					_, val, err := listIterator.Next()
-					if err != nil {
-						return
-					}
-					node, err := normalizeIPLDNode(val)
-					if err != nil {
-						return
-					}
-					la.AssembleValue().AssignNode(node)
-				}
-			},
-		), nil
-	default:
-		return n, nil
-	}
-}
-
 // Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
-func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
+func roundTripJOSE(j *DAGJOSE) (*DAGJOSE, error) {
 	var buf bytes.Buffer
 	ls := cidlink.DefaultLinkSystem()
 	ls.StorageWriteOpener = func(lnkCtx ipld.LinkContext) (io.Writer, ipld.BlockWriteCommitter, error) {
@@ -475,7 +361,7 @@ func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		validJWS := validJWSGen().Draw(t, "valid JWS").(*ValidJWS)
-		jose, err := roundTripJose(validJWS.dagJOSE.AsJOSE())
+		jose, err := roundTripJOSE(validJWS.dagJOSE.AsJOSE())
 		require.NoError(t, err)
 		roundTripped := jose.AsJWS()
 		require.Equal(t, validJWS.dagJOSE, roundTripped)
@@ -487,13 +373,17 @@ func TestRoundTripValidJWS(t *testing.T) {
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		jose := arbitraryJOSEGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
-		roundTripped, err := roundTripJose(jose)
+		roundTripped, err := roundTripJOSE(jose)
 		require.NoError(t, err)
-		err = normalizeJoseForJSONComparison(jose)
-		require.NoError(t, err)
-		err = normalizeJoseForJSONComparison(roundTripped)
-		require.NoError(t, err)
-		require.Equal(t, jose, roundTripped)
+
+		// compare as json
+		joseBytes, err := json.Marshal(jose)
+		assert.NoError(t, err)
+
+		roundTrippedByes, err := json.Marshal(roundTripped)
+		assert.NoError(t, err)
+
+		assert.JSONEq(t, string(joseBytes), string(roundTrippedByes))
 	})
 }
 
@@ -501,7 +391,7 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		jose := arbitraryJOSEGen().Draw(t, "An arbitrary JOSE object").(*DAGJOSE)
-		roundTripped, err := roundTripJose(jose)
+		roundTripped, err := roundTripJOSE(jose)
 		require.NoError(t, err)
 		if roundTripped.AsJWE() == nil {
 			require.NotNil(t, roundTripped.AsJWS())
@@ -518,9 +408,20 @@ func TestJSONSerializationJWS(t *testing.T) {
 		assert.NoError(t, err)
 		parsedJOSE, err := ParseJWS(generalSerialization)
 		assert.NoError(t, err, "error parsing full serialization")
-		err = normalizeJoseForJSONComparison(dagJWS.AsJOSE())
-		require.NoError(t, err)
-		require.EqualValues(t, dagJWS, parsedJOSE)
+
+		dagJWSJSON, err := dagJWS.asJSON()
+		assert.NoError(t, err)
+
+		parsedJOSEJSON, err := parsedJOSE.asJSON()
+		assert.NoError(t, err)
+
+		dagJWSJSONBytes, err := json.Marshal(dagJWSJSON)
+		assert.NoError(t, err)
+
+		parsedJOSEJSONBytes, err := json.Marshal(parsedJOSEJSON)
+		assert.NoError(t, err)
+
+		assert.JSONEq(t, string(dagJWSJSONBytes), string(parsedJOSEJSONBytes))
 	})
 }
 
@@ -532,9 +433,18 @@ func TestJSONSerializationJWE(t *testing.T) {
 		generalSerialization, err := dagJWE.GeneralJSONSerialization()
 		parsedJOSE, err := ParseJWE(generalSerialization)
 		require.NoError(t, err)
-		err = normalizeJoseForJSONComparison(dagJWE.AsJOSE())
-		require.NoError(t, err)
-		require.EqualValues(t, dagJWE, parsedJOSE)
+
+		originalJSON, err := dagJWE.asJSON()
+		assert.NoError(t, err)
+		originalJSONBytes, err := json.Marshal(originalJSON)
+		assert.NoError(t, err)
+
+		parsedJSON, err := parsedJOSE.asJSON()
+		assert.NoError(t, err)
+
+		parsedJSONBytes, err := json.Marshal(parsedJSON)
+		assert.NoError(t, err)
+		require.JSONEq(t, string(originalJSONBytes), string(parsedJSONBytes))
 	})
 }
 
@@ -562,10 +472,16 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 		flattenedSerialization, err := jws.FlattenedSerialization()
 		require.NoError(t, err, "error creating flattened serialization")
 		parsedJOSE, err := ParseJWS(flattenedSerialization)
-		require.NoError(t, err, "error parsing flattenedSerialization")
-		err = normalizeJoseForJSONComparison(jws.AsJOSE())
-		require.NoError(t, err)
-		require.Equal(t, jws, parsedJOSE)
+		require.NoError(t, err, "error parsing flattened serialization")
+
+		jwsJSONBytes, err := jws.asJSON()
+		assert.NoError(t, err)
+		originalBytes, err := json.Marshal(jwsJSONBytes)
+
+		parsedJSONBytes, err := parsedJOSE.asJSON()
+		parsedBytes, err := json.Marshal(parsedJSONBytes)
+
+		require.JSONEq(t, string(originalBytes), string(parsedBytes))
 	})
 }
 
@@ -585,18 +501,14 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		jwe := singleRecipientJWEGen().Draw(t, "a JWE with one recipient").(*DAGJWE)
 		flattenedSerialization, err := jwe.FlattenedSerialization()
-		if err != nil {
-			t.Errorf("error creating flattened serialization: %v", err)
-			return
-		}
-		parsedJose, err := ParseJWE(flattenedSerialization)
-		if err != nil {
-			t.Errorf("error parsing flattenedSerialization: %v", err)
-			return
-		}
-		err = normalizeJoseForJSONComparison(jwe.AsJOSE())
+		require.NoError(t, err, "error creating flattened serialization")
+
+		parsedJOSE, err := ParseJWE(flattenedSerialization)
+		require.NoError(t, err, "error parsing flattenedSerialization")
+		parsedFlattened, err := parsedJOSE.FlattenedSerialization()
 		require.NoError(t, err)
-		require.Equal(t, jwe, parsedJose)
+
+		assert.JSONEq(t, string(flattenedSerialization), string(parsedFlattened))
 	})
 }
 

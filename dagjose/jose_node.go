@@ -62,7 +62,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(ks)
 }
 
-func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
+func (d dagJOSENode) LookupByIndex(_ int64) (ipld.Node, error) {
 	return nil, nil
 }
 
