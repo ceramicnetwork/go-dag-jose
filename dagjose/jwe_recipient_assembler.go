@@ -93,7 +93,7 @@ func (j *jweRecipientAssembler) AssignLink(l ipld.Link) error {
 }
 
 func (j *jweRecipientAssembler) AssignNode(_ ipld.Node) error {
-	return fmt.Errorf("not implemented")
+	return errors.New("not implemented")
 }
 
 func (j *jweRecipientAssembler) Prototype() ipld.NodePrototype {

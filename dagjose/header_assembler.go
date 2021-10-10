@@ -1,12 +1,10 @@
 package dagjose
 
 import (
-	"errors"
-	"fmt"
-
-	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
+	"github.com/pkg/errors"
 )
 
 type headerAssembler struct {
@@ -147,7 +145,7 @@ func (h *headerAssembler) AssignNode(n ipld.Node) error {
 	if h.state == maStateMidKey {
 		k, err := n.AsString()
 		if err != nil {
-			return fmt.Errorf("cannot get string from key: %v", err)
+			return errors.Wrap(err, "cannot get string from key: %v")
 		}
 		h.key = &k
 		h.state = maStateExpectValue
@@ -160,7 +158,7 @@ func (h *headerAssembler) AssignNode(n ipld.Node) error {
 		h.valueBuilder = nil
 		return nil
 	}
-	return fmt.Errorf("attempted to assign node on header in bad state")
+	return errors.New("attempted to assign node on header in bad state")
 }
 
 func (h *headerAssembler) Prototype() ipld.NodePrototype {

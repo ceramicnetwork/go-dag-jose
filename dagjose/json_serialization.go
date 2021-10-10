@@ -18,15 +18,15 @@ import (
 // will return a DAGJWS
 func ParseJWS(jsonBytes []byte) (*DAGJWS, error) {
 	var rawJWS struct {
-		Payload    *string `json:"payload"`
+		Payload    *string `json:"payload,omitempty"`
 		Signatures []struct {
-			Protected *string                `json:"protected"`
-			Signature string                 `json:"signature"`
-			Header    map[string]interface{} `json:"header"`
-		} `json:"signatures"`
-		Protected *string                `json:"protected"`
-		Signature *string                `json:"signature"`
-		Header    map[string]interface{} `json:"header"`
+			Protected *string                `json:"protected,omitempty"`
+			Signature *string                `json:"signature,omitempty"`
+			Header    map[string]interface{} `json:"header,omitempty"`
+		} `json:"signatures,omitempty"`
+		Protected *string                `json:"protected,omitempty"`
+		Signature *string                `json:"signature,omitempty"`
+		Header    map[string]interface{} `json:"header,omitempty"`
 	}
 	if err := json.Unmarshal(jsonBytes, &rawJWS); err != nil {
 		return nil, errors.Wrap(err, "error parsing jws json")
@@ -84,7 +84,7 @@ func ParseJWS(jsonBytes []byte) (*DAGJWS, error) {
 	} else if rawJWS.Signatures != nil {
 		sigs = make([]jwsSignature, 0, len(rawJWS.Signatures))
 		for idx, rawSig := range rawJWS.Signatures {
-			sig := jwsSignature{}
+			sig := new(jwsSignature)
 			if rawSig.Protected != nil {
 				protectedBytes, err := base64.RawURLEncoding.DecodeString(*rawSig.Protected)
 				if err != nil {
@@ -105,12 +105,12 @@ func ParseJWS(jsonBytes []byte) (*DAGJWS, error) {
 				sig.header = header
 			}
 
-			sigBytes, err := base64.RawURLEncoding.DecodeString(rawSig.Signature)
+			sigBytes, err := base64.RawURLEncoding.DecodeString(*rawSig.Signature)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error decoding signature for signature %d", idx)
 			}
 			sig.signature = sigBytes
-			sigs = append(sigs, sig)
+			sigs = append(sigs, *sig)
 		}
 	}
 	result.signatures = sigs
@@ -129,8 +129,8 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 		Tag         *string `json:"tag,omitempty"`
 		Recipients  []struct {
 			Header       map[string]interface{} `json:"header,omitempty"`
-			EncryptedKey *string                 `json:"encrypted_key,omitempty"`
-		} `json:"recipients,omitempty¬"`
+			EncryptedKey *string                `json:"encrypted_key,omitempty"`
+		} `json:"recipients,omitempty"`
 		Header       map[string]interface{} `json:"header,omitempty"`
 		EncryptedKey *string                `json:"encrypted_key,omitempty"`
 	}
@@ -187,7 +187,7 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 	} else if rawJWE.Recipients != nil {
 		recipients = make([]jweRecipient, 0, len(rawJWE.Recipients))
 		for idx, rawRecipient := range rawJWE.Recipients {
-			recipient := jweRecipient{}
+			recipient := new(jweRecipient)
 			if rawRecipient.EncryptedKey != nil {
 				keyBytes, err := base64.RawURLEncoding.DecodeString(*rawRecipient.EncryptedKey)
 				if err != nil {
@@ -207,7 +207,7 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 				}
 				recipient.header = header
 			}
-			recipients = append(recipients, recipient)
+			recipients = append(recipients, *recipient)
 		}
 	}
 	resultJOSE.recipients = recipients
@@ -215,7 +215,7 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 	if rawJWE.Unprotected != nil {
 		unprotectedBytes, err := base64.RawURLEncoding.DecodeString(*rawJWE.Unprotected)
 		if err != nil {
-			return nil, fmt.Errorf("error parsing unprotected: %v", err)
+			return nil, errors.Wrap(err, "error parsing unprotected")
 		}
 		resultJOSE.unprotected = unprotectedBytes
 	}
@@ -223,7 +223,7 @@ func ParseJWE(jsonBytes []byte) (*DAGJWE, error) {
 	if rawJWE.IV != nil {
 		ivBytes, err := base64.RawURLEncoding.DecodeString(*rawJWE.IV)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error parsing iv")
+			return nil, errors.Wrap(err, "error parsing iv")
 		}
 		resultJOSE.iv = ivBytes
 	}
@@ -301,11 +301,13 @@ func (d *DAGJWS) FlattenedSerialization() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	jsonSignature := jsonRep["signatures"].([]map[string]interface{})[0]
 	jsonRep["protected"] = jsonSignature["protected"]
 	jsonRep["header"] = jsonSignature["header"]
 	jsonRep["signature"] = jsonSignature["signature"]
 	delete(jsonRep, "signatures")
+
 	result, err := json.Marshal(jsonRep)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error marshaling flattened JWS serialization to JSON")
@@ -413,12 +415,13 @@ func goPrimitiveToIPLDBasicNode(value interface{}) (ipld.Node, error) {
 					key   string
 					value ipld.Node
 				}
-				kvs := make([]kv, 0)
+				var kvs []kv
 				for k, v := range v {
 					value, err := goPrimitiveToIPLDBasicNode(v)
 					if err != nil {
 						// TODO it's unclear the correct behavior here, a nil return may be more beneficial
-						panic(fmt.Errorf("unable to convert primitive value %v to ipld Node: %v", v, err))
+						// panic(fmt.Errorf("unable to convert primitive value %v to ipld Node: %v", v, err))
+						return
 					}
 					kvs = append(kvs, kv{key: k, value: value})
 				}
@@ -438,7 +441,8 @@ func goPrimitiveToIPLDBasicNode(value interface{}) (ipld.Node, error) {
 				for _, v := range v {
 					value, err := goPrimitiveToIPLDBasicNode(v)
 					if err != nil {
-						panic(fmt.Errorf("unable to convert primitive value %v to ipld Node: %v", v, err))
+						// panic(fmt.Errorf("unable to convert primitive value %v to ipld Node: %v", v, err))
+						return
 					}
 					la.AssembleValue().AssignNode(value)
 				}
@@ -466,7 +470,7 @@ func ipldNodeToGo(node ipld.Node) (interface{}, error) {
 	case ipld.Kind_Link:
 		lnk, err := node.AsLink()
 		if err != nil {
-			return nil, fmt.Errorf("ipldNodeToGo: error parsing node as link even thought kind is link: %v", err)
+			return nil, errors.Wrap(err, "ipldNodeToGo: error parsing node as link even thought kind is link")
 		}
 		return map[string]string{
 			"/": lnk.String(),
@@ -474,7 +478,7 @@ func ipldNodeToGo(node ipld.Node) (interface{}, error) {
 	case ipld.Kind_Map:
 		mapIterator := node.MapIterator()
 		if mapIterator == nil {
-			return nil, fmt.Errorf("ipldNodeToGo: nil MapIterator returned from map node")
+			return nil, errors.New("ipldNodeToGo: nil MapIterator returned from map node")
 		}
 		result := make(map[string]interface{})
 		for !mapIterator.Done() {

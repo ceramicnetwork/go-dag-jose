@@ -2,8 +2,6 @@ package dagjose
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"io"
@@ -394,15 +392,15 @@ func normalizeIPLDNode(n ipld.Node) (ipld.Node, error) {
 				for !mapIterator.Done() {
 					key, val, err := mapIterator.Next()
 					if err != nil {
-						panic(fmt.Errorf("normalizeIPLDNode error calling Next on mapiterator: %v", err))
+						return
 					}
 					keyString, err := key.AsString()
 					if err != nil {
-						panic(fmt.Errorf("normalizeIPLDNode: error converting key to string: %v", err))
+						return
 					}
 					node, err := normalizeIPLDNode(val)
 					if err != nil {
-						panic(err)
+						return
 					}
 					kvs = append(kvs, kv{key: keyString, value: node})
 				}
@@ -418,7 +416,7 @@ func normalizeIPLDNode(n ipld.Node) (ipld.Node, error) {
 	case ipld.Kind_List:
 		listIterator := n.ListIterator()
 		if listIterator == nil {
-			return nil, errors.New("convertIntNodesToFlaot nil ListIterator returned from list node")
+			return nil, errors.New("convertIntNodesToFloat nil ListIterator returned from list node")
 		}
 		return fluent.MustBuildList(
 			n.Prototype(),
@@ -427,11 +425,11 @@ func normalizeIPLDNode(n ipld.Node) (ipld.Node, error) {
 				for !listIterator.Done() {
 					_, val, err := listIterator.Next()
 					if err != nil {
-						panic(errors.Wrap(err, "convertIntNodesToFlaot error calling Next on listiterator"))
+						return
 					}
 					node, err := normalizeIPLDNode(val)
 					if err != nil {
-						panic(err)
+						return
 					}
 					la.AssembleValue().AssignNode(node)
 				}
@@ -444,7 +442,7 @@ func normalizeIPLDNode(n ipld.Node) (ipld.Node, error) {
 
 // Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
 func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
-	buf := bytes.Buffer{}
+	var buf bytes.Buffer
 	ls := cidlink.DefaultLinkSystem()
 	ls.StorageWriteOpener = func(lnkCtx ipld.LinkContext) (io.Writer, ipld.BlockWriteCommitter, error) {
 		return &buf, func(lnk ipld.Link) error { return nil }, nil
@@ -459,7 +457,7 @@ func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
 		ls,
 	)
 	if err != nil {
-		panic(fmt.Errorf("error storing DAGJOSE: %v", err))
+		return nil, errors.Wrap(err, "error storing DAGJOSE")
 	}
 	jose, err := LoadJOSE(
 		link,
@@ -476,11 +474,11 @@ func roundTripJose(j *DAGJOSE) (*DAGJOSE, error) {
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripValidJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		validJws := validJWSGen().Draw(t, "valid JWS").(*ValidJWS)
-		jose, err := roundTripJose(validJws.dagJOSE.AsJOSE())
+		validJWS := validJWSGen().Draw(t, "valid JWS").(*ValidJWS)
+		jose, err := roundTripJose(validJWS.dagJOSE.AsJOSE())
 		require.NoError(t, err)
 		roundTripped := jose.AsJWS()
-		require.Equal(t, validJws.dagJOSE, roundTripped)
+		require.Equal(t, validJWS.dagJOSE, roundTripped)
 	})
 }
 
@@ -519,23 +517,11 @@ func TestJSONSerializationJWS(t *testing.T) {
 		generalSerialization, err := dagJWS.GeneralJSONSerialization()
 		assert.NoError(t, err)
 		parsedJOSE, err := ParseJWS(generalSerialization)
-		if err != nil {
-			t.Errorf("error parsing full serialization: %v", err)
-		}
+		assert.NoError(t, err, "error parsing full serialization")
 		err = normalizeJoseForJSONComparison(dagJWS.AsJOSE())
 		require.NoError(t, err)
 		require.EqualValues(t, dagJWS, parsedJOSE)
 	})
-}
-
-func testCompareJson(a interface{}, b interface{}) {
-	println("a is: ")
-	abyte, _ := json.Marshal(a)
-	println(string(abyte))
-
-	println("b is: ")
-	bbyte, _ := json.Marshal(b)
-	println(string(bbyte))
 }
 
 // If we parse the JSON serialization of a JWE then the output should equal
@@ -574,15 +560,9 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		jws := singleSigJWSGen().Draw(t, "a JWS").(*DAGJWS)
 		flattenedSerialization, err := jws.FlattenedSerialization()
-		if err != nil {
-			t.Errorf("error creating flattened serialization: %v", err)
-			return
-		}
+		require.NoError(t, err, "error creating flattened serialization")
 		parsedJOSE, err := ParseJWS(flattenedSerialization)
-		if err != nil {
-			t.Errorf("error parsing flattenedSerialization: %v", err)
-			return
-		}
+		require.NoError(t, err, "error parsing flattenedSerialization")
 		err = normalizeJoseForJSONComparison(jws.AsJOSE())
 		require.NoError(t, err)
 		require.Equal(t, jws, parsedJOSE)

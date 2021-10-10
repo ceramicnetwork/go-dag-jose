@@ -91,7 +91,7 @@ func StoreJOSE(linkContext ipld.LinkContext, jose *DAGJOSE, linkSystem ipld.Link
 	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
 }
 
-var NodePrototype = new(DAGJOSENodePrototype)
+var NodePrototype = new(dagJOSENodePrototype)
 
 // LoadJOSE is a convenience function which wraps ipld.LinkSystem.Load. This
 // will provide the dagjose.NodePrototype to the link system and attempt to

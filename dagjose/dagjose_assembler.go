@@ -1,17 +1,16 @@
 package dagjose
 
 import (
-	"errors"
 	"fmt"
-
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
+	"github.com/pkg/errors"
 )
 
 type (
-	DAGJOSENodePrototype struct{}
+	dagJOSENodePrototype struct{}
 	maState              uint
 )
 
@@ -24,10 +23,10 @@ const (
 )
 
 var (
-	dageJOSEMixin = mixins.MapAssembler{TypeName: "dagJOSE"}
+	dagJOSEMixin = mixins.MapAssembler{TypeName: "dagJOSE"}
 )
 
-func (d *DAGJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
+func (d *dagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 	return &dagJOSENodeBuilder{dagJOSE: DAGJOSE{}}
 }
 
@@ -65,7 +64,7 @@ func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, erro
 		d.state = maStateInitial
 		return &jwsSignatureListAssembler{d: &d.dagJOSE}, nil
 	}
-	return dageJOSEMixin.BeginList(sizeHint)
+	return dagJOSEMixin.BeginList(sizeHint)
 }
 
 func (d *dagJOSENodeBuilder) AssignNull() error {
@@ -95,19 +94,19 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 		d.state = maStateInitial
 		return nil
 	}
-	return dageJOSEMixin.AssignNull()
+	return dagJOSEMixin.AssignNull()
 }
 
 func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
-	return dageJOSEMixin.AssignBool(b)
+	return dagJOSEMixin.AssignBool(b)
 }
 
 func (d *dagJOSENodeBuilder) AssignInt(i int64) error {
-	return dageJOSEMixin.AssignInt(i)
+	return dagJOSEMixin.AssignInt(i)
 }
 
 func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
-	return dageJOSEMixin.AssignFloat(f)
+	return dagJOSEMixin.AssignFloat(f)
 }
 
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
@@ -119,7 +118,7 @@ func (d *dagJOSENodeBuilder) AssignString(s string) error {
 		d.state = maStateExpectValue
 		return nil
 	}
-	return dageJOSEMixin.AssignString(s)
+	return dagJOSEMixin.AssignString(s)
 }
 
 func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
@@ -128,7 +127,7 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 		case "payload":
 			_, id, err := cid.CidFromBytes(b)
 			if err != nil {
-				return fmt.Errorf("payload is not a valid CID: %v", err)
+				return errors.Wrap(err, "payload is not a valid CID: %v")
 			}
 			d.dagJOSE.payload = &id
 		case "protected":
@@ -144,20 +143,20 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 		case "tag":
 			d.dagJOSE.tag = b
 		case "signatures":
-			return fmt.Errorf("attempted to assign bytes to 'signatures' key")
+			return errors.New("attempted to assign bytes to 'signatures' key")
 		case "recipients":
-			return fmt.Errorf("attempted to assign bytes to 'recipients' key")
+			return errors.New("attempted to assign bytes to 'recipients' key")
 		default:
-			panic("should not happen due to AssignString implementation")
+			return errors.New("should not happen due to AssignString implementation")
 		}
 		d.state = maStateInitial
 		return nil
 	}
-	return dageJOSEMixin.AssignBytes(b)
+	return dagJOSEMixin.AssignBytes(b)
 }
 
 func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
-	return dageJOSEMixin.AssignLink(l)
+	return dagJOSEMixin.AssignLink(l)
 }
 
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
@@ -184,7 +183,7 @@ func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 }
 
 func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
-	return &DAGJOSENodePrototype{}
+	return &dagJOSENodePrototype{}
 }
 
 func (d *dagJOSENodeBuilder) Build() ipld.Node {
@@ -195,7 +194,8 @@ func (d *dagJOSENodeBuilder) Reset() {}
 
 func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
 	if d.state != maStateInitial {
-		panic("misuse")
+		// log error "misuse"
+		return nil
 	}
 	d.state = maStateMidKey
 	return d

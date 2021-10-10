@@ -118,7 +118,7 @@ func (d dagJOSENode) AsLink() (ipld.Link, error) {
 }
 
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
-	return new(DAGJOSENodePrototype)
+	return new(dagJOSENodePrototype)
 }
 
 // end ipld.Node implementation
