@@ -50,7 +50,7 @@ func ed25519PrivateKeyGen() *rapid.Generator {
 	})
 }
 
-// Reppresents a JWS which has been signed and the private key used to sign it
+// Represents a JWS which has been signed and the private key used to sign it
 type ValidJWS struct {
 	dagJose *DagJWS
 	key     ed25519.PrivateKey
@@ -71,7 +71,7 @@ func validJWSGen() *rapid.Generator {
 		}
 		gojoseJws, err := signer.Sign(link.Bytes())
 		if err != nil {
-			panic(fmt.Errorf("Error signing ValidJWS: %v", err))
+			panic(fmt.Errorf("error signing ValidJWS: %v", err))
 		}
 		dagJose, err := ParseJWS([]byte(gojoseJws.FullSerialize()))
 		if err != nil {
@@ -94,7 +94,7 @@ func sliceOfSignatures() *rapid.Generator {
 	})
 }
 
-// Generate a non empty slice of JWERecipients
+// Generate a non-empty slice of JWERecipients
 func sliceOfRecipients() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) []jweRecipient {
 		return rapid.SliceOf(recipientGen()).Filter(func(recipients interface{}) bool {
@@ -287,7 +287,7 @@ func jweGen() *rapid.Generator {
 	})
 }
 
-// Generate an arbitrary JOSE object, i.e either a JWE or a JWS
+// Generate an arbitrary JOSE object, i.e. either a JWE or a JWS
 func arbitraryJoseGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJOSE {
 		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
@@ -330,7 +330,7 @@ func singleRecipientJWEGen() *rapid.Generator {
 // and recipients
 //
 // Unprotected headers can contain arbitrary JSON. There are two things we have
-// to normalise for comparison in tests:
+// to normalize for comparison in tests:
 // - Integer values will end up as float values after serialization -> deserialization
 //   so we convert all integer values to floats
 // - Maps don't have a defined order in JSON, so we modify all maps so that
@@ -418,7 +418,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 }
 
 // This test failed in the past not sure if it still fails
-// Given a JOSE object we encode it using BuildJOSELink and decode it using LoadJOSE and return the result
+// Given a JOSE object we encode it using StoreJOSE and decode it using LoadJOSE and return the result
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
 	ls := cidlink.DefaultLinkSystem()

@@ -6,15 +6,14 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/ipld/go-ipld-prime/fluent"
-	basicnode "github.com/ipld/go-ipld-prime/node/basic"
-
 	"github.com/ipfs/go-cid"
-	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/fluent"
+	"github.com/ipld/go-ipld-prime/node/basic"
 )
 
-// Given a JSON string reresenting a JWS in either general or compact serialization this
-// will return a DagJWS
+// ParseJWS Given a JSON string representing a JWS in either general or compact
+// serialization this will return a DagJWS
 func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	var rawJws struct {
 		Payload    *string `json:"payload"`
@@ -44,11 +43,11 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing payload: %v", err)
 	}
-	_, cid, err := cid.CidFromBytes(payloadBytes)
+	_, c, err := cid.CidFromBytes(payloadBytes)
 	if err != nil {
 		panic(fmt.Errorf("error parsing payload: payload is not a CID"))
 	}
-	result.payload = &cid
+	result.payload = &c
 
 	var sigs []jwsSignature
 	if rawJws.Signature != nil {
@@ -117,8 +116,8 @@ func ParseJWS(jsonStr []byte) (*DagJWS, error) {
 	return &DagJWS{&result}, nil
 }
 
-// Given a JSON string reresenting a JWE in either general or compact serialization this
-// will return a DagJWE
+// ParseJWE Given a JSON string representing a JWE in either general or compact
+// serialization this will return a DagJWE
 func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 	var rawJwe struct {
 		Protected   *string `json:"protected"`
@@ -280,7 +279,7 @@ func (d *DagJWS) asJson() map[string]interface{} {
 	return jsonJose
 }
 
-// Return the general json serialization of this JWS
+// GeneralJSONSerialization returns the general json serialization of this JWS
 func (d *DagJWS) GeneralJSONSerialization() []byte {
 	jsonRep := d.asJson()
 	result, err := json.Marshal(jsonRep)
@@ -290,10 +289,10 @@ func (d *DagJWS) GeneralJSONSerialization() []byte {
 	return result
 }
 
-// Return the flattened json serialization of this JWS
+// FlattenedSerialization returns the flattened json serialization of this JWS
 func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
 	if len(d.dagjose.signatures) != 1 {
-		return nil, fmt.Errorf("Cannot create a flattened serialization for a JWS with more than one signature")
+		return nil, fmt.Errorf("cannot create a flattened serialization for a JWS with more than one signature")
 	}
 	jsonRep := d.asJson()
 	jsonSignature := jsonRep["signatures"].([]map[string]interface{})[0]
@@ -308,7 +307,7 @@ func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
 	return result, nil
 }
 
-// Return the general json serialization of this JWE
+// GeneralJSONSerialization returns the general json serialization of this JWE
 func (d *DagJWE) GeneralJSONSerialization() []byte {
 	jsonRep := d.asJson()
 	result, err := json.Marshal(jsonRep)
@@ -318,7 +317,7 @@ func (d *DagJWE) GeneralJSONSerialization() []byte {
 	return result
 }
 
-// Return the flattened json serialization of this JWE
+// FlattenedSerialization return the flattened json serialization of this JWE
 func (d *DagJWE) FlattenedSerialization() ([]byte, error) {
 	jsonRep := d.asJson()
 	jsonRecipient := jsonRep["recipients"].([]map[string]interface{})[0]

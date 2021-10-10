@@ -55,7 +55,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "recipients" {
 		if d.recipients != nil {
 			return fluent.MustBuildList(
-				ipldBasicNode.Prototype.List,
+				basicnode.Prototype.List,
 				int64(len(d.recipients)),
 				func(la fluent.ListAssembler) {
 					for i := range d.recipients {
@@ -147,7 +147,7 @@ func (d *dagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	key := presentKeys[d.index]
 	value, _ := d.d.LookupByString(key)
 	d.index += 1
-	return ipldBasicNode.NewString(key), value, nil
+	return basicnode.NewString(key), value, nil
 }
 
 func (d *dagJOSEMapIterator) Done() bool {
