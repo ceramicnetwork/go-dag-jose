@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/ipfs/go-cid"
-	ipld "github.com/ipld/go-ipld-prime"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/linking/cid"
 )
 
 func Example_read() {

@@ -169,7 +169,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error parsing encrypted_key: %v", err)
 			}
-			recipient.encrypted_key = keyBytes
+			recipient.encryptedKey = keyBytes
 		}
 
 		if rawJwe.Header != nil {
@@ -193,7 +193,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 				if err != nil {
 					return nil, fmt.Errorf("error parsing encrypted_key for recipient %d: %v", idx, err)
 				}
-				recipient.encrypted_key = keyBytes
+				recipient.encryptedKey = keyBytes
 			}
 
 			if rawRecipient.Header != nil {
@@ -355,8 +355,8 @@ func (d *DagJWE) asJson() map[string]interface{} {
 		recipients := make([]map[string]interface{}, 0, len(d.dagjose.recipients))
 		for _, r := range d.dagjose.recipients {
 			recipientJson := make(map[string]interface{})
-			if r.encrypted_key != nil {
-				recipientJson["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encrypted_key)
+			if r.encryptedKey != nil {
+				recipientJson["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encryptedKey)
 			}
 			if r.header != nil {
 				jsonHeader := make(map[string]interface{}, len(r.header))

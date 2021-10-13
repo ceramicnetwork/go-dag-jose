@@ -2,8 +2,8 @@ package dagjose
 
 import (
 	"github.com/ipfs/go-cid"
-	ipld "github.com/ipld/go-ipld-prime"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/linking/cid"
 )
 
 // DagJOSE is a union of the DagJWE and DagJWS types. Typically, you will want
@@ -29,8 +29,8 @@ type jwsSignature struct {
 }
 
 type jweRecipient struct {
-	header        map[string]ipld.Node
-	encrypted_key []byte
+	header       map[string]ipld.Node
+	encryptedKey []byte
 }
 
 func (d *DagJOSE) AsNode() ipld.Node {
@@ -84,17 +84,17 @@ var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 	MhLength: 48,   // sha3-224 hash has a 48-byte sum.
 }}
 
-// StoreJOSE is a convenience function which passes the correct
-// dagjose.LinkPrototype append jose.AsNode() to ipld.LinkSystem.Store
+// StoreJOSE is a convenience function which passes `dagjose.LinkPrototype` and
+// a `DagJOSE` IPLD Node (using `DagJOSE.AsNode`) to `ipld.LinkSystem.Store`.
 func StoreJOSE(linkContext ipld.LinkContext, jose *DagJOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
 	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
 }
 
 var NodePrototype = &DagJOSENodePrototype{}
 
-// LoadJOSE is a convenience function which wraps ipld.LinkSystem.Load. This
-// will provide the dagjose.NodePrototype to the link system and attempt to
-// cast the result to a DagJOSE object
+// LoadJOSE is a convenience function which wraps `ipld.LinkSystem.Load`. This
+// will provide the `dagjose.NodePrototype` to the link system and attempt to
+// cast the result to a `DagJOSE` object.
 func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkSystem) (*DagJOSE, error) {
 	n, err := linkSystem.Load(
 		linkContext,

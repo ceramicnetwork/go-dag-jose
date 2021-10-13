@@ -41,7 +41,7 @@ func (j *jweRecipientAssembler) AssignNull() error {
 		case "header":
 			j.recipient.header = nil
 		case "encrypted_key":
-			j.recipient.encrypted_key = nil
+			j.recipient.encryptedKey = nil
 		default:
 			panic("should never happen due to validation in map assembler")
 		}
@@ -72,7 +72,7 @@ func (j *jweRecipientAssembler) AssignString(s string) error {
 func (j *jweRecipientAssembler) AssignBytes(b []byte) error {
 	if j.state == maState_midValue {
 		if *j.key == "encrypted_key" {
-			j.recipient.encrypted_key = b
+			j.recipient.encryptedKey = b
 			j.state = maState_initial
 			return nil
 		}

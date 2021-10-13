@@ -3,7 +3,7 @@ package dagjose
 import (
 	"io"
 
-	"github.com/ipld/go-ipld-prime/codec/dagcbor"
+	"github.com/ipld/go-ipld-prime/codec/cbor"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/multicodec"
 )
@@ -17,7 +17,7 @@ func init() {
 // given datamodel.NodeAssembler. Decode fits the codec.Decoder function
 // interface.
 func Decode(na datamodel.NodeAssembler, r io.Reader) error {
-	return dagcbor.Decode(na, r)
+	return cbor.Decode(na, r)
 }
 
 // Encode walks the given datamodel.Node and serializes it to the given
@@ -31,7 +31,7 @@ func Encode(n datamodel.Node, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	// DAG-CBOR is a superset of DAG-JOSE and, as such, can be used to encode
+	// CBOR is a superset of DAG-JOSE and, as such, can be used to encode
 	// valid DAG-JOSE objects.
-	return dagcbor.Encode(dagJoseBuilder.Build(), w)
+	return cbor.Encode(dagJoseBuilder.Build(), w)
 }

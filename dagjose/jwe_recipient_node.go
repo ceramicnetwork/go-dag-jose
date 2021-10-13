@@ -17,20 +17,20 @@ func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 		return valueOrNotFound(
 			key,
 			r.header,
-			func () (ipld.Node, error) {
-			return fluent.MustBuildMap(
-				basicnode.Prototype.Map,
-				int64(len(r.header)),
-				func(ma fluent.MapAssembler) {
-					for key, value := range r.header {
-						ma.AssembleEntry(key).AssignNode(value)
-					}
-				},
-			), nil
-		})
+			func() (ipld.Node, error) {
+				return fluent.MustBuildMap(
+					basicnode.Prototype.Map,
+					int64(len(r.header)),
+					func(ma fluent.MapAssembler) {
+						for key, value := range r.header {
+							ma.AssembleEntry(key).AssignNode(value)
+						}
+					},
+				), nil
+			})
 	}
 	if key == "encrypted_key" {
-		return valueOrNotFound(key, r.encrypted_key, nil)
+		return valueOrNotFound(key, r.encryptedKey, nil)
 	}
 	return nil, nil
 }
@@ -54,10 +54,10 @@ func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
 func (r jweRecipientNode) Length() int64 {
-	if r.encrypted_key == nil && r.header == nil {
+	if r.encryptedKey == nil && r.header == nil {
 		return 0
 	}
-	if r.encrypted_key != nil && r.header != nil {
+	if r.encryptedKey != nil && r.header != nil {
 		return 2
 	}
 	return 1
@@ -115,7 +115,7 @@ func (j *jweRecipientMapIterator) presentKeys() []string {
 	if j.r.header != nil {
 		result = append(result, "header")
 	}
-	if j.r.encrypted_key != nil {
+	if j.r.encryptedKey != nil {
 		result = append(result, "encrypted_key")
 	}
 	return result
