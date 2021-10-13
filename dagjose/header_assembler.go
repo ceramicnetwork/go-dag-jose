@@ -120,9 +120,6 @@ func (h *headerAssembler) AssignBytes(b []byte) error {
 	return headerMixin.AssignBytes(b)
 }
 func (h *headerAssembler) AssignLink(l ipld.Link) error {
-	if h.state == maState_midValue {
-		return h.AssignNode(basicnode.NewLink(l))
-	}
 	return headerMixin.AssignLink(l)
 }
 func (h *headerAssembler) AssignNode(n ipld.Node) error {

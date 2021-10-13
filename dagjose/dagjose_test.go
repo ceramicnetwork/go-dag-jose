@@ -10,12 +10,12 @@ import (
 	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
-	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
-	basicnode "github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime/linking/cid"
+	"github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/ed25519"
-	gojose "gopkg.in/square/go-jose.v2"
+	"gopkg.in/square/go-jose.v2"
 	"pgregory.net/rapid"
 )
 
@@ -62,18 +62,18 @@ func validJWSGen() *rapid.Generator {
 		link := cidGen().Draw(t, "Valid DagJOSE payload").(*cid.Cid)
 		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
 
-		signer, err := gojose.NewSigner(gojose.SigningKey{
-			Algorithm: gojose.EdDSA,
+		signer, err := jose.NewSigner(jose.SigningKey{
+			Algorithm: jose.EdDSA,
 			Key:       privateKey,
 		}, nil)
 		if err != nil {
 			panic(fmt.Errorf("error creating signer for ValidJWS: %v", err))
 		}
-		gojoseJws, err := signer.Sign(link.Bytes())
+		joseJws, err := signer.Sign(link.Bytes())
 		if err != nil {
 			panic(fmt.Errorf("error signing ValidJWS: %v", err))
 		}
-		dagJose, err := ParseJWS([]byte(gojoseJws.FullSerialize()))
+		dagJose, err := ParseJWS([]byte(joseJws.FullSerialize()))
 		if err != nil {
 			panic(fmt.Errorf("error creating dagjose: %v", err))
 		}

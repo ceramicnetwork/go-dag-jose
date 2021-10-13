@@ -14,25 +14,30 @@ func (r jweRecipientNode) Kind() ipld.Kind {
 }
 func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "header" {
-		return fluent.MustBuildMap(
-			basicnode.Prototype.Map,
-			int64(len(r.header)),
-			func(ma fluent.MapAssembler) {
-				for key, value := range r.header {
-					ma.AssembleEntry(key).AssignNode(value)
-				}
-			},
-		), nil
+		return valueOrNotFound(
+			key,
+			r.header,
+			func () (ipld.Node, error) {
+			return fluent.MustBuildMap(
+				basicnode.Prototype.Map,
+				int64(len(r.header)),
+				func(ma fluent.MapAssembler) {
+					for key, value := range r.header {
+						ma.AssembleEntry(key).AssignNode(value)
+					}
+				},
+			), nil
+		})
 	}
 	if key == "encrypted_key" {
-		return bytesOrNil(r.encrypted_key), nil
+		return valueOrNotFound(key, r.encrypted_key, nil)
 	}
 	return nil, nil
 }
 func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	str, err := key.AsString()
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return r.LookupByString(str)
 }

@@ -1,6 +1,7 @@
 package dagjose
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/ipld/go-ipld-prime"
@@ -19,7 +20,7 @@ func (d *jwsSignaturesNode) Kind() ipld.Kind {
 func (d *jwsSignaturesNode) LookupByString(key string) (ipld.Node, error) {
 	index, err := strconv.Atoi(key)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return d.LookupByIndex(int64(index))
 }
@@ -34,12 +35,12 @@ func (d *jwsSignaturesNode) LookupByIndex(idx int64) (ipld.Node, error) {
 	if int64(len(d.sigs)) > idx {
 		return jwsSignatureNode{&d.sigs[idx]}, nil
 	}
-	return nil, nil
+	return nil, fmt.Errorf("Index %v out of range", idx)
 }
 func (d *jwsSignaturesNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	idx, err := seg.Index()
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 	return d.LookupByIndex(idx)
 }

@@ -1,8 +1,12 @@
 package dagjose
 
 import (
+	"errors"
+	"github.com/ipld/go-ipld-prime/datamodel"
+
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/fluent"
+	"github.com/ipld/go-ipld-prime/linking/cid"
 	"github.com/ipld/go-ipld-prime/node/basic"
 )
 
@@ -13,44 +17,62 @@ func (d dagJOSENode) Kind() ipld.Kind {
 }
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
-		return basicnode.NewBytes(d.payload.Bytes()), nil
+		return valueOrNotFound(key, d.payload, nil)
+	}
+	if key == "link" {
+		return valueOrNotFound(
+			key,
+			d.payload,
+			func () (ipld.Node, error) {
+				return basicnode.NewLink(cidlink.Link{Cid: *(d.payload)}), nil
+			},
+		)
 	}
 	if key == "signatures" {
-		return &jwsSignaturesNode{d.signatures}, nil
+		return valueOrNotFound(
+			key,
+			d.signatures,
+			func () (ipld.Node, error) {
+				return &jwsSignaturesNode{d.signatures}, nil
+			},
+		)
 	}
 	if key == "protected" {
-		return bytesOrNil(d.protected), nil
+		return valueOrNotFound(key, d.protected, nil)
 	}
 	if key == "unprotected" {
-		return bytesOrNil(d.unprotected), nil
+		return valueOrNotFound(key, d.unprotected, nil)
 	}
 	if key == "iv" {
-		return bytesOrNil(d.iv), nil
+		return valueOrNotFound(key, d.iv, nil)
 	}
 	if key == "aad" {
-		return bytesOrNil(d.aad), nil
+		return valueOrNotFound(key, d.aad, nil)
 	}
 	if key == "ciphertext" {
-		return bytesOrNil(d.ciphertext), nil
+		return valueOrNotFound(key, d.ciphertext, nil)
 	}
 	if key == "tag" {
-		return bytesOrNil(d.tag), nil
+		return valueOrNotFound(key, d.tag, nil)
 	}
 	if key == "recipients" {
-		if d.recipients != nil {
-			return fluent.MustBuildList(
-				basicnode.Prototype.List,
-				int64(len(d.recipients)),
-				func(la fluent.ListAssembler) {
-					for i := range d.recipients {
-						la.AssembleValue().AssignNode(jweRecipientNode{&d.recipients[i]})
-					}
-				},
-			), nil
-		}
-		return nil, nil
+		return valueOrNotFound(
+			key,
+			d.recipients,
+			func () (ipld.Node, error) {
+				return fluent.MustBuildList(
+					basicnode.Prototype.List,
+					int64(len(d.recipients)),
+					func(la fluent.ListAssembler) {
+						for i := range d.recipients {
+							la.AssembleValue().AssignNode(jweRecipientNode{&d.recipients[i]})
+						}
+					},
+				), nil
+			},
+		)
 	}
-	return nil, nil
+	return valueOrNotFound(key, nil, nil)
 }
 func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	ks, err := key.AsString()
@@ -60,7 +82,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(ks)
 }
 func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return nil, nil
+	return nil, errors.New("can not lookup by index in of a map")
 }
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
@@ -107,12 +129,15 @@ func (d dagJOSENode) Prototype() ipld.NodePrototype {
 
 // end ipld.Node implementation
 
-func bytesOrNil(value []byte) ipld.Node {
+func valueOrNotFound(key string, value interface{}, createNode func () (ipld.Node, error)) (ipld.Node, error) {
 	if value != nil {
-		return basicnode.NewBytes(value)
-	} else {
-		return ipld.Absent
+		if createNode != nil {
+			// `createNode` must be a closure that returns a correctly created `ipld.Node` or an appropriate error
+			return createNode()
+		}
+		return goPrimitiveToIpldBasicNode(value)
 	}
+	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 }
 
 type dagJOSEMapIterator struct {
