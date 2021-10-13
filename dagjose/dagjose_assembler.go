@@ -33,11 +33,11 @@ func NewBuilder() ipld.NodeBuilder {
 type maState uint8
 
 const (
-	maState_initial     maState = iota // also the 'expect key or finish' state
-	maState_midKey                     // waiting for a 'finished' state in the KeyAssembler.
-	maState_expectValue                // 'AssembleValue' is the only valid next step
-	maState_midValue                   // waiting for a 'finished' state in the ValueAssembler.
-	maState_finished                   // finished
+	maStateInitial     maState = iota // also the 'expect key or finish' state
+	maStateMidKey                     // waiting for a 'finished' state in the KeyAssembler
+	maStateExpectValue                // 'AssembleValue' is the only valid next step
+	maStateMidValue                   // waiting for a 'finished' state in the ValueAssembler
+	maStateFinished                   // finished
 )
 
 // An implementation of `ipld.NodeBuilder` which builds a `dagjose.DagJOSE`
@@ -49,29 +49,29 @@ type dagJOSENodeBuilder struct {
 	key     *string
 }
 
-var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
+var dagJoseMixin = mixins.MapAssembler{TypeName: "dagJOSENodeAssembler"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
-	if d.state != maState_initial {
+	if d.state != maStateInitial {
 		panic("misuse")
 	}
 	return d, nil
 }
 func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	if d.state == maState_midValue && *d.key == "recipients" {
+	if d.state == maStateMidValue && *d.key == "recipients" {
 		d.dagJose.recipients = make([]jweRecipient, 0, sizeHint)
-		d.state = maState_initial
+		d.state = maStateInitial
 		return &jweRecipientListAssembler{&d.dagJose}, nil
 	}
-	if d.state == maState_midValue && *d.key == "signatures" {
+	if d.state == maStateMidValue && *d.key == "signatures" {
 		d.dagJose.signatures = make([]jwsSignature, 0, sizeHint)
-		d.state = maState_initial
+		d.state = maStateInitial
 		return &jwsSignatureListAssembler{&d.dagJose}, nil
 	}
 	return dagJoseMixin.BeginList(sizeHint)
 }
 func (d *dagJOSENodeBuilder) AssignNull() error {
-	if d.state == maState_midValue {
+	if d.state == maStateMidValue {
 		switch *d.key {
 		case "payload":
 			d.dagJose.payload = nil
@@ -92,9 +92,9 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 		case "recipients":
 			d.dagJose.recipients = nil
 		default:
-			panic("should not happen due to AssignString implementation")
+			return dagJoseMixin.AssignNull()
 		}
-		d.state = maState_initial
+		d.state = maStateInitial
 		return nil
 	}
 	return dagJoseMixin.AssignNull()
@@ -109,18 +109,18 @@ func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
 	return dagJoseMixin.AssignFloat(f)
 }
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
-	if d.state == maState_midKey {
+	if d.state == maStateMidKey {
 		if !isValidJOSEKey(s) {
 			return fmt.Errorf("attempted to assign an invalid JOSE key: %v", s)
 		}
 		d.key = &s
-		d.state = maState_expectValue
+		d.state = maStateExpectValue
 		return nil
 	}
 	return dagJoseMixin.AssignString(s)
 }
 func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
-	if d.state == maState_midValue {
+	if d.state == maStateMidValue {
 		switch *d.key {
 		case "payload":
 			_, c, err := cid.CidFromBytes(b)
@@ -147,7 +147,7 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 		default:
 			panic("should not happen due to AssignString implementation")
 		}
-		d.state = maState_initial
+		d.state = maStateInitial
 		return nil
 	}
 	return dagJoseMixin.AssignBytes(b)
@@ -168,32 +168,32 @@ func (d *dagJOSENodeBuilder) Reset() {
 }
 
 func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
-	if d.state != maState_initial {
+	if d.state != maStateInitial {
 		panic("misuse")
 	}
-	d.state = maState_midKey
+	d.state = maStateMidKey
 	return d
 }
 func (d *dagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
-	if d.state != maState_expectValue {
+	if d.state != maStateExpectValue {
 		panic("misuse")
 	}
-	d.state = maState_midValue
+	d.state = maStateMidValue
 	return d
 }
 func (d *dagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error) {
-	if d.state != maState_initial {
+	if d.state != maStateInitial {
 		panic("misuse")
 	}
 	d.key = &k
-	d.state = maState_midValue
+	d.state = maStateMidValue
 	return d, nil
 }
 func (d *dagJOSENodeBuilder) Finish() error {
-	if d.state != maState_initial {
+	if d.state != maStateInitial {
 		panic("misuse")
 	}
-	d.state = maState_finished
+	d.state = maStateFinished
 	return nil
 }
 func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {

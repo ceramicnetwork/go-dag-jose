@@ -13,7 +13,7 @@ func (l *jwsSignatureListAssembler) AssembleValue() ipld.NodeAssembler {
 	return &jwsSignatureAssembler{
 		signature: sigRef,
 		key:       nil,
-		state:     maState_initial,
+		state:     maStateInitial,
 	}
 }
 

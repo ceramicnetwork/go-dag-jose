@@ -41,7 +41,7 @@ func (d *DagJOSE) AsNode() ipld.Node {
 // JWE
 func (d *DagJOSE) AsJWS() *DagJWS {
 	if d.payload != nil {
-		return &DagJWS{dagjose: d}
+		return &DagJWS{dagJOSE: d}
 	}
 	return nil
 }
@@ -50,29 +50,29 @@ func (d *DagJOSE) AsJWS() *DagJWS {
 // JWS
 func (d *DagJOSE) AsJWE() *DagJWE {
 	if d.ciphertext != nil {
-		return &DagJWE{dagjose: d}
+		return &DagJWE{dagJOSE: d}
 	}
 	return nil
 }
 
-type DagJWS struct{ dagjose *DagJOSE }
+type DagJWS struct{ dagJOSE *DagJOSE }
 
 // AsJOSE returns a DagJOSE object that implements ipld.Node and can be passed
 // to ipld related infrastructure
 func (d *DagJWS) AsJOSE() *DagJOSE {
-	return d.dagjose
+	return d.dagJOSE
 }
 
-type DagJWE struct{ dagjose *DagJOSE }
+type DagJWE struct{ dagJOSE *DagJOSE }
 
 // AsJOSE returns a DagJOSE object that implements ipld.Node and can be passed
 // to ipld related infrastructure
 func (d *DagJWE) AsJOSE() *DagJOSE {
-	return d.dagjose
+	return d.dagJOSE
 }
 
 func (d *DagJWS) PayloadLink() ipld.Link {
-	return cidlink.Link{Cid: *d.dagjose.payload}
+	return cidlink.Link{Cid: *d.dagJOSE.payload}
 }
 
 // LinkPrototype will build CIDs using the dag-jose multicodec and the sha-384
@@ -85,7 +85,7 @@ var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 }}
 
 // StoreJOSE is a convenience function which passes `dagjose.LinkPrototype` and
-// a `DagJOSE` IPLD Node (using `DagJOSE.AsNode`) to `ipld.LinkSystem.Store`.
+// a DAG-JOSE Node (using `DagJOSE.AsNode`) to `ipld.LinkSystem.Store`.
 func StoreJOSE(linkContext ipld.LinkContext, jose *DagJOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
 	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
 }
@@ -94,7 +94,7 @@ var NodePrototype = &DagJOSENodePrototype{}
 
 // LoadJOSE is a convenience function which wraps `ipld.LinkSystem.Load`. This
 // will provide the `dagjose.NodePrototype` to the link system and attempt to
-// cast the result to a `DagJOSE` object.
+// cast the result to a `dagjose.DagJOSE` object.
 func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkSystem) (*DagJOSE, error) {
 	n, err := linkSystem.Load(
 		linkContext,

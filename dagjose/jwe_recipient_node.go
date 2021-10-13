@@ -9,6 +9,8 @@ import (
 
 type jweRecipientNode struct{ *jweRecipient }
 
+var jweRecipientMixin = mixins.Map{TypeName: "JWERecipient"}
+
 func (r jweRecipientNode) Kind() ipld.Kind {
 	return ipld.Kind_Map
 }
@@ -42,7 +44,7 @@ func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return r.LookupByString(str)
 }
 func (r jweRecipientNode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.LookupByIndex(idx)
+	return jweRecipientMixin.LookupByIndex(idx)
 }
 func (r jweRecipientNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return r.LookupByString(seg.String())
@@ -69,22 +71,22 @@ func (r jweRecipientNode) IsNull() bool {
 	return false
 }
 func (r jweRecipientNode) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBool()
+	return jweRecipientMixin.AsBool()
 }
 func (r jweRecipientNode) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsInt()
+	return jweRecipientMixin.AsInt()
 }
 func (r jweRecipientNode) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsFloat()
+	return jweRecipientMixin.AsFloat()
 }
 func (r jweRecipientNode) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsString()
+	return jweRecipientMixin.AsString()
 }
 func (r jweRecipientNode) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsBytes()
+	return jweRecipientMixin.AsBytes()
 }
 func (r jweRecipientNode) AsLink() (ipld.Link, error) {
-	return mixins.Map{TypeName: "dagjose.JWERecipient"}.AsLink()
+	return jweRecipientMixin.AsLink()
 }
 func (r jweRecipientNode) Prototype() ipld.NodePrototype {
 	return nil

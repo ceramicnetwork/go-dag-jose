@@ -1,29 +1,36 @@
 package dagjose
 
 import (
-	"errors"
-	"github.com/ipld/go-ipld-prime/datamodel"
-
 	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/fluent"
 	"github.com/ipld/go-ipld-prime/linking/cid"
 	"github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
 type dagJOSENode struct{ *DagJOSE }
+
+var dagJOSENodeMixin = mixins.Map{TypeName: "DagJOSENode"}
 
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
 }
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
-		return valueOrNotFound(key, d.payload, nil)
+		return valueOrNotFound(
+			key,
+			d.payload,
+			func() (ipld.Node, error) {
+				return basicnode.NewBytes(d.payload.Bytes()), nil
+			},
+		)
 	}
 	if key == "link" {
 		return valueOrNotFound(
 			key,
 			d.payload,
-			func () (ipld.Node, error) {
+			func() (ipld.Node, error) {
 				return basicnode.NewLink(cidlink.Link{Cid: *(d.payload)}), nil
 			},
 		)
@@ -32,7 +39,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 		return valueOrNotFound(
 			key,
 			d.signatures,
-			func () (ipld.Node, error) {
+			func() (ipld.Node, error) {
 				return &jwsSignaturesNode{d.signatures}, nil
 			},
 		)
@@ -59,7 +66,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 		return valueOrNotFound(
 			key,
 			d.recipients,
-			func () (ipld.Node, error) {
+			func() (ipld.Node, error) {
 				return fluent.MustBuildList(
 					basicnode.Prototype.List,
 					int64(len(d.recipients)),
@@ -82,7 +89,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(ks)
 }
 func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return nil, errors.New("can not lookup by index in of a map")
+	return dagJOSENodeMixin.LookupByIndex(idx)
 }
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
@@ -106,22 +113,22 @@ func (d dagJOSENode) IsNull() bool {
 	return false
 }
 func (d dagJOSENode) AsBool() (bool, error) {
-	return false, nil
+	return dagJOSENodeMixin.AsBool()
 }
 func (d dagJOSENode) AsInt() (int64, error) {
-	return 0, nil
+	return dagJOSENodeMixin.AsInt()
 }
 func (d dagJOSENode) AsFloat() (float64, error) {
-	return 0, nil
+	return dagJOSENodeMixin.AsFloat()
 }
 func (d dagJOSENode) AsString() (string, error) {
-	return "", nil
+	return dagJOSENodeMixin.AsString()
 }
 func (d dagJOSENode) AsBytes() ([]byte, error) {
-	return nil, nil
+	return dagJOSENodeMixin.AsBytes()
 }
 func (d dagJOSENode) AsLink() (ipld.Link, error) {
-	return nil, nil
+	return dagJOSENodeMixin.AsLink()
 }
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}
@@ -129,12 +136,13 @@ func (d dagJOSENode) Prototype() ipld.NodePrototype {
 
 // end ipld.Node implementation
 
-func valueOrNotFound(key string, value interface{}, createNode func () (ipld.Node, error)) (ipld.Node, error) {
+func valueOrNotFound(key string, value interface{}, createNode func() (ipld.Node, error)) (ipld.Node, error) {
 	if value != nil {
 		if createNode != nil {
 			// `createNode` must be a closure that returns a correctly created `ipld.Node` or an appropriate error
 			return createNode()
 		}
+		// Assume that `value` is a primitive type
 		return goPrimitiveToIpldBasicNode(value)
 	}
 	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}

@@ -15,28 +15,28 @@ type jweRecipientAssembler struct {
 	state     maState
 }
 
-var jweRecipientMixin = mixins.MapAssembler{TypeName: "JOSERecipient"}
+var jweRecipientAssemblerMixin = mixins.MapAssembler{TypeName: "JWERecipientAssembler"}
 
 func (j *jweRecipientAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
-	if j.state == maState_midValue && *j.key == "header" {
+	if j.state == maStateMidValue && *j.key == "header" {
 		j.recipient.header = make(map[string]ipld.Node)
-		j.state = maState_initial
+		j.state = maStateInitial
 		return &headerAssembler{
 			header: j.recipient.header,
 			key:    nil,
-			state:  maState_initial,
+			state:  maStateInitial,
 		}, nil
 	}
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
 	return j, nil
 }
 func (j *jweRecipientAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	return jweRecipientMixin.BeginList(sizeHint)
+	return jweRecipientAssemblerMixin.BeginList(sizeHint)
 }
 func (j *jweRecipientAssembler) AssignNull() error {
-	if j.state == maState_midValue {
+	if j.state == maStateMidValue {
 		switch *j.key {
 		case "header":
 			j.recipient.header = nil
@@ -47,41 +47,41 @@ func (j *jweRecipientAssembler) AssignNull() error {
 		}
 		return nil
 	}
-	return jweRecipientMixin.AssignNull()
+	return jweRecipientAssemblerMixin.AssignNull()
 }
 func (j *jweRecipientAssembler) AssignBool(b bool) error {
-	return jweRecipientMixin.AssignBool(b)
+	return jweRecipientAssemblerMixin.AssignBool(b)
 }
 func (j *jweRecipientAssembler) AssignInt(i int64) error {
-	return jweRecipientMixin.AssignInt(i)
+	return jweRecipientAssemblerMixin.AssignInt(i)
 }
 func (j *jweRecipientAssembler) AssignFloat(f float64) error {
-	return jweRecipientMixin.AssignFloat(f)
+	return jweRecipientAssemblerMixin.AssignFloat(f)
 }
 func (j *jweRecipientAssembler) AssignString(s string) error {
-	if j.state == maState_midKey {
+	if j.state == maStateMidKey {
 		if !isValidJWERecipientKey(s) {
 			return fmt.Errorf("%s is not a valid JWE recipient key", s)
 		}
 		j.key = &s
-		j.state = maState_expectValue
+		j.state = maStateExpectValue
 		return nil
 	}
-	return jweRecipientMixin.AssignString(s)
+	return jweRecipientAssemblerMixin.AssignString(s)
 }
 func (j *jweRecipientAssembler) AssignBytes(b []byte) error {
-	if j.state == maState_midValue {
+	if j.state == maStateMidValue {
 		if *j.key == "encrypted_key" {
 			j.recipient.encryptedKey = b
-			j.state = maState_initial
+			j.state = maStateInitial
 			return nil
 		}
 		panic("should not be possible due to validation in map assembler")
 	}
-	return jweRecipientMixin.AssignBytes(b)
+	return jweRecipientAssemblerMixin.AssignBytes(b)
 }
 func (j *jweRecipientAssembler) AssignLink(l ipld.Link) error {
-	return jweRecipientMixin.AssignLink(l)
+	return jweRecipientAssemblerMixin.AssignLink(l)
 }
 func (j *jweRecipientAssembler) AssignNode(n ipld.Node) error {
 	return datamodel.Copy(n, j)
@@ -91,26 +91,26 @@ func (j *jweRecipientAssembler) Prototype() ipld.NodePrototype {
 }
 
 func (j *jweRecipientAssembler) AssembleKey() ipld.NodeAssembler {
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
-	j.state = maState_midKey
+	j.state = maStateMidKey
 	return j
 }
 
 func (j *jweRecipientAssembler) AssembleValue() ipld.NodeAssembler {
-	if j.state != maState_expectValue {
+	if j.state != maStateExpectValue {
 		panic("misuse")
 	}
-	j.state = maState_midValue
+	j.state = maStateMidValue
 	return j
 }
 func (j *jweRecipientAssembler) AssembleEntry(k string) (ipld.NodeAssembler, error) {
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
 	j.key = &k
-	j.state = maState_midValue
+	j.state = maStateMidValue
 	return j, nil
 }
 
@@ -122,10 +122,10 @@ func (j *jweRecipientAssembler) ValuePrototype(k string) ipld.NodePrototype {
 }
 
 func (j *jweRecipientAssembler) Finish() error {
-	if j.state != maState_initial {
+	if j.state != maStateInitial {
 		panic("misuse")
 	}
-	j.state = maState_finished
+	j.state = maStateFinished
 	return nil
 }
 
