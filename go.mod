@@ -11,5 +11,3 @@ require (
 	gopkg.in/square/go-jose.v2 v2.5.1
 	pgregory.net/rapid v0.4.6
 )
-
-replace github.com/ceramicnetwork/go-dag-jose v0.0.5 => ./
