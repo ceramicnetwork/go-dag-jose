@@ -31,7 +31,8 @@ func Encode(n datamodel.Node, w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	// CBOR is a superset of DAG-JOSE and, as such, can be used to encode
-	// valid DAG-JOSE objects.
+	// CBOR is a superset of DAG-JOSE and, as such, can be used to encode valid
+	// DAG-JOSE objects without encoding the CID (as expected by the DAG-JOSE
+	// spec: https://specs.ipld.io/block-layer/codecs/dag-jose.html).
 	return cbor.Encode(dagJoseBuilder.Build(), w)
 }

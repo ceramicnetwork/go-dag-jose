@@ -417,7 +417,8 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 	}
 }
 
-// Given a JOSE object we encode it using StoreJOSE and decode it using LoadJOSE and return the result
+// Given a JOSE object we encode it using StoreJOSE and decode it using LoadJOSE
+// and return the result
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
 	ls := cidlink.DefaultLinkSystem()
@@ -436,7 +437,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error storing DagJOSE: %v", err))
 	}
-	jose, err := LoadJOSE(
+	dagJOSE, err := LoadJOSE(
 		link,
 		ipld.LinkContext{},
 		ls,
@@ -444,7 +445,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error reading data from datastore: %v", err))
 	}
-	return jose
+	return dagJOSE
 }
 
 // Check that if we encode and decode a valid JWS object then the
@@ -461,19 +462,19 @@ func TestRoundTripValidJWS(t *testing.T) {
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
-		roundTripped := roundTripJose(jose)
-		normalizeJoseForJsonComparison(jose)
+		dagJOSE := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		roundTripped := roundTripJose(dagJOSE)
+		normalizeJoseForJsonComparison(dagJOSE)
 		normalizeJoseForJsonComparison(roundTripped)
-		require.Equal(t, jose, roundTripped)
+		require.Equal(t, dagJOSE, roundTripped)
 	})
 }
 
 // Decoding should always return either a JWS or a JWE if the input is valid
 func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
-		roundTripped := roundTripJose(jose)
+		dagJOSE := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		roundTripped := roundTripJose(dagJOSE)
 		if roundTripped.AsJWE() == nil {
 			require.NotNil(t, roundTripped.AsJWS())
 		}
@@ -536,13 +537,13 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 			t.Errorf("error creating flattened serialization: %v", err)
 			return
 		}
-		parsedJose, err := ParseJWS([]byte(flattenedSerialization))
+		dagJWS, err := ParseJWS(flattenedSerialization)
 		if err != nil {
 			t.Errorf("error parsing flattenedSerialization: %v", err)
 			return
 		}
 		normalizeJoseForJsonComparison(jws.AsJOSE())
-		require.Equal(t, jws, parsedJose)
+		require.Equal(t, jws, dagJWS)
 	})
 }
 
@@ -566,13 +567,13 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 			t.Errorf("error creating flattened serialization: %v", err)
 			return
 		}
-		parsedJose, err := ParseJWE([]byte(flattenedSerialization))
+		dagJWE, err := ParseJWE(flattenedSerialization)
 		if err != nil {
 			t.Errorf("error parsing flattenedSerialization: %v", err)
 			return
 		}
 		normalizeJoseForJsonComparison(jwe.AsJOSE())
-		require.Equal(t, jwe, parsedJose)
+		require.Equal(t, jwe, dagJWE)
 	})
 }
 

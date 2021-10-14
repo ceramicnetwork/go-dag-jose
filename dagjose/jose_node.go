@@ -16,6 +16,7 @@ var dagJOSENodeMixin = mixins.Map{TypeName: "DagJOSENode"}
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
 }
+
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
 		return valueOrNotFound(
@@ -159,7 +160,10 @@ func (d *dagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 	}
 	presentKeys := d.presentKeys()
 	key := presentKeys[d.index]
-	value, _ := d.d.LookupByString(key)
+	value, err := d.d.LookupByString(key)
+	if err != nil {
+		return nil, nil, err
+	}
 	d.index += 1
 	return basicnode.NewString(key), value, nil
 }

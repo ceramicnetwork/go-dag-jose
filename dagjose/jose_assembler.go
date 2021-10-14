@@ -8,6 +8,7 @@ import (
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
+	"github.com/ipld/go-ipld-prime/schema"
 )
 
 var (
@@ -19,7 +20,7 @@ var (
 type DagJOSENodePrototype struct{}
 
 func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
-	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
+	return &dagJOSENodeBuilder{dagJOSE: DagJOSE{}}
 }
 
 // NewBuilder Returns an instance of the DagJOSENodeBuilder which can be passed
@@ -27,7 +28,7 @@ func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 // be necessary in reasonably advanced situations, most of the time you should
 // be able to use dagjose.LoadJOSE.
 func NewBuilder() ipld.NodeBuilder {
-	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
+	return &dagJOSENodeBuilder{dagJOSE: DagJOSE{}}
 }
 
 type maState uint8
@@ -40,120 +41,139 @@ const (
 	maStateFinished                   // finished
 )
 
+type ErrInvalidState struct {
+	state maState
+}
+
+func (e ErrInvalidState) Error() string {
+	return fmt.Sprintf("invalid state: %d", e.state)
+}
+
 // An implementation of `ipld.NodeBuilder` which builds a `dagjose.DagJOSE`
 // object. This builder will throw an error if the IPLD data it is building
 // does not match the schema specified in the spec
 type dagJOSENodeBuilder struct {
-	dagJose DagJOSE
+	dagJOSE DagJOSE
 	state   maState
 	key     *string
 }
 
-var dagJoseMixin = mixins.MapAssembler{TypeName: "dagJOSENodeAssembler"}
+var dagJOSEAssemblerMixin = mixins.MapAssembler{TypeName: "DagJOSEAssembler"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if d.state != maStateInitial {
-		panic("misuse")
+		return nil, ErrInvalidState{d.state}
 	}
 	return d, nil
 }
+
 func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	if d.state == maStateMidValue && *d.key == "recipients" {
-		d.dagJose.recipients = make([]jweRecipient, 0, sizeHint)
-		d.state = maStateInitial
-		return &jweRecipientListAssembler{&d.dagJose}, nil
+	if d.state != maStateMidValue {
+		return nil, ErrInvalidState{d.state}
 	}
-	if d.state == maStateMidValue && *d.key == "signatures" {
-		d.dagJose.signatures = make([]jwsSignature, 0, sizeHint)
+	if *d.key == "recipients" {
+		d.dagJOSE.recipients = make([]jweRecipient, 0, sizeHint)
 		d.state = maStateInitial
-		return &jwsSignatureListAssembler{&d.dagJose}, nil
+		return &jweRecipientListAssembler{&d.dagJOSE}, nil
 	}
-	return dagJoseMixin.BeginList(sizeHint)
+	if *d.key == "signatures" {
+		d.dagJOSE.signatures = make([]jwsSignature, 0, sizeHint)
+		d.state = maStateInitial
+		return &jwsSignatureListAssembler{&d.dagJOSE}, nil
+	}
+	return dagJOSEAssemblerMixin.BeginList(sizeHint)
 }
+
 func (d *dagJOSENodeBuilder) AssignNull() error {
-	if d.state == maStateMidValue {
-		switch *d.key {
-		case "payload":
-			d.dagJose.payload = nil
-		case "protected":
-			d.dagJose.protected = nil
-		case "unprotected":
-			d.dagJose.unprotected = nil
-		case "iv":
-			d.dagJose.iv = nil
-		case "aad":
-			d.dagJose.aad = nil
-		case "ciphertext":
-			d.dagJose.ciphertext = nil
-		case "tag":
-			d.dagJose.tag = nil
-		case "signatures":
-			d.dagJose.signatures = nil
-		case "recipients":
-			d.dagJose.recipients = nil
-		default:
-			return dagJoseMixin.AssignNull()
-		}
-		d.state = maStateInitial
-		return nil
+	if d.state != maStateMidValue {
+		return ErrInvalidState{d.state}
 	}
-	return dagJoseMixin.AssignNull()
+	switch *d.key {
+	case "payload":
+		d.dagJOSE.payload = nil
+	case "protected":
+		d.dagJOSE.protected = nil
+	case "unprotected":
+		d.dagJOSE.unprotected = nil
+	case "iv":
+		d.dagJOSE.iv = nil
+	case "aad":
+		d.dagJOSE.aad = nil
+	case "ciphertext":
+		d.dagJOSE.ciphertext = nil
+	case "tag":
+		d.dagJOSE.tag = nil
+	case "signatures":
+		d.dagJOSE.signatures = nil
+	case "recipients":
+		d.dagJOSE.recipients = nil
+	default:
+		return dagJOSEAssemblerMixin.AssignNull()
+	}
+	d.state = maStateInitial
+	return nil
 }
+
 func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
-	return dagJoseMixin.AssignBool(b)
+	return dagJOSEAssemblerMixin.AssignBool(b)
 }
+
 func (d *dagJOSENodeBuilder) AssignInt(i int64) error {
-	return dagJoseMixin.AssignInt(i)
+	return dagJOSEAssemblerMixin.AssignInt(i)
 }
+
 func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
-	return dagJoseMixin.AssignFloat(f)
+	return dagJOSEAssemblerMixin.AssignFloat(f)
 }
+
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
-	if d.state == maStateMidKey {
-		if !isValidJOSEKey(s) {
-			return fmt.Errorf("attempted to assign an invalid JOSE key: %v", s)
-		}
-		d.key = &s
-		d.state = maStateExpectValue
-		return nil
+	if d.state != maStateMidKey {
+		return ErrInvalidState{d.state}
 	}
-	return dagJoseMixin.AssignString(s)
+	if !isValidJOSEKey(s) {
+		return schema.ErrNoSuchField{Type: nil, Field: datamodel.PathSegmentOfString(s)}
+	}
+	d.key = &s
+	d.state = maStateExpectValue
+	return nil
 }
+
 func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
-	if d.state == maStateMidValue {
-		switch *d.key {
-		case "payload":
-			_, c, err := cid.CidFromBytes(b)
-			if err != nil {
-				return fmt.Errorf("payload is not a valid CID: %v", err)
-			}
-			d.dagJose.payload = &c
-		case "protected":
-			d.dagJose.protected = b
-		case "unprotected":
-			d.dagJose.unprotected = b
-		case "iv":
-			d.dagJose.iv = b
-		case "aad":
-			d.dagJose.aad = b
-		case "ciphertext":
-			d.dagJose.ciphertext = b
-		case "tag":
-			d.dagJose.tag = b
-		case "signatures":
-			return fmt.Errorf("attempted to assign bytes to 'signatures' key")
-		case "recipients":
-			return fmt.Errorf("attempted to assign bytes to 'recipients' key")
-		default:
-			panic("should not happen due to AssignString implementation")
-		}
-		d.state = maStateInitial
-		return nil
+	if d.state != maStateMidValue {
+		return ErrInvalidState{d.state}
 	}
-	return dagJoseMixin.AssignBytes(b)
+	switch *d.key {
+	case "payload":
+		_, c, err := cid.CidFromBytes(b)
+		if err != nil {
+			return fmt.Errorf("payload is not a valid CID: %v", err)
+		}
+		d.dagJOSE.payload = &c
+	case "protected":
+		d.dagJOSE.protected = b
+	case "unprotected":
+		d.dagJOSE.unprotected = b
+	case "iv":
+		d.dagJOSE.iv = b
+	case "aad":
+		d.dagJOSE.aad = b
+	case "ciphertext":
+		d.dagJOSE.ciphertext = b
+	case "tag":
+		d.dagJOSE.tag = b
+	case "signatures":
+		return fmt.Errorf("attempted to assign bytes to 'signatures' key")
+	case "recipients":
+		return fmt.Errorf("attempted to assign bytes to 'recipients' key")
+	default:
+		return dagJOSEAssemblerMixin.AssignBytes(b)
+	}
+	d.state = maStateInitial
+	return nil
 }
+
 func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
-	return dagJoseMixin.AssignLink(l)
+	return dagJOSEAssemblerMixin.AssignLink(l)
 }
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 	return datamodel.Copy(n, d)
@@ -162,7 +182,7 @@ func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}
 }
 func (d *dagJOSENodeBuilder) Build() ipld.Node {
-	return dagJOSENode{&d.dagJose}
+	return dagJOSENode{&d.dagJOSE}
 }
 func (d *dagJOSENodeBuilder) Reset() {
 }
@@ -183,7 +203,7 @@ func (d *dagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
 }
 func (d *dagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error) {
 	if d.state != maStateInitial {
-		panic("misuse")
+		return nil, ErrInvalidState{d.state}
 	}
 	d.key = &k
 	d.state = maStateMidValue
@@ -191,7 +211,7 @@ func (d *dagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error)
 }
 func (d *dagJOSENodeBuilder) Finish() error {
 	if d.state != maStateInitial {
-		panic("misuse")
+		return ErrInvalidState{d.state}
 	}
 	d.state = maStateFinished
 	return nil
@@ -199,7 +219,7 @@ func (d *dagJOSENodeBuilder) Finish() error {
 func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {
 	return basicnode.Prototype.String
 }
-func (d *dagJOSENodeBuilder) ValuePrototype(k string) ipld.NodePrototype {
+func (d *dagJOSENodeBuilder) ValuePrototype(string) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }
 
