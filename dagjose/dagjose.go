@@ -29,8 +29,8 @@ type jwsSignature struct {
 }
 
 type jweRecipient struct {
-	header       map[string]ipld.Node
-	encryptedKey []byte
+	header        map[string]ipld.Node
+	encrypted_key []byte
 }
 
 func (d *DagJOSE) AsNode() ipld.Node {
@@ -41,7 +41,7 @@ func (d *DagJOSE) AsNode() ipld.Node {
 // JWE
 func (d *DagJOSE) AsJWS() *DagJWS {
 	if d.payload != nil {
-		return &DagJWS{dagJOSE: d}
+		return &DagJWS{dagjose: d}
 	}
 	return nil
 }
@@ -50,29 +50,29 @@ func (d *DagJOSE) AsJWS() *DagJWS {
 // JWS
 func (d *DagJOSE) AsJWE() *DagJWE {
 	if d.ciphertext != nil {
-		return &DagJWE{dagJOSE: d}
+		return &DagJWE{dagjose: d}
 	}
 	return nil
 }
 
-type DagJWS struct{ dagJOSE *DagJOSE }
+type DagJWS struct{ dagjose *DagJOSE }
 
 // AsJOSE returns a DagJOSE object that implements ipld.Node and can be passed
 // to ipld related infrastructure
 func (d *DagJWS) AsJOSE() *DagJOSE {
-	return d.dagJOSE
+	return d.dagjose
 }
 
-type DagJWE struct{ dagJOSE *DagJOSE }
+type DagJWE struct{ dagjose *DagJOSE }
 
 // AsJOSE returns a DagJOSE object that implements ipld.Node and can be passed
 // to ipld related infrastructure
 func (d *DagJWE) AsJOSE() *DagJOSE {
-	return d.dagJOSE
+	return d.dagjose
 }
 
 func (d *DagJWS) PayloadLink() ipld.Link {
-	return cidlink.Link{Cid: *d.dagJOSE.payload}
+	return cidlink.Link{Cid: *d.dagjose.payload}
 }
 
 // LinkPrototype will build CIDs using the dag-jose multicodec and the sha-384

@@ -34,11 +34,11 @@ func NewBuilder() ipld.NodeBuilder {
 type maState uint8
 
 const (
-	maStateInitial     maState = iota // also the 'expect key or finish' state
-	maStateMidKey                     // waiting for a 'finished' state in the KeyAssembler
-	maStateExpectValue                // 'AssembleValue' is the only valid next step
-	maStateMidValue                   // waiting for a 'finished' state in the ValueAssembler
-	maStateFinished                   // finished
+	maState_initial     maState = iota // also the 'expect key or finish' state
+	maState_midKey                     // waiting for a 'finished' state in the KeyAssembler
+	maState_expectValue                // 'AssembleValue' is the only valid next step
+	maState_midValue                   // waiting for a 'finished' state in the ValueAssembler
+	maState_finished                   // finished
 )
 
 type ErrInvalidState struct {
@@ -61,31 +61,31 @@ type dagJOSENodeBuilder struct {
 var dagJOSEAssemblerMixin = mixins.MapAssembler{TypeName: "DagJOSEAssembler"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
-	if d.state != maStateInitial {
+	if d.state != maState_initial {
 		return nil, ErrInvalidState{d.state}
 	}
 	return d, nil
 }
 
 func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	if d.state != maStateMidValue {
+	if d.state != maState_midValue {
 		return nil, ErrInvalidState{d.state}
 	}
 	if *d.key == "recipients" {
 		d.dagJOSE.recipients = make([]jweRecipient, 0, sizeHint)
-		d.state = maStateInitial
+		d.state = maState_initial
 		return &jweRecipientListAssembler{&d.dagJOSE}, nil
 	}
 	if *d.key == "signatures" {
 		d.dagJOSE.signatures = make([]jwsSignature, 0, sizeHint)
-		d.state = maStateInitial
+		d.state = maState_initial
 		return &jwsSignatureListAssembler{&d.dagJOSE}, nil
 	}
 	return dagJOSEAssemblerMixin.BeginList(sizeHint)
 }
 
 func (d *dagJOSENodeBuilder) AssignNull() error {
-	if d.state != maStateMidValue {
+	if d.state != maState_midValue {
 		return ErrInvalidState{d.state}
 	}
 	switch *d.key {
@@ -110,7 +110,7 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 	default:
 		return dagJOSEAssemblerMixin.AssignNull()
 	}
-	d.state = maStateInitial
+	d.state = maState_initial
 	return nil
 }
 
@@ -127,19 +127,19 @@ func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
 }
 
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
-	if d.state != maStateMidKey {
+	if d.state != maState_midKey {
 		return ErrInvalidState{d.state}
 	}
 	if !isValidJOSEKey(s) {
 		return schema.ErrNoSuchField{Type: nil, Field: datamodel.PathSegmentOfString(s)}
 	}
 	d.key = &s
-	d.state = maStateExpectValue
+	d.state = maState_expectValue
 	return nil
 }
 
 func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
-	if d.state != maStateMidValue {
+	if d.state != maState_midValue {
 		return ErrInvalidState{d.state}
 	}
 	switch *d.key {
@@ -168,7 +168,7 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	default:
 		return dagJOSEAssemblerMixin.AssignBytes(b)
 	}
-	d.state = maStateInitial
+	d.state = maState_initial
 	return nil
 }
 
@@ -188,32 +188,32 @@ func (d *dagJOSENodeBuilder) Reset() {
 }
 
 func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
-	if d.state != maStateInitial {
+	if d.state != maState_initial {
 		panic("misuse")
 	}
-	d.state = maStateMidKey
+	d.state = maState_midKey
 	return d
 }
 func (d *dagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
-	if d.state != maStateExpectValue {
+	if d.state != maState_expectValue {
 		panic("misuse")
 	}
-	d.state = maStateMidValue
+	d.state = maState_midValue
 	return d
 }
 func (d *dagJOSENodeBuilder) AssembleEntry(k string) (ipld.NodeAssembler, error) {
-	if d.state != maStateInitial {
+	if d.state != maState_initial {
 		return nil, ErrInvalidState{d.state}
 	}
 	d.key = &k
-	d.state = maStateMidValue
+	d.state = maState_midValue
 	return d, nil
 }
 func (d *dagJOSENodeBuilder) Finish() error {
-	if d.state != maStateInitial {
+	if d.state != maState_initial {
 		return ErrInvalidState{d.state}
 	}
-	d.state = maStateFinished
+	d.state = maState_finished
 	return nil
 }
 func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {

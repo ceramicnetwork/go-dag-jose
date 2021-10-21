@@ -18,16 +18,16 @@ type jweRecipientAssembler struct {
 var jweRecipientAssemblerMixin = mixins.MapAssembler{TypeName: "JWERecipientAssembler"}
 
 func (j *jweRecipientAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
-	if j.state == maStateMidValue && *j.key == "header" {
+	if j.state == maState_midValue && *j.key == "header" {
 		j.recipient.header = make(map[string]ipld.Node)
-		j.state = maStateInitial
+		j.state = maState_initial
 		return &headerAssembler{
 			header: j.recipient.header,
 			key:    nil,
-			state:  maStateInitial,
+			state:  maState_initial,
 		}, nil
 	}
-	if j.state != maStateInitial {
+	if j.state != maState_initial {
 		panic("misuse")
 	}
 	return j, nil
@@ -36,12 +36,12 @@ func (j *jweRecipientAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, e
 	return jweRecipientAssemblerMixin.BeginList(sizeHint)
 }
 func (j *jweRecipientAssembler) AssignNull() error {
-	if j.state == maStateMidValue {
+	if j.state == maState_midValue {
 		switch *j.key {
 		case "header":
 			j.recipient.header = nil
 		case "encrypted_key":
-			j.recipient.encryptedKey = nil
+			j.recipient.encrypted_key = nil
 		default:
 			panic("should never happen due to validation in map assembler")
 		}
@@ -59,21 +59,21 @@ func (j *jweRecipientAssembler) AssignFloat(f float64) error {
 	return jweRecipientAssemblerMixin.AssignFloat(f)
 }
 func (j *jweRecipientAssembler) AssignString(s string) error {
-	if j.state == maStateMidKey {
+	if j.state == maState_midKey {
 		if !isValidJWERecipientKey(s) {
 			return fmt.Errorf("%s is not a valid JWE recipient key", s)
 		}
 		j.key = &s
-		j.state = maStateExpectValue
+		j.state = maState_expectValue
 		return nil
 	}
 	return jweRecipientAssemblerMixin.AssignString(s)
 }
 func (j *jweRecipientAssembler) AssignBytes(b []byte) error {
-	if j.state == maStateMidValue {
+	if j.state == maState_midValue {
 		if *j.key == "encrypted_key" {
-			j.recipient.encryptedKey = b
-			j.state = maStateInitial
+			j.recipient.encrypted_key = b
+			j.state = maState_initial
 			return nil
 		}
 		panic("should not be possible due to validation in map assembler")
@@ -91,26 +91,26 @@ func (j *jweRecipientAssembler) Prototype() ipld.NodePrototype {
 }
 
 func (j *jweRecipientAssembler) AssembleKey() ipld.NodeAssembler {
-	if j.state != maStateInitial {
+	if j.state != maState_initial {
 		panic("misuse")
 	}
-	j.state = maStateMidKey
+	j.state = maState_midKey
 	return j
 }
 
 func (j *jweRecipientAssembler) AssembleValue() ipld.NodeAssembler {
-	if j.state != maStateExpectValue {
+	if j.state != maState_expectValue {
 		panic("misuse")
 	}
-	j.state = maStateMidValue
+	j.state = maState_midValue
 	return j
 }
 func (j *jweRecipientAssembler) AssembleEntry(k string) (ipld.NodeAssembler, error) {
-	if j.state != maStateInitial {
+	if j.state != maState_initial {
 		panic("misuse")
 	}
 	j.key = &k
-	j.state = maStateMidValue
+	j.state = maState_midValue
 	return j, nil
 }
 
@@ -122,10 +122,10 @@ func (j *jweRecipientAssembler) ValuePrototype(k string) ipld.NodePrototype {
 }
 
 func (j *jweRecipientAssembler) Finish() error {
-	if j.state != maStateInitial {
+	if j.state != maState_initial {
 		panic("misuse")
 	}
-	j.state = maStateFinished
+	j.state = maState_finished
 	return nil
 }
 

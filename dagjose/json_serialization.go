@@ -169,7 +169,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error parsing encrypted_key: %v", err)
 			}
-			recipient.encryptedKey = keyBytes
+			recipient.encrypted_key = keyBytes
 		}
 
 		if rawJwe.Header != nil {
@@ -193,7 +193,7 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 				if err != nil {
 					return nil, fmt.Errorf("error parsing encrypted_key for recipient %d: %v", idx, err)
 				}
-				recipient.encryptedKey = keyBytes
+				recipient.encrypted_key = keyBytes
 			}
 
 			if rawRecipient.Header != nil {
@@ -249,12 +249,12 @@ func ParseJWE(jsonStr []byte) (*DagJWE, error) {
 
 func (d *DagJWS) asJson() map[string]interface{} {
 	jsonJose := make(map[string]interface{})
-	jsonJose["payload"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.payload.Bytes())
+	jsonJose["payload"] = base64.RawURLEncoding.EncodeToString(d.dagjose.payload.Bytes())
 
-	if d.dagJOSE.signatures != nil {
-		sigs := make([]map[string]interface{}, 0, len(d.dagJOSE.signatures))
-		for _, sig := range d.dagJOSE.signatures {
-			jsonSig := make(map[string]interface{}, len(d.dagJOSE.signatures))
+	if d.dagjose.signatures != nil {
+		sigs := make([]map[string]interface{}, 0, len(d.dagjose.signatures))
+		for _, sig := range d.dagjose.signatures {
+			jsonSig := make(map[string]interface{}, len(d.dagjose.signatures))
 			if sig.protected != nil {
 				jsonSig["protected"] = base64.RawURLEncoding.EncodeToString(sig.protected)
 			}
@@ -291,7 +291,7 @@ func (d *DagJWS) GeneralJSONSerialization() []byte {
 
 // FlattenedSerialization returns the flattened json serialization of this JWS
 func (d *DagJWS) FlattenedSerialization() ([]byte, error) {
-	if len(d.dagJOSE.signatures) != 1 {
+	if len(d.dagjose.signatures) != 1 {
 		return nil, fmt.Errorf("cannot create a flattened serialization for a JWS with more than one signature")
 	}
 	jsonRep := d.asJson()
@@ -334,29 +334,29 @@ func (d *DagJWE) FlattenedSerialization() ([]byte, error) {
 func (d *DagJWE) asJson() map[string]interface{} {
 	jsonJose := make(map[string]interface{})
 
-	if d.dagJOSE.protected != nil {
-		jsonJose["protected"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.protected)
+	if d.dagjose.protected != nil {
+		jsonJose["protected"] = base64.RawURLEncoding.EncodeToString(d.dagjose.protected)
 	}
-	if d.dagJOSE.unprotected != nil {
-		jsonJose["unprotected"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.unprotected)
+	if d.dagjose.unprotected != nil {
+		jsonJose["unprotected"] = base64.RawURLEncoding.EncodeToString(d.dagjose.unprotected)
 	}
-	if d.dagJOSE.iv != nil {
-		jsonJose["iv"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.iv)
+	if d.dagjose.iv != nil {
+		jsonJose["iv"] = base64.RawURLEncoding.EncodeToString(d.dagjose.iv)
 	}
-	if d.dagJOSE.aad != nil {
-		jsonJose["aad"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.aad)
+	if d.dagjose.aad != nil {
+		jsonJose["aad"] = base64.RawURLEncoding.EncodeToString(d.dagjose.aad)
 	}
-	jsonJose["ciphertext"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.ciphertext)
-	if d.dagJOSE.tag != nil {
-		jsonJose["tag"] = base64.RawURLEncoding.EncodeToString(d.dagJOSE.tag)
+	jsonJose["ciphertext"] = base64.RawURLEncoding.EncodeToString(d.dagjose.ciphertext)
+	if d.dagjose.tag != nil {
+		jsonJose["tag"] = base64.RawURLEncoding.EncodeToString(d.dagjose.tag)
 	}
 
-	if d.dagJOSE.recipients != nil {
-		recipients := make([]map[string]interface{}, 0, len(d.dagJOSE.recipients))
-		for _, r := range d.dagJOSE.recipients {
+	if d.dagjose.recipients != nil {
+		recipients := make([]map[string]interface{}, 0, len(d.dagjose.recipients))
+		for _, r := range d.dagjose.recipients {
 			recipientJson := make(map[string]interface{})
-			if r.encryptedKey != nil {
-				recipientJson["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encryptedKey)
+			if r.encrypted_key != nil {
+				recipientJson["encrypted_key"] = base64.RawURLEncoding.EncodeToString(r.encrypted_key)
 			}
 			if r.header != nil {
 				jsonHeader := make(map[string]interface{}, len(r.header))

@@ -32,7 +32,7 @@ func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 			})
 	}
 	if key == "encrypted_key" {
-		return valueOrNotFound(key, r.encryptedKey, nil)
+		return valueOrNotFound(key, r.encrypted_key, nil)
 	}
 	return nil, nil
 }
@@ -56,10 +56,10 @@ func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
 func (r jweRecipientNode) Length() int64 {
-	if r.encryptedKey == nil && r.header == nil {
+	if r.encrypted_key == nil && r.header == nil {
 		return 0
 	}
-	if r.encryptedKey != nil && r.header != nil {
+	if r.encrypted_key != nil && r.header != nil {
 		return 2
 	}
 	return 1
@@ -117,7 +117,7 @@ func (j *jweRecipientMapIterator) presentKeys() []string {
 	if j.r.header != nil {
 		result = append(result, "header")
 	}
-	if j.r.encryptedKey != nil {
+	if j.r.encrypted_key != nil {
 		result = append(result, "encrypted_key")
 	}
 	return result

@@ -13,7 +13,7 @@ func (l *jweRecipientListAssembler) AssembleValue() ipld.NodeAssembler {
 	return &jweRecipientAssembler{
 		recipient: nextRef,
 		key:       nil,
-		state:     maStateInitial,
+		state:     maState_initial,
 	}
 }
 

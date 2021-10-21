@@ -253,11 +253,11 @@ func signatureGen() *rapid.Generator {
 func recipientGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) jweRecipient {
 		return jweRecipient{
-			header:       stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
-			encryptedKey: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
+			header:        stringKeyedIPLDMapGen(4).Draw(t, "recipient header").(map[string]ipld.Node),
+			encrypted_key: sliceOfBytes().Draw(t, "recipient encrypted key").([]byte),
 		}
 	}).Filter(func(recipient jweRecipient) bool {
-		return recipient.encryptedKey != nil || recipient.header != nil
+		return recipient.encrypted_key != nil || recipient.header != nil
 	})
 }
 
