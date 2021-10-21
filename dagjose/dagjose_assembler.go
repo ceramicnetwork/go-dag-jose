@@ -20,7 +20,7 @@ var (
 type DagJOSENodePrototype struct{}
 
 func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
-	return &dagJOSENodeBuilder{dagJOSE: DagJOSE{}}
+	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
 // NewBuilder Returns an instance of the DagJOSENodeBuilder which can be passed
@@ -28,7 +28,7 @@ func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 // be necessary in reasonably advanced situations, most of the time you should
 // be able to use dagjose.LoadJOSE.
 func NewBuilder() ipld.NodeBuilder {
-	return &dagJOSENodeBuilder{dagJOSE: DagJOSE{}}
+	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
 type maState uint8
@@ -53,12 +53,12 @@ func (e ErrInvalidState) Error() string {
 // object. This builder will throw an error if the IPLD data it is building
 // does not match the schema specified in the spec
 type dagJOSENodeBuilder struct {
-	dagJOSE DagJOSE
+	dagJose DagJOSE
 	state   maState
 	key     *string
 }
 
-var dagJOSEAssemblerMixin = mixins.MapAssembler{TypeName: "DagJOSEAssembler"}
+var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if d.state != maState_initial {
@@ -72,16 +72,16 @@ func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, erro
 		return nil, ErrInvalidState{d.state}
 	}
 	if *d.key == "recipients" {
-		d.dagJOSE.recipients = make([]jweRecipient, 0, sizeHint)
+		d.dagJose.recipients = make([]jweRecipient, 0, sizeHint)
 		d.state = maState_initial
-		return &jweRecipientListAssembler{&d.dagJOSE}, nil
+		return &jweRecipientListAssembler{&d.dagJose}, nil
 	}
 	if *d.key == "signatures" {
-		d.dagJOSE.signatures = make([]jwsSignature, 0, sizeHint)
+		d.dagJose.signatures = make([]jwsSignature, 0, sizeHint)
 		d.state = maState_initial
-		return &jwsSignatureListAssembler{&d.dagJOSE}, nil
+		return &jwsSignatureListAssembler{&d.dagJose}, nil
 	}
-	return dagJOSEAssemblerMixin.BeginList(sizeHint)
+	return dagJoseMixin.BeginList(sizeHint)
 }
 
 func (d *dagJOSENodeBuilder) AssignNull() error {
@@ -90,40 +90,40 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 	}
 	switch *d.key {
 	case "payload":
-		d.dagJOSE.payload = nil
+		d.dagJose.payload = nil
 	case "protected":
-		d.dagJOSE.protected = nil
+		d.dagJose.protected = nil
 	case "unprotected":
-		d.dagJOSE.unprotected = nil
+		d.dagJose.unprotected = nil
 	case "iv":
-		d.dagJOSE.iv = nil
+		d.dagJose.iv = nil
 	case "aad":
-		d.dagJOSE.aad = nil
+		d.dagJose.aad = nil
 	case "ciphertext":
-		d.dagJOSE.ciphertext = nil
+		d.dagJose.ciphertext = nil
 	case "tag":
-		d.dagJOSE.tag = nil
+		d.dagJose.tag = nil
 	case "signatures":
-		d.dagJOSE.signatures = nil
+		d.dagJose.signatures = nil
 	case "recipients":
-		d.dagJOSE.recipients = nil
+		d.dagJose.recipients = nil
 	default:
-		return dagJOSEAssemblerMixin.AssignNull()
+		return dagJoseMixin.AssignNull()
 	}
 	d.state = maState_initial
 	return nil
 }
 
 func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
-	return dagJOSEAssemblerMixin.AssignBool(b)
+	return dagJoseMixin.AssignBool(b)
 }
 
 func (d *dagJOSENodeBuilder) AssignInt(i int64) error {
-	return dagJOSEAssemblerMixin.AssignInt(i)
+	return dagJoseMixin.AssignInt(i)
 }
 
 func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
-	return dagJOSEAssemblerMixin.AssignFloat(f)
+	return dagJoseMixin.AssignFloat(f)
 }
 
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
@@ -148,32 +148,32 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 		if err != nil {
 			return fmt.Errorf("payload is not a valid CID: %v", err)
 		}
-		d.dagJOSE.payload = &c
+		d.dagJose.payload = &c
 	case "protected":
-		d.dagJOSE.protected = b
+		d.dagJose.protected = b
 	case "unprotected":
-		d.dagJOSE.unprotected = b
+		d.dagJose.unprotected = b
 	case "iv":
-		d.dagJOSE.iv = b
+		d.dagJose.iv = b
 	case "aad":
-		d.dagJOSE.aad = b
+		d.dagJose.aad = b
 	case "ciphertext":
-		d.dagJOSE.ciphertext = b
+		d.dagJose.ciphertext = b
 	case "tag":
-		d.dagJOSE.tag = b
+		d.dagJose.tag = b
 	case "signatures":
 		return fmt.Errorf("attempted to assign bytes to 'signatures' key")
 	case "recipients":
 		return fmt.Errorf("attempted to assign bytes to 'recipients' key")
 	default:
-		return dagJOSEAssemblerMixin.AssignBytes(b)
+		return dagJoseMixin.AssignBytes(b)
 	}
 	d.state = maState_initial
 	return nil
 }
 
 func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
-	return dagJOSEAssemblerMixin.AssignLink(l)
+	return dagJoseMixin.AssignLink(l)
 }
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 	return datamodel.Copy(n, d)
@@ -182,7 +182,7 @@ func (d *dagJOSENodeBuilder) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}
 }
 func (d *dagJOSENodeBuilder) Build() ipld.Node {
-	return dagJOSENode{&d.dagJOSE}
+	return dagJOSENode{&d.dagJose}
 }
 func (d *dagJOSENodeBuilder) Reset() {
 }
