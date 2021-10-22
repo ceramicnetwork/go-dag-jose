@@ -178,6 +178,7 @@ func (d *dagJOSENodeBuilder) Build() ipld.Node {
 }
 func (d *dagJOSENodeBuilder) Reset() {
 }
+
 func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
 	if d.state != maState_initial {
 		panic("misuse")
@@ -185,7 +186,6 @@ func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
 	d.state = maState_midKey
 	return d
 }
-
 func (d *dagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
 	if d.state != maState_expectValue {
 		panic("misuse")
