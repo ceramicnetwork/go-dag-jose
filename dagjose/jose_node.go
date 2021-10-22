@@ -6,7 +6,6 @@ import (
 	"github.com/ipld/go-ipld-prime/fluent"
 	"github.com/ipld/go-ipld-prime/linking/cid"
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
-	"github.com/ipld/go-ipld-prime/node/basicnode"
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
@@ -69,7 +68,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 			d.recipients,
 			func() (ipld.Node, error) {
 				return fluent.MustBuildList(
-					basicnode.Prototype.List,
+					ipldBasicNode.Prototype.List,
 					int64(len(d.recipients)),
 					func(la fluent.ListAssembler) {
 						for i := range d.recipients {

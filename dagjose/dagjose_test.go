@@ -417,8 +417,7 @@ func normalizeIpldNode(n ipld.Node) ipld.Node {
 	}
 }
 
-// Given a JOSE object we encode it using StoreJOSE and decode it using LoadJOSE
-// and return the result
+// Given a JOSE object we encode it using StoreJOSE and decode it using LoadJOSE and return the result
 func roundTripJose(j *DagJOSE) *DagJOSE {
 	buf := bytes.Buffer{}
 	ls := cidlink.DefaultLinkSystem()

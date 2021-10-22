@@ -1,8 +1,8 @@
 package dagjose
 
 import (
-	"github.com/ipld/go-ipld-prime"
-	"github.com/ipld/go-ipld-prime/node/basic"
+	ipld "github.com/ipld/go-ipld-prime"
+	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 )
 
 type jweRecipientListAssembler struct{ d *DagJOSE }

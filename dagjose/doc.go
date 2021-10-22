@@ -14,7 +14,7 @@
 //
 // The latter point is provided by the dagjose.DagJOSE data type. This type
 // represents the union of the dagjose.DagJWS and dagjose.DagJWE types.
-// Typically, you will use dagjose.LoadJOSE(..) to load a dagjose.DagJOSE
+// Typically you will use dagjose.LoadJOSE(..) to load a dagjose.DagJOSE
 // object, then you will use DagJOSE.AsJWS and DagJOSE.AsJWE to determine
 // whether you have a JWS or JWE object respectively.
 //

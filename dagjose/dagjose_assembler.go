@@ -23,10 +23,10 @@ func (d *DagJOSENodePrototype) NewBuilder() ipld.NodeBuilder {
 	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
 
-// NewBuilder Returns an instance of the DagJOSENodeBuilder which can be passed
-// to ipld.Link.Load and will build a dagjose.DagJOSE object. This should only
-// be necessary in reasonably advanced situations, most of the time you should
-// be able to use dagjose.LoadJOSE.
+// Returns an instance of the DagJOSENodeBuilder which can be passed to
+// ipld.Link.Load and will build a dagjose.DagJOSE object. This should only be
+// necessary in reasonably advanced situations, most of the time you should be
+// able to use dagjose.LoadJOSE
 func NewBuilder() ipld.NodeBuilder {
 	return &dagJOSENodeBuilder{dagJose: DagJOSE{}}
 }
@@ -58,7 +58,7 @@ type dagJOSENodeBuilder struct {
 	key     *string
 }
 
-var dagJoseMixin = mixins.MapAssembler{TypeName: "dagJose"}
+var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if d.state != maState_initial {
@@ -185,6 +185,7 @@ func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
 	d.state = maState_midKey
 	return d
 }
+
 func (d *dagJOSENodeBuilder) AssembleValue() ipld.NodeAssembler {
 	if d.state != maState_expectValue {
 		panic("misuse")
@@ -213,6 +214,7 @@ func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {
 func (d *dagJOSENodeBuilder) ValuePrototype(k string) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }
+
 func isValidJOSEKey(key string) bool {
 	allowedKeys := []string{
 		"payload",

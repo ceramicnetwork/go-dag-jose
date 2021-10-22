@@ -3,9 +3,9 @@ package dagjose
 import (
 	"fmt"
 
-	"github.com/ipld/go-ipld-prime"
+	ipld "github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/datamodel"
-	"github.com/ipld/go-ipld-prime/node/basic"
+	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
@@ -15,7 +15,7 @@ type jweRecipientAssembler struct {
 	state     maState
 }
 
-var jweRecipientAssemblerMixin = mixins.MapAssembler{TypeName: "JWERecipientAssembler"}
+var recipientAssemblerMixin = mixins.MapAssembler{TypeName: "recipientAssembler"}
 
 func (j *jweRecipientAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if j.state == maState_midValue && *j.key == "header" {
@@ -33,7 +33,7 @@ func (j *jweRecipientAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, err
 	return j, nil
 }
 func (j *jweRecipientAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	return jweRecipientAssemblerMixin.BeginList(sizeHint)
+	return recipientAssemblerMixin.BeginList(sizeHint)
 }
 func (j *jweRecipientAssembler) AssignNull() error {
 	if j.state == maState_midValue {
@@ -47,16 +47,16 @@ func (j *jweRecipientAssembler) AssignNull() error {
 		}
 		return nil
 	}
-	return jweRecipientAssemblerMixin.AssignNull()
+	return recipientAssemblerMixin.AssignNull()
 }
 func (j *jweRecipientAssembler) AssignBool(b bool) error {
-	return jweRecipientAssemblerMixin.AssignBool(b)
+	return recipientAssemblerMixin.AssignBool(b)
 }
 func (j *jweRecipientAssembler) AssignInt(i int64) error {
-	return jweRecipientAssemblerMixin.AssignInt(i)
+	return recipientAssemblerMixin.AssignInt(i)
 }
 func (j *jweRecipientAssembler) AssignFloat(f float64) error {
-	return jweRecipientAssemblerMixin.AssignFloat(f)
+	return recipientAssemblerMixin.AssignFloat(f)
 }
 func (j *jweRecipientAssembler) AssignString(s string) error {
 	if j.state == maState_midKey {
@@ -67,7 +67,7 @@ func (j *jweRecipientAssembler) AssignString(s string) error {
 		j.state = maState_expectValue
 		return nil
 	}
-	return jweRecipientAssemblerMixin.AssignString(s)
+	return recipientAssemblerMixin.AssignString(s)
 }
 func (j *jweRecipientAssembler) AssignBytes(b []byte) error {
 	if j.state == maState_midValue {
@@ -78,10 +78,10 @@ func (j *jweRecipientAssembler) AssignBytes(b []byte) error {
 		}
 		panic("should not be possible due to validation in map assembler")
 	}
-	return jweRecipientAssemblerMixin.AssignBytes(b)
+	return recipientAssemblerMixin.AssignBytes(b)
 }
 func (j *jweRecipientAssembler) AssignLink(l ipld.Link) error {
-	return jweRecipientAssemblerMixin.AssignLink(l)
+	return recipientAssemblerMixin.AssignLink(l)
 }
 func (j *jweRecipientAssembler) AssignNode(n ipld.Node) error {
 	return datamodel.Copy(n, j)

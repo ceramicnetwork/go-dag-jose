@@ -9,7 +9,7 @@ import (
 
 type jweRecipientNode struct{ *jweRecipient }
 
-var jweRecipientMixin = mixins.Map{TypeName: "JOSERecipient"}
+var jweRecipientMixin = mixins.Map{TypeName: "JWERecipient"}
 
 func (r jweRecipientNode) Kind() ipld.Kind {
 	return ipld.Kind_Map
