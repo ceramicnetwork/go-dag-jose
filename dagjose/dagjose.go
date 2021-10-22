@@ -3,7 +3,7 @@ package dagjose
 import (
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
-	cidLink "github.com/ipld/go-ipld-prime/linking/cid"
+	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
 // This is a union of the DagJWE and DagJWS types. Typically you will want to
@@ -72,12 +72,12 @@ func (d *DagJWE) AsJOSE() *DagJOSE {
 }
 
 func (d *DagJWS) PayloadLink() ipld.Link {
-	return cidLink.Link{Cid: *d.dagjose.payload}
+	return cidlink.Link{Cid: *d.dagjose.payload}
 }
 
 // A link prototype which will build CIDs using the dag-jose multicodec and
 // the sha-384 multihash
-var LinkPrototype = cidLink.LinkPrototype{Prefix: cid.Prefix{
+var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 	Version:  1,    // Usually '1'.
 	Codec:    0x85, // 0x85 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
 	MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
