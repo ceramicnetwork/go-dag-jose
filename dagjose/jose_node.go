@@ -1,11 +1,12 @@
 package dagjose
 
 import (
-	"github.com/ipld/go-ipld-prime"
+	ipld "github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/fluent"
 	"github.com/ipld/go-ipld-prime/linking/cid"
-	"github.com/ipld/go-ipld-prime/node/basic"
+	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
+	"github.com/ipld/go-ipld-prime/node/basicnode"
 	"github.com/ipld/go-ipld-prime/node/mixins"
 )
 
@@ -16,14 +17,13 @@ var joseNodeMixin = mixins.Map{TypeName: "dagJoseNode"}
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
 }
-
 func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 	if key == "payload" {
 		return valueOrNotFound(
 			key,
 			d.payload,
 			func() (ipld.Node, error) {
-				return basicnode.NewBytes(d.payload.Bytes()), nil
+				return ipldBasicNode.NewBytes(d.payload.Bytes()), nil
 			},
 		)
 	}
@@ -32,7 +32,7 @@ func (d dagJOSENode) LookupByString(key string) (ipld.Node, error) {
 			key,
 			d.payload,
 			func() (ipld.Node, error) {
-				return basicnode.NewLink(cidlink.Link{Cid: *(d.payload)}), nil
+				return ipldBasicNode.NewLink(cidlink.Link{Cid: *(d.payload)}), nil
 			},
 		)
 	}
@@ -165,7 +165,7 @@ func (d *dagJOSEMapIterator) Next() (ipld.Node, ipld.Node, error) {
 		return nil, nil, err
 	}
 	d.index += 1
-	return basicnode.NewString(key), value, nil
+	return ipldBasicNode.NewString(key), value, nil
 }
 
 func (d *dagJOSEMapIterator) Done() bool {

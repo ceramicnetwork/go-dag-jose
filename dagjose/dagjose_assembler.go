@@ -35,9 +35,9 @@ type maState uint8
 
 const (
 	maState_initial     maState = iota // also the 'expect key or finish' state
-	maState_midKey                     // waiting for a 'finished' state in the KeyAssembler
+	maState_midKey                     // waiting for a 'finished' state in the KeyAssembler.
 	maState_expectValue                // 'AssembleValue' is the only valid next step
-	maState_midValue                   // waiting for a 'finished' state in the ValueAssembler
+	maState_midValue                   // waiting for a 'finished' state in the ValueAssembler.
 	maState_finished                   // finished
 )
 
@@ -210,7 +210,7 @@ func (d *dagJOSENodeBuilder) Finish() error {
 func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {
 	return basicnode.Prototype.String
 }
-func (d *dagJOSENodeBuilder) ValuePrototype(string) ipld.NodePrototype {
+func (d *dagJOSENodeBuilder) ValuePrototype(k string) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }
 func isValidJOSEKey(key string) bool {
