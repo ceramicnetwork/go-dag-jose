@@ -110,7 +110,7 @@ func (j *jwsSignaturesIterator) Done() bool {
 
 type jwsSignatureNode struct{ *jwsSignature }
 
-var jwsSignatureNodeMixin = mixins.Map{TypeName: "JWSSignatureNode"}
+var signatureMixin = mixins.Map{TypeName: "jwsSignature"}
 
 func (d jwsSignatureNode) Kind() ipld.Kind {
 	return ipld.Kind_Map
@@ -168,22 +168,22 @@ func (d jwsSignatureNode) IsNull() bool {
 	return false
 }
 func (d jwsSignatureNode) AsBool() (bool, error) {
-	return jwsSignatureNodeMixin.AsBool()
+	return signatureMixin.AsBool()
 }
 func (d jwsSignatureNode) AsInt() (int64, error) {
-	return jwsSignatureNodeMixin.AsInt()
+	return signatureMixin.AsInt()
 }
 func (d jwsSignatureNode) AsFloat() (float64, error) {
-	return jwsSignatureNodeMixin.AsFloat()
+	return signatureMixin.AsFloat()
 }
 func (d jwsSignatureNode) AsString() (string, error) {
-	return jwsSignatureNodeMixin.AsString()
+	return signatureMixin.AsString()
 }
 func (d jwsSignatureNode) AsBytes() ([]byte, error) {
-	return jwsSignatureNodeMixin.AsBytes()
+	return signatureMixin.AsBytes()
 }
 func (d jwsSignatureNode) AsLink() (ipld.Link, error) {
-	return jwsSignatureNodeMixin.AsLink()
+	return signatureMixin.AsLink()
 }
 func (d jwsSignatureNode) Prototype() ipld.NodePrototype {
 	return nil

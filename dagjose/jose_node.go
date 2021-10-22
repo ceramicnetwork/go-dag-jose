@@ -11,7 +11,7 @@ import (
 
 type dagJOSENode struct{ *DagJOSE }
 
-var dagJOSENodeMixin = mixins.Map{TypeName: "DagJOSENode"}
+var joseNodeMixin = mixins.Map{TypeName: "dagJoseNode"}
 
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
@@ -90,7 +90,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(ks)
 }
 func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return dagJOSENodeMixin.LookupByIndex(idx)
+	return joseNodeMixin.LookupByIndex(idx)
 }
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
@@ -114,22 +114,22 @@ func (d dagJOSENode) IsNull() bool {
 	return false
 }
 func (d dagJOSENode) AsBool() (bool, error) {
-	return dagJOSENodeMixin.AsBool()
+	return joseNodeMixin.AsBool()
 }
 func (d dagJOSENode) AsInt() (int64, error) {
-	return dagJOSENodeMixin.AsInt()
+	return joseNodeMixin.AsInt()
 }
 func (d dagJOSENode) AsFloat() (float64, error) {
-	return dagJOSENodeMixin.AsFloat()
+	return joseNodeMixin.AsFloat()
 }
 func (d dagJOSENode) AsString() (string, error) {
-	return dagJOSENodeMixin.AsString()
+	return joseNodeMixin.AsString()
 }
 func (d dagJOSENode) AsBytes() ([]byte, error) {
-	return dagJOSENodeMixin.AsBytes()
+	return joseNodeMixin.AsBytes()
 }
 func (d dagJOSENode) AsLink() (ipld.Link, error) {
-	return dagJOSENodeMixin.AsLink()
+	return joseNodeMixin.AsLink()
 }
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}

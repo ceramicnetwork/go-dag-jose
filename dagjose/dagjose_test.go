@@ -15,7 +15,7 @@ import (
 	"github.com/multiformats/go-multihash"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/ed25519"
-	"gopkg.in/square/go-jose.v2"
+	gojose "gopkg.in/square/go-jose.v2"
 	"pgregory.net/rapid"
 )
 
@@ -62,18 +62,18 @@ func validJWSGen() *rapid.Generator {
 		link := cidGen().Draw(t, "Valid DagJOSE payload").(*cid.Cid)
 		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
 
-		signer, err := jose.NewSigner(jose.SigningKey{
-			Algorithm: jose.EdDSA,
+		signer, err := gojose.NewSigner(gojose.SigningKey{
+			Algorithm: gojose.EdDSA,
 			Key:       privateKey,
 		}, nil)
 		if err != nil {
 			panic(fmt.Errorf("error creating signer for ValidJWS: %v", err))
 		}
-		joseJws, err := signer.Sign(link.Bytes())
+		gojoseJws, err := signer.Sign(link.Bytes())
 		if err != nil {
 			panic(fmt.Errorf("error signing ValidJWS: %v", err))
 		}
-		dagJose, err := ParseJWS([]byte(joseJws.FullSerialize()))
+		dagJose, err := ParseJWS([]byte(gojoseJws.FullSerialize()))
 		if err != nil {
 			panic(fmt.Errorf("error creating dagjose: %v", err))
 		}
@@ -94,7 +94,7 @@ func sliceOfSignatures() *rapid.Generator {
 	})
 }
 
-// Generate a non-empty slice of JWERecipients
+// Generate a non empty slice of JWERecipients
 func sliceOfRecipients() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) []jweRecipient {
 		return rapid.SliceOf(recipientGen()).Filter(func(recipients interface{}) bool {
@@ -287,7 +287,7 @@ func jweGen() *rapid.Generator {
 	})
 }
 
-// Generate an arbitrary JOSE object, i.e. either a JWE or a JWS
+// Generate an arbitrary JOSE object, i.e either a JWE or a JWS
 func arbitraryJoseGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) *DagJOSE {
 		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
@@ -330,7 +330,7 @@ func singleRecipientJWEGen() *rapid.Generator {
 // and recipients
 //
 // Unprotected headers can contain arbitrary JSON. There are two things we have
-// to normalize for comparison in tests:
+// to normalise for comparison in tests:
 // - Integer values will end up as float values after serialization -> deserialization
 //   so we convert all integer values to floats
 // - Maps don't have a defined order in JSON, so we modify all maps so that
@@ -437,7 +437,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error storing DagJOSE: %v", err))
 	}
-	dagJOSE, err := LoadJOSE(
+	jose, err := LoadJOSE(
 		link,
 		ipld.LinkContext{},
 		ls,
@@ -445,7 +445,7 @@ func roundTripJose(j *DagJOSE) *DagJOSE {
 	if err != nil {
 		panic(fmt.Errorf("error reading data from datastore: %v", err))
 	}
-	return dagJOSE
+	return jose
 }
 
 // Check that if we encode and decode a valid JWS object then the
@@ -462,19 +462,19 @@ func TestRoundTripValidJWS(t *testing.T) {
 // output is equal to the input (up to ipld normalization)
 func TestRoundTripArbitraryJOSE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		dagJOSE := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
-		roundTripped := roundTripJose(dagJOSE)
-		normalizeJoseForJsonComparison(dagJOSE)
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		roundTripped := roundTripJose(jose)
+		normalizeJoseForJsonComparison(jose)
 		normalizeJoseForJsonComparison(roundTripped)
-		require.Equal(t, dagJOSE, roundTripped)
+		require.Equal(t, jose, roundTripped)
 	})
 }
 
 // Decoding should always return either a JWS or a JWE if the input is valid
 func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
-		dagJOSE := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
-		roundTripped := roundTripJose(dagJOSE)
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(*DagJOSE)
+		roundTripped := roundTripJose(jose)
 		if roundTripped.AsJWE() == nil {
 			require.NotNil(t, roundTripped.AsJWS())
 		}
@@ -537,13 +537,13 @@ func TestFlattenedSerializationJWS(t *testing.T) {
 			t.Errorf("error creating flattened serialization: %v", err)
 			return
 		}
-		dagJWS, err := ParseJWS(flattenedSerialization)
+		parsedJose, err := ParseJWS([]byte(flattenedSerialization))
 		if err != nil {
 			t.Errorf("error parsing flattenedSerialization: %v", err)
 			return
 		}
 		normalizeJoseForJsonComparison(jws.AsJOSE())
-		require.Equal(t, jws, dagJWS)
+		require.Equal(t, jws, parsedJose)
 	})
 }
 
@@ -567,13 +567,13 @@ func TestFlattenedSerializationJWE(t *testing.T) {
 			t.Errorf("error creating flattened serialization: %v", err)
 			return
 		}
-		dagJWE, err := ParseJWE(flattenedSerialization)
+		parsedJose, err := ParseJWE([]byte(flattenedSerialization))
 		if err != nil {
 			t.Errorf("error parsing flattenedSerialization: %v", err)
 			return
 		}
 		normalizeJoseForJsonComparison(jwe.AsJOSE())
-		require.Equal(t, jwe, dagJWE)
+		require.Equal(t, jwe, parsedJose)
 	})
 }
 

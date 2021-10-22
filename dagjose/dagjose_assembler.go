@@ -58,7 +58,7 @@ type dagJOSENodeBuilder struct {
 	key     *string
 }
 
-var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
+var dagJoseMixin = mixins.MapAssembler{TypeName: "dagJose"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if d.state != maState_initial {
@@ -66,7 +66,6 @@ func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error)
 	}
 	return d, nil
 }
-
 func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
 	if d.state != maState_midValue {
 		return nil, ErrInvalidState{d.state}
@@ -83,7 +82,6 @@ func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, erro
 	}
 	return dagJoseMixin.BeginList(sizeHint)
 }
-
 func (d *dagJOSENodeBuilder) AssignNull() error {
 	if d.state != maState_midValue {
 		return ErrInvalidState{d.state}
@@ -113,19 +111,15 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 	d.state = maState_initial
 	return nil
 }
-
 func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
 	return dagJoseMixin.AssignBool(b)
 }
-
 func (d *dagJOSENodeBuilder) AssignInt(i int64) error {
 	return dagJoseMixin.AssignInt(i)
 }
-
 func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
 	return dagJoseMixin.AssignFloat(f)
 }
-
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
 	if d.state != maState_midKey {
 		return ErrInvalidState{d.state}
@@ -137,7 +131,6 @@ func (d *dagJOSENodeBuilder) AssignString(s string) error {
 	d.state = maState_expectValue
 	return nil
 }
-
 func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	if d.state != maState_midValue {
 		return ErrInvalidState{d.state}
@@ -171,7 +164,6 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	d.state = maState_initial
 	return nil
 }
-
 func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
 	return dagJoseMixin.AssignLink(l)
 }
@@ -186,7 +178,6 @@ func (d *dagJOSENodeBuilder) Build() ipld.Node {
 }
 func (d *dagJOSENodeBuilder) Reset() {
 }
-
 func (d *dagJOSENodeBuilder) AssembleKey() ipld.NodeAssembler {
 	if d.state != maState_initial {
 		panic("misuse")
@@ -222,7 +213,6 @@ func (d *dagJOSENodeBuilder) KeyPrototype() ipld.NodePrototype {
 func (d *dagJOSENodeBuilder) ValuePrototype(string) ipld.NodePrototype {
 	return basicnode.Prototype.Any
 }
-
 func isValidJOSEKey(key string) bool {
 	allowedKeys := []string{
 		"payload",
