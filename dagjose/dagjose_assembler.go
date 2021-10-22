@@ -14,7 +14,7 @@ import (
 var (
 	_ ipld.Node          = dagJOSENode{}
 	_ ipld.NodePrototype = &DagJOSENodePrototype{}
-	_ ipld.NodeBuilder   = &dagJOSENodeBuilder{}
+	_ ipld.NodeAssembler = &dagJOSENodeBuilder{}
 )
 
 type DagJOSENodePrototype struct{}
