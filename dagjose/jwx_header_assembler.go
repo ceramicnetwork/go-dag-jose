@@ -15,9 +15,6 @@ type headerAssembler struct {
 }
 
 func (h *headerAssembler) AssembleKey() ipld.NodeAssembler {
-	if h.state != maState_initial {
-		panic("misuse")
-	}
 	h.state = maState_midKey
 	return h
 }

@@ -15,7 +15,7 @@ type jwsSignatureAssembler struct {
 	state     maState
 }
 
-var jwsSignatureMixin = mixins.MapAssembler{TypeName: "JWSSignature"}
+var signatureAssemblerMixin = mixins.MapAssembler{TypeName: "jwsSignatureAssembler"}
 
 func (j *jwsSignatureAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if j.state == maState_midValue && *j.key == "header" {
@@ -33,7 +33,7 @@ func (j *jwsSignatureAssembler) BeginMap(sizeHint int64) (ipld.MapAssembler, err
 	return j, nil
 }
 func (j *jwsSignatureAssembler) BeginList(sizeHint int64) (ipld.ListAssembler, error) {
-	return jwsSignatureMixin.BeginList(sizeHint)
+	return signatureAssemblerMixin.BeginList(sizeHint)
 }
 func (j *jwsSignatureAssembler) AssignNull() error {
 	if j.state == maState_midValue {
@@ -49,16 +49,16 @@ func (j *jwsSignatureAssembler) AssignNull() error {
 		}
 		return nil
 	}
-	return jwsSignatureMixin.AssignNull()
+	return signatureAssemblerMixin.AssignNull()
 }
 func (j *jwsSignatureAssembler) AssignBool(b bool) error {
-	return jwsSignatureMixin.AssignBool(b)
+	return signatureAssemblerMixin.AssignBool(b)
 }
 func (j *jwsSignatureAssembler) AssignInt(i int64) error {
-	return jwsSignatureMixin.AssignInt(i)
+	return signatureAssemblerMixin.AssignInt(i)
 }
 func (j *jwsSignatureAssembler) AssignFloat(f float64) error {
-	return jwsSignatureMixin.AssignFloat(f)
+	return signatureAssemblerMixin.AssignFloat(f)
 }
 func (j *jwsSignatureAssembler) AssignString(s string) error {
 	if j.state == maState_midKey {
@@ -69,7 +69,7 @@ func (j *jwsSignatureAssembler) AssignString(s string) error {
 		j.state = maState_expectValue
 		return nil
 	}
-	return jwsSignatureMixin.AssignString(s)
+	return signatureAssemblerMixin.AssignString(s)
 }
 func (j *jwsSignatureAssembler) AssignBytes(b []byte) error {
 	if j.state == maState_midValue {
@@ -85,10 +85,10 @@ func (j *jwsSignatureAssembler) AssignBytes(b []byte) error {
 		}
 		panic("should not be possible due to validation in map assembler")
 	}
-	return jwsSignatureMixin.AssignBytes(b)
+	return signatureAssemblerMixin.AssignBytes(b)
 }
 func (j *jwsSignatureAssembler) AssignLink(l ipld.Link) error {
-	return jwsSignatureMixin.AssignLink(l)
+	return signatureAssemblerMixin.AssignLink(l)
 }
 func (j *jwsSignatureAssembler) AssignNode(n ipld.Node) error {
 	return datamodel.Copy(n, j)

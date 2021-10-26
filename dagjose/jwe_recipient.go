@@ -2,6 +2,7 @@ package dagjose
 
 import (
 	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/fluent"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
@@ -9,7 +10,7 @@ import (
 
 type jweRecipientNode struct{ *jweRecipient }
 
-var recipientNodeMixin = mixins.Map{TypeName: "JWERecipientNode"}
+var recipientMixin = mixins.Map{TypeName: "jweRecipient"}
 
 func (r jweRecipientNode) Kind() ipld.Kind {
 	return ipld.Kind_Map
@@ -34,7 +35,7 @@ func (r jweRecipientNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "encrypted_key" {
 		return valueOrNotFound(key, r.encrypted_key, nil)
 	}
-	return nil, nil
+	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 }
 func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	str, err := key.AsString()
@@ -44,7 +45,7 @@ func (r jweRecipientNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return r.LookupByString(str)
 }
 func (r jweRecipientNode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return recipientNodeMixin.LookupByIndex(idx)
+	return recipientMixin.LookupByIndex(idx)
 }
 func (r jweRecipientNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return r.LookupByString(seg.String())
@@ -56,13 +57,14 @@ func (r jweRecipientNode) ListIterator() ipld.ListIterator {
 	return nil
 }
 func (r jweRecipientNode) Length() int64 {
-	if r.encrypted_key == nil && r.header == nil {
-		return 0
+	var l int64 = 0
+	if r.encrypted_key != nil {
+		l++
 	}
-	if r.encrypted_key != nil && r.header != nil {
-		return 2
+	if r.header != nil {
+		l++
 	}
-	return 1
+	return l
 }
 func (r jweRecipientNode) IsAbsent() bool {
 	return false
@@ -71,22 +73,22 @@ func (r jweRecipientNode) IsNull() bool {
 	return false
 }
 func (r jweRecipientNode) AsBool() (bool, error) {
-	return recipientNodeMixin.AsBool()
+	return recipientMixin.AsBool()
 }
 func (r jweRecipientNode) AsInt() (int64, error) {
-	return recipientNodeMixin.AsInt()
+	return recipientMixin.AsInt()
 }
 func (r jweRecipientNode) AsFloat() (float64, error) {
-	return recipientNodeMixin.AsFloat()
+	return recipientMixin.AsFloat()
 }
 func (r jweRecipientNode) AsString() (string, error) {
-	return recipientNodeMixin.AsString()
+	return recipientMixin.AsString()
 }
 func (r jweRecipientNode) AsBytes() ([]byte, error) {
-	return recipientNodeMixin.AsBytes()
+	return recipientMixin.AsBytes()
 }
 func (r jweRecipientNode) AsLink() (ipld.Link, error) {
-	return recipientNodeMixin.AsLink()
+	return recipientMixin.AsLink()
 }
 func (r jweRecipientNode) Prototype() ipld.NodePrototype {
 	return nil

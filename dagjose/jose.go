@@ -2,7 +2,6 @@ package dagjose
 
 import (
 	ipld "github.com/ipld/go-ipld-prime"
-	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/fluent"
 	"github.com/ipld/go-ipld-prime/linking/cid"
 	ipldBasicNode "github.com/ipld/go-ipld-prime/node/basic"
@@ -11,7 +10,7 @@ import (
 
 type dagJOSENode struct{ *DagJOSE }
 
-var joseNodeMixin = mixins.Map{TypeName: "dagJoseNode"}
+var dagJOSEMixin = mixins.Map{TypeName: "dagJOSE"}
 
 func (d dagJOSENode) Kind() ipld.Kind {
 	return ipld.Kind_Map
@@ -89,7 +88,7 @@ func (d dagJOSENode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(ks)
 }
 func (d dagJOSENode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return joseNodeMixin.LookupByIndex(idx)
+	return dagJOSEMixin.LookupByIndex(idx)
 }
 func (d dagJOSENode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {
 	return d.LookupByString(seg.String())
@@ -113,40 +112,28 @@ func (d dagJOSENode) IsNull() bool {
 	return false
 }
 func (d dagJOSENode) AsBool() (bool, error) {
-	return joseNodeMixin.AsBool()
+	return dagJOSEMixin.AsBool()
 }
 func (d dagJOSENode) AsInt() (int64, error) {
-	return joseNodeMixin.AsInt()
+	return dagJOSEMixin.AsInt()
 }
 func (d dagJOSENode) AsFloat() (float64, error) {
-	return joseNodeMixin.AsFloat()
+	return dagJOSEMixin.AsFloat()
 }
 func (d dagJOSENode) AsString() (string, error) {
-	return joseNodeMixin.AsString()
+	return dagJOSEMixin.AsString()
 }
 func (d dagJOSENode) AsBytes() ([]byte, error) {
-	return joseNodeMixin.AsBytes()
+	return dagJOSEMixin.AsBytes()
 }
 func (d dagJOSENode) AsLink() (ipld.Link, error) {
-	return joseNodeMixin.AsLink()
+	return dagJOSEMixin.AsLink()
 }
 func (d dagJOSENode) Prototype() ipld.NodePrototype {
 	return &DagJOSENodePrototype{}
 }
 
 // end ipld.Node implementation
-
-func valueOrNotFound(key string, value interface{}, createNode func() (ipld.Node, error)) (ipld.Node, error) {
-	if value != nil {
-		if createNode != nil {
-			// `createNode` must be a closure that returns a correctly created `ipld.Node` or an appropriate error
-			return createNode()
-		}
-		// Assume that `value` is a primitive type
-		return goPrimitiveToIpldBasicNode(value)
-	}
-	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-}
 
 type dagJOSEMapIterator struct {
 	d     dagJOSENode

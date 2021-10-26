@@ -58,7 +58,7 @@ type dagJOSENodeBuilder struct {
 	key     *string
 }
 
-var dagJoseMixin = mixins.MapAssembler{TypeName: "dagjose"}
+var dagJOSEAssemblerMixin = mixins.MapAssembler{TypeName: "dagJOSEAssembler"}
 
 func (d *dagJOSENodeBuilder) BeginMap(sizeHint int64) (ipld.MapAssembler, error) {
 	if d.state != maState_initial {
@@ -80,7 +80,7 @@ func (d *dagJOSENodeBuilder) BeginList(sizeHint int64) (ipld.ListAssembler, erro
 		d.state = maState_initial
 		return &jwsSignatureListAssembler{&d.dagJose}, nil
 	}
-	return dagJoseMixin.BeginList(sizeHint)
+	return dagJOSEAssemblerMixin.BeginList(sizeHint)
 }
 func (d *dagJOSENodeBuilder) AssignNull() error {
 	if d.state != maState_midValue {
@@ -106,19 +106,19 @@ func (d *dagJOSENodeBuilder) AssignNull() error {
 	case "recipients":
 		d.dagJose.recipients = nil
 	default:
-		return dagJoseMixin.AssignNull()
+		return dagJOSEAssemblerMixin.AssignNull()
 	}
 	d.state = maState_initial
 	return nil
 }
 func (d *dagJOSENodeBuilder) AssignBool(b bool) error {
-	return dagJoseMixin.AssignBool(b)
+	return dagJOSEAssemblerMixin.AssignBool(b)
 }
 func (d *dagJOSENodeBuilder) AssignInt(i int64) error {
-	return dagJoseMixin.AssignInt(i)
+	return dagJOSEAssemblerMixin.AssignInt(i)
 }
 func (d *dagJOSENodeBuilder) AssignFloat(f float64) error {
-	return dagJoseMixin.AssignFloat(f)
+	return dagJOSEAssemblerMixin.AssignFloat(f)
 }
 func (d *dagJOSENodeBuilder) AssignString(s string) error {
 	if d.state != maState_midKey {
@@ -159,13 +159,13 @@ func (d *dagJOSENodeBuilder) AssignBytes(b []byte) error {
 	case "recipients":
 		return fmt.Errorf("attempted to assign bytes to 'recipients' key")
 	default:
-		return dagJoseMixin.AssignBytes(b)
+		return dagJOSEAssemblerMixin.AssignBytes(b)
 	}
 	d.state = maState_initial
 	return nil
 }
 func (d *dagJOSENodeBuilder) AssignLink(l ipld.Link) error {
-	return dagJoseMixin.AssignLink(l)
+	return dagJOSEAssemblerMixin.AssignLink(l)
 }
 func (d *dagJOSENodeBuilder) AssignNode(n ipld.Node) error {
 	return datamodel.Copy(n, d)

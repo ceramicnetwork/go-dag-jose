@@ -2,9 +2,8 @@ package dagjose
 
 import (
 	"fmt"
-	"strconv"
-
 	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/fluent"
 	basicnode "github.com/ipld/go-ipld-prime/node/basic"
 	"github.com/ipld/go-ipld-prime/node/mixins"
@@ -12,24 +11,18 @@ import (
 
 type jwsSignaturesNode struct{ sigs []jwsSignature }
 
+var signaturesMixin = mixins.List{TypeName: "signatureNode"}
+
 // jwsSignatures Node implementation
 
 func (d *jwsSignaturesNode) Kind() ipld.Kind {
 	return ipld.Kind_List
 }
 func (d *jwsSignaturesNode) LookupByString(key string) (ipld.Node, error) {
-	index, err := strconv.Atoi(key)
-	if err != nil {
-		return nil, err
-	}
-	return d.LookupByIndex(int64(index))
+	return signaturesMixin.LookupByString(key)
 }
 func (d *jwsSignaturesNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
-	index, err := key.AsInt()
-	if err != nil {
-		return nil, err
-	}
-	return d.LookupByIndex(index)
+	return signaturesMixin.LookupByNode(key)
 }
 func (d *jwsSignaturesNode) LookupByIndex(idx int64) (ipld.Node, error) {
 	if int64(len(d.sigs)) > idx {
@@ -63,22 +56,22 @@ func (d *jwsSignaturesNode) IsNull() bool {
 	return false
 }
 func (d *jwsSignaturesNode) AsBool() (bool, error) {
-	return mixins.List{TypeName: "jose.JWSSignature"}.AsBool()
+	return signaturesMixin.AsBool()
 }
 func (d *jwsSignaturesNode) AsInt() (int64, error) {
-	return mixins.List{TypeName: "jose.JWSSignature"}.AsInt()
+	return signaturesMixin.AsInt()
 }
 func (d *jwsSignaturesNode) AsFloat() (float64, error) {
-	return mixins.List{TypeName: "jose.JWSSignature"}.AsFloat()
+	return signaturesMixin.AsFloat()
 }
 func (d *jwsSignaturesNode) AsString() (string, error) {
-	return mixins.List{TypeName: "jose.JWSSignature"}.AsString()
+	return signaturesMixin.AsString()
 }
 func (d *jwsSignaturesNode) AsBytes() ([]byte, error) {
-	return mixins.List{TypeName: "jose.JWSSignature"}.AsBytes()
+	return signaturesMixin.AsBytes()
 }
 func (d *jwsSignaturesNode) AsLink() (ipld.Link, error) {
-	return mixins.List{TypeName: "jose.JWSSignature"}.AsLink()
+	return signaturesMixin.AsLink()
 }
 func (d *jwsSignaturesNode) Prototype() ipld.NodePrototype {
 	return nil
@@ -117,26 +110,28 @@ func (d jwsSignatureNode) Kind() ipld.Kind {
 }
 func (d jwsSignatureNode) LookupByString(key string) (ipld.Node, error) {
 	if key == "signature" {
-		return basicnode.NewBytes(d.signature), nil
+		return valueOrNotFound(key, d.signature, nil)
 	}
 	if key == "protected" {
-		return basicnode.NewBytes(d.protected), nil
+		return valueOrNotFound(key, d.protected, nil)
 	}
 	if key == "header" {
-		if d.header == nil {
-			return nil, nil
-		}
-		return fluent.MustBuildMap(
-			basicnode.Prototype.Map,
-			int64(len(d.header)),
-			func(ma fluent.MapAssembler) {
-				for key, value := range d.header {
-					ma.AssembleEntry(key).AssignNode(value)
-				}
-			},
-		), nil
+		return valueOrNotFound(
+			key,
+			d.header,
+			func() (ipld.Node, error) {
+				return fluent.MustBuildMap(
+					basicnode.Prototype.Map,
+					int64(len(d.header)),
+					func(ma fluent.MapAssembler) {
+						for key, value := range d.header {
+							ma.AssembleEntry(key).AssignNode(value)
+						}
+					},
+				), nil
+			})
 	}
-	return nil, nil
+	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 }
 func (d jwsSignatureNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	keyString, err := key.AsString()
@@ -146,7 +141,7 @@ func (d jwsSignatureNode) LookupByNode(key ipld.Node) (ipld.Node, error) {
 	return d.LookupByString(keyString)
 }
 func (d jwsSignatureNode) LookupByIndex(idx int64) (ipld.Node, error) {
-	return nil, nil
+	return signatureMixin.LookupByIndex(idx)
 }
 
 func (d jwsSignatureNode) LookupBySegment(seg ipld.PathSegment) (ipld.Node, error) {

@@ -210,8 +210,10 @@ func stringKeyedIPLDMapGen(depth int) *rapid.Generator {
 		keys := rapid.SliceOf(rapid.String()).Draw(t, "IPLD map keys").([]string)
 		result := make(map[string]ipld.Node)
 		for _, key := range keys {
-			value := ipldNodeGen(depth-1).Draw(t, "an IPLD map value").(ipld.Node)
-			result[key] = value
+			if key != "" {
+				value := ipldNodeGen(depth-1).Draw(t, "an IPLD map value").(ipld.Node)
+				result[key] = value
+			}
 		}
 		return result
 	})
@@ -604,15 +606,13 @@ func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
 			LinkPrototype,
 			node,
 		)
-		if err != nil {
-			t.Errorf("Error creating link to invalid payload node: %v", err)
-			return
+		if err == nil {
+			_, err = LoadJOSE(
+				link,
+				ipld.LinkContext{},
+				ls,
+			)
 		}
-		_, err = LoadJOSE(
-			link,
-			ipld.LinkContext{},
-			ls,
-		)
 		require.NotNil(t, err)
 		require.Contains(t, err.Error(), "payload is not a valid CID")
 	})

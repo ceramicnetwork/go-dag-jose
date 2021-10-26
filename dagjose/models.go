@@ -3,6 +3,7 @@ package dagjose
 import (
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/datamodel"
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 )
 
@@ -106,4 +107,16 @@ func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkS
 	}
 
 	return n.(dagJOSENode).DagJOSE, nil
+}
+
+func valueOrNotFound(key string, value interface{}, createNode func() (ipld.Node, error)) (ipld.Node, error) {
+	if value != nil {
+		if createNode != nil {
+			// `createNode` must be a closure that returns a correctly created `ipld.Node` or an appropriate error
+			return createNode()
+		}
+		// Assume that `value` is a primitive type
+		return goPrimitiveToIpldBasicNode(value)
+	}
+	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 }
