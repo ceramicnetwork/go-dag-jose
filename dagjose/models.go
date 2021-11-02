@@ -3,78 +3,10 @@ package dagjose
 import (
 	"github.com/ipfs/go-cid"
 	ipld "github.com/ipld/go-ipld-prime"
-	"github.com/ipld/go-ipld-prime/datamodel"
+	//"github.com/ipld/go-ipld-prime/datamodel"
 	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
+	//"github.com/ipld/go-ipld-prime/schema"
 )
-
-// This is a union of the DagJWE and DagJWS types. Typically you will want to
-// use AsJWE and AsJWS to get a concrete JOSE object.
-type DagJOSE struct {
-	// JWS top level keys
-	payload    *cid.Cid
-	signatures []jwsSignature
-	// JWE top level keys
-	protected   []byte
-	unprotected []byte
-	iv          []byte
-	aad         []byte
-	ciphertext  []byte
-	tag         []byte
-	recipients  []jweRecipient
-}
-
-type jwsSignature struct {
-	protected []byte
-	header    map[string]ipld.Node
-	signature []byte
-}
-
-type jweRecipient struct {
-	header        map[string]ipld.Node
-	encrypted_key []byte
-}
-
-func (d *DagJOSE) AsNode() ipld.Node {
-	return dagJOSENode{d}
-}
-
-// If this jose object is a JWS then this will return a DagJWS, if it is a
-// JWE then AsJWS will return nil
-func (d *DagJOSE) AsJWS() *DagJWS {
-	if d.payload != nil {
-		return &DagJWS{dagjose: d}
-	}
-	return nil
-}
-
-// If this jose object is a JWE then this will return a DagJWE, if it is a
-// JWS then AsJWE will return nil
-func (d *DagJOSE) AsJWE() *DagJWE {
-	if d.ciphertext != nil {
-		return &DagJWE{dagjose: d}
-	}
-	return nil
-}
-
-type DagJWS struct{ dagjose *DagJOSE }
-
-// Returns a DagJOSE object that implements ipld.Node and can be passed to
-// ipld related infrastructure
-func (d *DagJWS) AsJOSE() *DagJOSE {
-	return d.dagjose
-}
-
-type DagJWE struct{ dagjose *DagJOSE }
-
-// Returns a DagJOSE object that implements ipld.Node and can be passed to
-// ipld related infrastructure
-func (d *DagJWE) AsJOSE() *DagJOSE {
-	return d.dagjose
-}
-
-func (d *DagJWS) PayloadLink() ipld.Link {
-	return cidlink.Link{Cid: *d.dagjose.payload}
-}
 
 // A link prototype which will build CIDs using the dag-jose multicodec and
 // the sha-384 multihash
@@ -87,36 +19,22 @@ var LinkPrototype = cidlink.LinkPrototype{Prefix: cid.Prefix{
 
 // A convenience function which passes the correct dagjose.LinkProtoype and
 // DAG-JOSE object to ipld.LinkSystem.Store
-func StoreJOSE(linkContext ipld.LinkContext, jose *DagJOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
-	return linkSystem.Store(linkContext, LinkPrototype, jose.AsNode())
+func StoreJOSE(linkContext ipld.LinkContext, jose _JOSE, linkSystem ipld.LinkSystem) (ipld.Link, error) {
+	return linkSystem.Store(linkContext, LinkPrototype, &jose)
 }
-
-var NodePrototype = &DagJOSENodePrototype{}
 
 // LoadJOSE is a convenience function which wraps ipld.LinkSystem.Load. This
 // will provide the dagjose.NodePrototype to the link system and attempt to
 // cast the result to a DagJOSE object
-func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkSystem) (*DagJOSE, error) {
+func LoadJOSE(lnk ipld.Link, linkContext ipld.LinkContext, linkSystem ipld.LinkSystem) (JOSE, error) {
 	n, err := linkSystem.Load(
 		linkContext,
 		lnk,
-		NodePrototype,
+		Type.JOSE,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return n.(dagJOSENode).DagJOSE, nil
-}
-
-func valueOrNotFound(key string, value interface{}, createNode func() (ipld.Node, error)) (ipld.Node, error) {
-	if value != nil {
-		if createNode != nil {
-			// `createNode` must be a closure that returns a correctly created `ipld.Node` or an appropriate error
-			return createNode()
-		}
-		// Assume that `value` is a primitive type
-		return goPrimitiveToIpldBasicNode(value)
-	}
-	return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+	return n.(JOSE), nil
 }
