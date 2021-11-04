@@ -15,22 +15,22 @@ func main() {
 	// Common
 	ts.Accumulate(schema.SpawnString("String"))
 	ts.Accumulate(schema.SpawnBytes("Bytes"))
-	//ts.Accumulate(schema.SpawnMap("Map", "String", "String", false))
+	ts.Accumulate(schema.SpawnMap("Map", "String", "String", false))
 
 	// JWS
 	ts.Accumulate(schema.SpawnStruct("Signature", []schema.StructField{
-		//schema.SpawnStructField("header", "Map", true, false),
+		schema.SpawnStructField("header", "Map", true, false),
 		schema.SpawnStructField("protected", "String", true, false),
 		schema.SpawnStructField("signature", "String", false, false),
-	}, schema.SpawnStructRepresentationMap(map[string]string{})))
+	}, nil))
 
 	ts.Accumulate(schema.SpawnList("Signatures", "Signature", false))
 
 	// JWE
 	ts.Accumulate(schema.SpawnStruct("Recipient", []schema.StructField{
-		//schema.SpawnStructField("header", "Map", true, false),
+		schema.SpawnStructField("header", "Map", true, false),
 		schema.SpawnStructField("encrypted_key", "String", true, false),
-	}, schema.SpawnStructRepresentationMap(map[string]string{})))
+	}, nil))
 
 	ts.Accumulate(schema.SpawnList("Recipients", "Recipient", false))
 
@@ -44,9 +44,8 @@ func main() {
 		schema.SpawnStructField("recipients", "Recipients", true, false),
 		schema.SpawnStructField("signatures", "Signatures", true, false),
 		schema.SpawnStructField("tag", "String", true, false),
-		//schema.SpawnStructField("unprotected", "Map", true, false),
-	}, schema.SpawnStructRepresentationMap(map[string]string{})))
-
+		schema.SpawnStructField("unprotected", "Map", true, false),
+	}, nil))
 	if errs := ts.ValidateGraph(); errs != nil {
 		for _, err := range errs {
 			fmt.Printf("- %s\n", err)

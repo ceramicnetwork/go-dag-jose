@@ -237,6 +237,9 @@ func (n _JOSE) FieldSignatures() MaybeSignatures {
 func (n _JOSE) FieldTag() MaybeString {
 	return &n.tag
 }
+func (n _JOSE) FieldUnprotected() MaybeMap {
+	return &n.unprotected
+}
 
 type _JOSE__Maybe struct {
 	m schema.Maybe
@@ -273,14 +276,15 @@ func (m MaybeJOSE) Must() JOSE {
 }
 
 var (
-	fieldName__JOSE_Aad        = _String{"aad"}
-	fieldName__JOSE_Ciphertext = _String{"ciphertext"}
-	fieldName__JOSE_Iv         = _String{"iv"}
-	fieldName__JOSE_Payload    = _String{"payload"}
-	fieldName__JOSE_Protected  = _String{"protected"}
-	fieldName__JOSE_Recipients = _String{"recipients"}
-	fieldName__JOSE_Signatures = _String{"signatures"}
-	fieldName__JOSE_Tag        = _String{"tag"}
+	fieldName__JOSE_Aad         = _String{"aad"}
+	fieldName__JOSE_Ciphertext  = _String{"ciphertext"}
+	fieldName__JOSE_Iv          = _String{"iv"}
+	fieldName__JOSE_Payload     = _String{"payload"}
+	fieldName__JOSE_Protected   = _String{"protected"}
+	fieldName__JOSE_Recipients  = _String{"recipients"}
+	fieldName__JOSE_Signatures  = _String{"signatures"}
+	fieldName__JOSE_Tag         = _String{"tag"}
+	fieldName__JOSE_Unprotected = _String{"unprotected"}
 )
 var _ datamodel.Node = (JOSE)(&_JOSE{})
 var _ schema.TypedNode = (JOSE)(&_JOSE{})
@@ -330,6 +334,11 @@ func (n JOSE) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, nil
 		}
 		return &n.tag.v, nil
+	case "unprotected":
+		if n.unprotected.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.unprotected.v, nil
 	default:
 		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
 	}
@@ -357,7 +366,7 @@ type _JOSE__MapItr struct {
 }
 
 func (itr *_JOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 8 {
+	if itr.idx >= 9 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
@@ -417,6 +426,13 @@ func (itr *_JOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 			break
 		}
 		v = &itr.n.tag.v
+	case 8:
+		k = &fieldName__JOSE_Unprotected
+		if itr.n.unprotected.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.unprotected.v
 	default:
 		panic("unreachable")
 	}
@@ -424,14 +440,14 @@ func (itr *_JOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 	return
 }
 func (itr *_JOSE__MapItr) Done() bool {
-	return itr.idx >= 8
+	return itr.idx >= 9
 }
 
 func (JOSE) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (JOSE) Length() int64 {
-	return 8
+	return 9
 }
 func (JOSE) IsAbsent() bool {
 	return false
@@ -492,15 +508,16 @@ type _JOSE__Assembler struct {
 	s     int
 	f     int
 
-	cm            schema.Maybe
-	ca_aad        _String__Assembler
-	ca_ciphertext _String__Assembler
-	ca_iv         _String__Assembler
-	ca_payload    _String__Assembler
-	ca_protected  _String__Assembler
-	ca_recipients _Recipients__Assembler
-	ca_signatures _Signatures__Assembler
-	ca_tag        _String__Assembler
+	cm             schema.Maybe
+	ca_aad         _String__Assembler
+	ca_ciphertext  _String__Assembler
+	ca_iv          _String__Assembler
+	ca_payload     _String__Assembler
+	ca_protected   _String__Assembler
+	ca_recipients  _Recipients__Assembler
+	ca_signatures  _Signatures__Assembler
+	ca_tag         _String__Assembler
+	ca_unprotected _Map__Assembler
 }
 
 func (na *_JOSE__Assembler) reset() {
@@ -514,6 +531,7 @@ func (na *_JOSE__Assembler) reset() {
 	na.ca_recipients.reset()
 	na.ca_signatures.reset()
 	na.ca_tag.reset()
+	na.ca_unprotected.reset()
 }
 
 var (
@@ -525,6 +543,7 @@ var (
 	fieldBit__JOSE_Recipients  = 1 << 5
 	fieldBit__JOSE_Signatures  = 1 << 6
 	fieldBit__JOSE_Tag         = 1 << 7
+	fieldBit__JOSE_Unprotected = 1 << 8
 	fieldBits__JOSE_sufficient = 0
 )
 
@@ -683,6 +702,14 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
+	case 8:
+		switch ma.w.unprotected.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
 	default:
 		panic("unreachable")
 	}
@@ -783,6 +810,16 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag, nil
+	case "unprotected":
+		if ma.s&fieldBit__JOSE_Unprotected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Unprotected}
+		}
+		ma.s += fieldBit__JOSE_Unprotected
+		ma.state = maState_midValue
+		ma.f = 8
+		ma.ca_unprotected.w = &ma.w.unprotected.v
+		ma.ca_unprotected.m = &ma.w.unprotected.m
+		return &ma.ca_unprotected, nil
 	}
 	return nil, schema.ErrInvalidKey{TypeName: "dagjose.JOSE", Key: &_String{k}}
 }
@@ -851,6 +888,10 @@ func (ma *_JOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag
+	case 8:
+		ma.ca_unprotected.w = &ma.w.unprotected.v
+		ma.ca_unprotected.m = &ma.w.unprotected.m
+		return &ma.ca_unprotected
 	default:
 		panic("unreachable")
 	}
@@ -974,6 +1015,14 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		ka.state = maState_expectValue
 		ka.f = 7
 		return nil
+	case "unprotected":
+		if ka.s&fieldBit__JOSE_Unprotected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Unprotected}
+		}
+		ka.s += fieldBit__JOSE_Unprotected
+		ka.state = maState_expectValue
+		ka.f = 8
+		return nil
 	default:
 		return schema.ErrInvalidKey{TypeName: "dagjose.JOSE", Key: &_String{k}}
 	}
@@ -1004,14 +1053,15 @@ func (n JOSE) Representation() datamodel.Node {
 type _JOSE__Repr _JOSE
 
 var (
-	fieldName__JOSE_Aad_serial        = _String{"aad"}
-	fieldName__JOSE_Ciphertext_serial = _String{"ciphertext"}
-	fieldName__JOSE_Iv_serial         = _String{"iv"}
-	fieldName__JOSE_Payload_serial    = _String{"payload"}
-	fieldName__JOSE_Protected_serial  = _String{"protected"}
-	fieldName__JOSE_Recipients_serial = _String{"recipients"}
-	fieldName__JOSE_Signatures_serial = _String{"signatures"}
-	fieldName__JOSE_Tag_serial        = _String{"tag"}
+	fieldName__JOSE_Aad_serial         = _String{"aad"}
+	fieldName__JOSE_Ciphertext_serial  = _String{"ciphertext"}
+	fieldName__JOSE_Iv_serial          = _String{"iv"}
+	fieldName__JOSE_Payload_serial     = _String{"payload"}
+	fieldName__JOSE_Protected_serial   = _String{"protected"}
+	fieldName__JOSE_Recipients_serial  = _String{"recipients"}
+	fieldName__JOSE_Signatures_serial  = _String{"signatures"}
+	fieldName__JOSE_Tag_serial         = _String{"tag"}
+	fieldName__JOSE_Unprotected_serial = _String{"unprotected"}
 )
 var _ datamodel.Node = &_JOSE__Repr{}
 
@@ -1060,6 +1110,11 @@ func (n *_JOSE__Repr) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 		}
 		return n.tag.v.Representation(), nil
+	case "unprotected":
+		if n.unprotected.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.unprotected.v.Representation(), nil
 	default:
 		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
 	}
@@ -1078,7 +1133,12 @@ func (n _JOSE__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node,
 	return n.LookupByString(seg.String())
 }
 func (n *_JOSE__Repr) MapIterator() datamodel.MapIterator {
-	end := 8
+	end := 9
+	if n.unprotected.m == schema.Maybe_Absent {
+		end = 8
+	} else {
+		goto done
+	}
 	if n.tag.m == schema.Maybe_Absent {
 		end = 7
 	} else {
@@ -1131,7 +1191,7 @@ type _JOSE__ReprMapItr struct {
 
 func (itr *_JOSE__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 8 {
+	if itr.idx >= 9 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
@@ -1191,6 +1251,13 @@ advance:
 			goto advance
 		}
 		v = itr.n.tag.v.Representation()
+	case 8:
+		k = &fieldName__JOSE_Unprotected_serial
+		if itr.n.unprotected.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.unprotected.v.Representation()
 	default:
 		panic("unreachable")
 	}
@@ -1204,7 +1271,7 @@ func (_JOSE__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (rn *_JOSE__Repr) Length() int64 {
-	l := 8
+	l := 9
 	if rn.aad.m == schema.Maybe_Absent {
 		l--
 	}
@@ -1227,6 +1294,9 @@ func (rn *_JOSE__Repr) Length() int64 {
 		l--
 	}
 	if rn.tag.m == schema.Maybe_Absent {
+		l--
+	}
+	if rn.unprotected.m == schema.Maybe_Absent {
 		l--
 	}
 	return int64(l)
@@ -1278,27 +1348,28 @@ func (nb *_JOSE__ReprBuilder) Build() datamodel.Node {
 	return nb.w
 }
 func (nb *_JOSE__ReprBuilder) Reset() {
-	var w _JOSE
+	var w _JOSE__Repr
 	var m schema.Maybe
 	*nb = _JOSE__ReprBuilder{_JOSE__ReprAssembler{w: &w, m: &m}}
 }
 
 type _JOSE__ReprAssembler struct {
-	w     *_JOSE
+	w     *_JOSE__Repr
 	m     *schema.Maybe
 	state maState
 	s     int
 	f     int
 
-	cm            schema.Maybe
-	ca_aad        _String__ReprAssembler
-	ca_ciphertext _String__ReprAssembler
-	ca_iv         _String__ReprAssembler
-	ca_payload    _String__ReprAssembler
-	ca_protected  _String__ReprAssembler
-	ca_recipients _Recipients__ReprAssembler
-	ca_signatures _Signatures__ReprAssembler
-	ca_tag        _String__ReprAssembler
+	cm             schema.Maybe
+	ca_aad         _String__ReprAssembler
+	ca_ciphertext  _String__ReprAssembler
+	ca_iv          _String__ReprAssembler
+	ca_payload     _String__ReprAssembler
+	ca_protected   _String__ReprAssembler
+	ca_recipients  _Recipients__ReprAssembler
+	ca_signatures  _Signatures__ReprAssembler
+	ca_tag         _String__ReprAssembler
+	ca_unprotected _Map__ReprAssembler
 }
 
 func (na *_JOSE__ReprAssembler) reset() {
@@ -1312,6 +1383,7 @@ func (na *_JOSE__ReprAssembler) reset() {
 	na.ca_recipients.reset()
 	na.ca_signatures.reset()
 	na.ca_tag.reset()
+	na.ca_unprotected.reset()
 }
 func (na *_JOSE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
 	switch *na.m {
@@ -1322,7 +1394,7 @@ func (na *_JOSE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) 
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_JOSE{}
+		na.w = &_JOSE__Repr{}
 	}
 	return na, nil
 }
@@ -1365,7 +1437,7 @@ func (na *_JOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_JOSE); ok {
+	if v2, ok := v.(*_JOSE__Repr); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -1462,6 +1534,14 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 		}
 	case 7:
 		switch ma.w.tag.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 8:
+		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -1576,6 +1656,17 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag, nil
+	case "unprotected":
+		if ma.s&fieldBit__JOSE_Unprotected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Unprotected_serial}
+		}
+		ma.s += fieldBit__JOSE_Unprotected
+		ma.state = maState_midValue
+		ma.f = 8
+		ma.ca_unprotected.w = &ma.w.unprotected.v
+		ma.ca_unprotected.m = &ma.w.unprotected.m
+
+		return &ma.ca_unprotected, nil
 	default:
 	}
 	return nil, schema.ErrInvalidKey{TypeName: "dagjose.JOSE.Repr", Key: &_String{k}}
@@ -1653,6 +1744,11 @@ func (ma *_JOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag
+	case 8:
+		ma.ca_unprotected.w = &ma.w.unprotected.v
+		ma.ca_unprotected.m = &ma.w.unprotected.m
+
+		return &ma.ca_unprotected
 	default:
 		panic("unreachable")
 	}
@@ -1776,6 +1872,14 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		ka.state = maState_expectValue
 		ka.f = 7
 		return nil
+	case "unprotected":
+		if ka.s&fieldBit__JOSE_Unprotected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Unprotected_serial}
+		}
+		ka.s += fieldBit__JOSE_Unprotected
+		ka.state = maState_expectValue
+		ka.f = 8
+		return nil
 	}
 	return schema.ErrInvalidKey{TypeName: "dagjose.JOSE.Repr", Key: &_String{k}}
 }
@@ -1796,6 +1900,762 @@ func (_JOSE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
 
+func (n *_Map) Lookup(k String) String {
+	v, exists := n.m[*k]
+	if !exists {
+		return nil
+	}
+	return v
+}
+func (n *_Map) LookupMaybe(k String) MaybeString {
+	v, exists := n.m[*k]
+	if !exists {
+		return &_Map__valueAbsent
+	}
+	return &_String__Maybe{
+		m: schema.Maybe_Value,
+		v: *v,
+	}
+}
+
+var _Map__valueAbsent = _String__Maybe{m: schema.Maybe_Absent}
+
+func (n Map) Iterator() *Map__Itr {
+	return &Map__Itr{n, 0}
+}
+
+type Map__Itr struct {
+	n   Map
+	idx int
+}
+
+func (itr *Map__Itr) Next() (k String, v String) {
+	if itr.idx >= len(itr.n.t) {
+		return nil, nil
+	}
+	x := &itr.n.t[itr.idx]
+	k = &x.k
+	v = &x.v
+	itr.idx++
+	return
+}
+func (itr *Map__Itr) Done() bool {
+	return itr.idx >= len(itr.n.t)
+}
+
+type _Map__Maybe struct {
+	m schema.Maybe
+	v _Map
+}
+type MaybeMap = *_Map__Maybe
+
+func (m MaybeMap) IsNull() bool {
+	return m.m == schema.Maybe_Null
+}
+func (m MaybeMap) IsAbsent() bool {
+	return m.m == schema.Maybe_Absent
+}
+func (m MaybeMap) Exists() bool {
+	return m.m == schema.Maybe_Value
+}
+func (m MaybeMap) AsNode() datamodel.Node {
+	switch m.m {
+	case schema.Maybe_Absent:
+		return datamodel.Absent
+	case schema.Maybe_Null:
+		return datamodel.Null
+	case schema.Maybe_Value:
+		return &m.v
+	default:
+		panic("unreachable")
+	}
+}
+func (m MaybeMap) Must() Map {
+	if !m.Exists() {
+		panic("unbox of a maybe rejected")
+	}
+	return &m.v
+}
+
+var _ datamodel.Node = (Map)(&_Map{})
+var _ schema.TypedNode = (Map)(&_Map{})
+
+func (Map) Kind() datamodel.Kind {
+	return datamodel.Kind_Map
+}
+func (n Map) LookupByString(k string) (datamodel.Node, error) {
+	var k2 _String
+	if err := (_String__ReprPrototype{}).fromString(&k2, k); err != nil {
+		return nil, err // TODO wrap in some kind of ErrInvalidKey
+	}
+	v, exists := n.m[k2]
+	if !exists {
+		return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(k)}
+	}
+	return v, nil
+}
+func (n Map) LookupByNode(k datamodel.Node) (datamodel.Node, error) {
+	k2, ok := k.(String)
+	if !ok {
+		panic("todo invalid key type error")
+		// 'schema.ErrInvalidKey{TypeName:"dagjose.Map", Key:&_String{k}}' doesn't quite cut it: need room to explain the type, and it's not guaranteed k can be turned into a string at all
+	}
+	v, exists := n.m[*k2]
+	if !exists {
+		return nil, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(k2.String())}
+	}
+	return v, nil
+}
+func (Map) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.LookupByIndex(0)
+}
+func (n Map) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return n.LookupByString(seg.String())
+}
+func (n Map) MapIterator() datamodel.MapIterator {
+	return &_Map__MapItr{n, 0}
+}
+
+type _Map__MapItr struct {
+	n   Map
+	idx int
+}
+
+func (itr *_Map__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+	if itr.idx >= len(itr.n.t) {
+		return nil, nil, datamodel.ErrIteratorOverread{}
+	}
+	x := &itr.n.t[itr.idx]
+	k = &x.k
+	v = &x.v
+	itr.idx++
+	return
+}
+func (itr *_Map__MapItr) Done() bool {
+	return itr.idx >= len(itr.n.t)
+}
+
+func (Map) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (n Map) Length() int64 {
+	return int64(len(n.t))
+}
+func (Map) IsAbsent() bool {
+	return false
+}
+func (Map) IsNull() bool {
+	return false
+}
+func (Map) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.AsBool()
+}
+func (Map) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.AsInt()
+}
+func (Map) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.AsFloat()
+}
+func (Map) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.AsString()
+}
+func (Map) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.AsBytes()
+}
+func (Map) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.Map"}.AsLink()
+}
+func (Map) Prototype() datamodel.NodePrototype {
+	return _Map__Prototype{}
+}
+
+type _Map__Prototype struct{}
+
+func (_Map__Prototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _Map__Builder
+	nb.Reset()
+	return &nb
+}
+
+type _Map__Builder struct {
+	_Map__Assembler
+}
+
+func (nb *_Map__Builder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_Map__Builder) Reset() {
+	var w _Map
+	var m schema.Maybe
+	*nb = _Map__Builder{_Map__Assembler{w: &w, m: &m}}
+}
+
+type _Map__Assembler struct {
+	w     *_Map
+	m     *schema.Maybe
+	state maState
+
+	cm schema.Maybe
+	ka _String__Assembler
+	va _String__Assembler
+}
+
+func (na *_Map__Assembler) reset() {
+	na.state = maState_initial
+	na.ka.reset()
+	na.va.reset()
+}
+func (na *_Map__Assembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: it makes no sense to 'begin' twice on the same assembler!")
+	}
+	*na.m = midvalue
+	if sizeHint < 0 {
+		sizeHint = 0
+	}
+	na.w.m = make(map[_String]*_String, sizeHint)
+	na.w.t = make([]_Map__entry, 0, sizeHint)
+	return na, nil
+}
+func (_Map__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.BeginList(0)
+}
+func (na *_Map__Assembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+	}
+	panic("unreachable")
+}
+func (_Map__Assembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignBool(false)
+}
+func (_Map__Assembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignInt(0)
+}
+func (_Map__Assembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignFloat(0)
+}
+func (_Map__Assembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignString("")
+}
+func (_Map__Assembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignBytes(nil)
+}
+func (_Map__Assembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map"}.AssignLink(nil)
+}
+func (na *_Map__Assembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_Map); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		case midvalue:
+			panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v.Kind() != datamodel.Kind_Map {
+		return datamodel.ErrWrongKind{TypeName: "dagjose.Map", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+	}
+	itr := v.MapIterator()
+	for !itr.Done() {
+		k, v, err := itr.Next()
+		if err != nil {
+			return err
+		}
+		if err := na.AssembleKey().AssignNode(k); err != nil {
+			return err
+		}
+		if err := na.AssembleValue().AssignNode(v); err != nil {
+			return err
+		}
+	}
+	return na.Finish()
+}
+func (_Map__Assembler) Prototype() datamodel.NodePrototype {
+	return _Map__Prototype{}
+}
+func (ma *_Map__Assembler) keyFinishTidy() bool {
+	switch ma.cm {
+	case schema.Maybe_Value:
+		ma.ka.w = nil
+		tz := &ma.w.t[len(ma.w.t)-1]
+		ma.cm = schema.Maybe_Absent
+		ma.state = maState_expectValue
+		ma.w.m[tz.k] = &tz.v
+		ma.va.w = &tz.v
+		ma.va.m = &ma.cm
+		ma.ka.reset()
+		return true
+	default:
+		return false
+	}
+}
+func (ma *_Map__Assembler) valueFinishTidy() bool {
+	switch ma.cm {
+	case schema.Maybe_Value:
+		ma.va.w = nil
+		ma.cm = schema.Maybe_Absent
+		ma.state = maState_initial
+		ma.va.reset()
+		return true
+	default:
+		return false
+	}
+}
+func (ma *_Map__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleEntry cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleEntry cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleEntry cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
+	}
+
+	var k2 _String
+	if err := (_String__ReprPrototype{}).fromString(&k2, k); err != nil {
+		return nil, err // TODO wrap in some kind of ErrInvalidKey
+	}
+	if _, exists := ma.w.m[k2]; exists {
+		return nil, datamodel.ErrRepeatedMapKey{Key: &k2}
+	}
+	ma.w.t = append(ma.w.t, _Map__entry{k: k2})
+	tz := &ma.w.t[len(ma.w.t)-1]
+	ma.state = maState_midValue
+
+	ma.w.m[k2] = &tz.v
+	ma.va.w = &tz.v
+	ma.va.m = &ma.cm
+	return &ma.va, nil
+}
+func (ma *_Map__Assembler) AssembleKey() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleKey cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleKey cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleKey cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
+	}
+	ma.w.t = append(ma.w.t, _Map__entry{})
+	ma.state = maState_midKey
+	ma.ka.m = &ma.cm
+	ma.ka.w = &ma.w.t[len(ma.w.t)-1].k
+	return &ma.ka
+}
+func (ma *_Map__Assembler) AssembleValue() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		panic("invalid state: AssembleValue cannot be called when no key is primed")
+	case maState_midKey:
+		if !ma.keyFinishTidy() {
+			panic("invalid state: AssembleValue cannot be called when in the middle of assembling a key")
+		} // if tidy success: carry on
+	case maState_expectValue:
+		// carry on
+	case maState_midValue:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling another value")
+	case maState_finished:
+		panic("invalid state: AssembleValue cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midValue
+	return &ma.va
+}
+func (ma *_Map__Assembler) Finish() error {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: Finish cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		panic("invalid state: Finish cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: Finish cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: Finish cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_finished
+	*ma.m = schema.Maybe_Value
+	return nil
+}
+func (ma *_Map__Assembler) KeyPrototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (ma *_Map__Assembler) ValuePrototype(_ string) datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (Map) Type() schema.Type {
+	return nil /*TODO:typelit*/
+}
+func (n Map) Representation() datamodel.Node {
+	return (*_Map__Repr)(n)
+}
+
+type _Map__Repr _Map
+
+var _ datamodel.Node = &_Map__Repr{}
+
+func (_Map__Repr) Kind() datamodel.Kind {
+	return datamodel.Kind_Map
+}
+func (nr *_Map__Repr) LookupByString(k string) (datamodel.Node, error) {
+	v, err := (Map)(nr).LookupByString(k)
+	if err != nil || v == datamodel.Null {
+		return v, err
+	}
+	return v.(String).Representation(), nil
+}
+func (nr *_Map__Repr) LookupByNode(k datamodel.Node) (datamodel.Node, error) {
+	v, err := (Map)(nr).LookupByNode(k)
+	if err != nil || v == datamodel.Null {
+		return v, err
+	}
+	return v.(String).Representation(), nil
+}
+func (_Map__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.LookupByIndex(0)
+}
+func (n _Map__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return n.LookupByString(seg.String())
+}
+func (nr *_Map__Repr) MapIterator() datamodel.MapIterator {
+	return &_Map__ReprMapItr{(Map)(nr), 0}
+}
+
+type _Map__ReprMapItr _Map__MapItr
+
+func (itr *_Map__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, err error) {
+	k, v, err = (*_Map__MapItr)(itr).Next()
+	if err != nil || v == datamodel.Null {
+		return
+	}
+	return k, v.(String).Representation(), nil
+}
+func (itr *_Map__ReprMapItr) Done() bool {
+	return (*_Map__MapItr)(itr).Done()
+}
+
+func (_Map__Repr) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (rn *_Map__Repr) Length() int64 {
+	return int64(len(rn.t))
+}
+func (_Map__Repr) IsAbsent() bool {
+	return false
+}
+func (_Map__Repr) IsNull() bool {
+	return false
+}
+func (_Map__Repr) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.AsBool()
+}
+func (_Map__Repr) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.AsInt()
+}
+func (_Map__Repr) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.AsFloat()
+}
+func (_Map__Repr) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.AsString()
+}
+func (_Map__Repr) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.AsBytes()
+}
+func (_Map__Repr) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.Map.Repr"}.AsLink()
+}
+func (_Map__Repr) Prototype() datamodel.NodePrototype {
+	return _Map__ReprPrototype{}
+}
+
+type _Map__ReprPrototype struct{}
+
+func (_Map__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _Map__ReprBuilder
+	nb.Reset()
+	return &nb
+}
+
+type _Map__ReprBuilder struct {
+	_Map__ReprAssembler
+}
+
+func (nb *_Map__ReprBuilder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_Map__ReprBuilder) Reset() {
+	var w _Map
+	var m schema.Maybe
+	*nb = _Map__ReprBuilder{_Map__ReprAssembler{w: &w, m: &m}}
+}
+
+type _Map__ReprAssembler struct {
+	w     *_Map
+	m     *schema.Maybe
+	state maState
+
+	cm schema.Maybe
+	ka _String__ReprAssembler
+	va _String__ReprAssembler
+}
+
+func (na *_Map__ReprAssembler) reset() {
+	na.state = maState_initial
+	na.ka.reset()
+	na.va.reset()
+}
+func (na *_Map__ReprAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: it makes no sense to 'begin' twice on the same assembler!")
+	}
+	*na.m = midvalue
+	if sizeHint < 0 {
+		sizeHint = 0
+	}
+	na.w.m = make(map[_String]*_String, sizeHint)
+	na.w.t = make([]_Map__entry, 0, sizeHint)
+	return na, nil
+}
+func (_Map__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.BeginList(0)
+}
+func (na *_Map__ReprAssembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.MapAssembler{TypeName: "dagjose.Map.Repr.Repr"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+	}
+	panic("unreachable")
+}
+func (_Map__ReprAssembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.AssignBool(false)
+}
+func (_Map__ReprAssembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.AssignInt(0)
+}
+func (_Map__ReprAssembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.AssignFloat(0)
+}
+func (_Map__ReprAssembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.AssignString("")
+}
+func (_Map__ReprAssembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.AssignBytes(nil)
+}
+func (_Map__ReprAssembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.Map.Repr"}.AssignLink(nil)
+}
+func (na *_Map__ReprAssembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_Map); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		case midvalue:
+			panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v.Kind() != datamodel.Kind_Map {
+		return datamodel.ErrWrongKind{TypeName: "dagjose.Map.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+	}
+	itr := v.MapIterator()
+	for !itr.Done() {
+		k, v, err := itr.Next()
+		if err != nil {
+			return err
+		}
+		if err := na.AssembleKey().AssignNode(k); err != nil {
+			return err
+		}
+		if err := na.AssembleValue().AssignNode(v); err != nil {
+			return err
+		}
+	}
+	return na.Finish()
+}
+func (_Map__ReprAssembler) Prototype() datamodel.NodePrototype {
+	return _Map__ReprPrototype{}
+}
+func (ma *_Map__ReprAssembler) keyFinishTidy() bool {
+	switch ma.cm {
+	case schema.Maybe_Value:
+		ma.ka.w = nil
+		tz := &ma.w.t[len(ma.w.t)-1]
+		ma.cm = schema.Maybe_Absent
+		ma.state = maState_expectValue
+		ma.w.m[tz.k] = &tz.v
+		ma.va.w = &tz.v
+		ma.va.m = &ma.cm
+		ma.ka.reset()
+		return true
+	default:
+		return false
+	}
+}
+func (ma *_Map__ReprAssembler) valueFinishTidy() bool {
+	switch ma.cm {
+	case schema.Maybe_Value:
+		ma.va.w = nil
+		ma.cm = schema.Maybe_Absent
+		ma.state = maState_initial
+		ma.va.reset()
+		return true
+	default:
+		return false
+	}
+}
+func (ma *_Map__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleEntry cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleEntry cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleEntry cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
+	}
+
+	var k2 _String
+	if err := (_String__ReprPrototype{}).fromString(&k2, k); err != nil {
+		return nil, err // TODO wrap in some kind of ErrInvalidKey
+	}
+	if _, exists := ma.w.m[k2]; exists {
+		return nil, datamodel.ErrRepeatedMapKey{Key: &k2}
+	}
+	ma.w.t = append(ma.w.t, _Map__entry{k: k2})
+	tz := &ma.w.t[len(ma.w.t)-1]
+	ma.state = maState_midValue
+
+	ma.w.m[k2] = &tz.v
+	ma.va.w = &tz.v
+	ma.va.m = &ma.cm
+	return &ma.va, nil
+}
+func (ma *_Map__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleKey cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleKey cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleKey cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
+	}
+	ma.w.t = append(ma.w.t, _Map__entry{})
+	ma.state = maState_midKey
+	ma.ka.m = &ma.cm
+	ma.ka.w = &ma.w.t[len(ma.w.t)-1].k
+	return &ma.ka
+}
+func (ma *_Map__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		panic("invalid state: AssembleValue cannot be called when no key is primed")
+	case maState_midKey:
+		if !ma.keyFinishTidy() {
+			panic("invalid state: AssembleValue cannot be called when in the middle of assembling a key")
+		} // if tidy success: carry on
+	case maState_expectValue:
+		// carry on
+	case maState_midValue:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling another value")
+	case maState_finished:
+		panic("invalid state: AssembleValue cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midValue
+	return &ma.va
+}
+func (ma *_Map__ReprAssembler) Finish() error {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: Finish cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		panic("invalid state: Finish cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: Finish cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: Finish cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_finished
+	*ma.m = schema.Maybe_Value
+	return nil
+}
+func (ma *_Map__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
+	return _String__ReprPrototype{}
+}
+func (ma *_Map__ReprAssembler) ValuePrototype(_ string) datamodel.NodePrototype {
+	return _String__ReprPrototype{}
+}
+
+func (n _Recipient) FieldHeader() MaybeMap {
+	return &n.header
+}
 func (n _Recipient) FieldEncrypted_key() MaybeString {
 	return &n.encrypted_key
 }
@@ -1835,6 +2695,7 @@ func (m MaybeRecipient) Must() Recipient {
 }
 
 var (
+	fieldName__Recipient_Header        = _String{"header"}
 	fieldName__Recipient_Encrypted_key = _String{"encrypted_key"}
 )
 var _ datamodel.Node = (Recipient)(&_Recipient{})
@@ -1845,6 +2706,11 @@ func (Recipient) Kind() datamodel.Kind {
 }
 func (n Recipient) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
+	case "header":
+		if n.header.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.header.v, nil
 	case "encrypted_key":
 		if n.encrypted_key.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -1877,11 +2743,18 @@ type _Recipient__MapItr struct {
 }
 
 func (itr *_Recipient__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 1 {
+	if itr.idx >= 2 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
+		k = &fieldName__Recipient_Header
+		if itr.n.header.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.header.v
+	case 1:
 		k = &fieldName__Recipient_Encrypted_key
 		if itr.n.encrypted_key.m == schema.Maybe_Absent {
 			v = datamodel.Absent
@@ -1895,14 +2768,14 @@ func (itr *_Recipient__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ err
 	return
 }
 func (itr *_Recipient__MapItr) Done() bool {
-	return itr.idx >= 1
+	return itr.idx >= 2
 }
 
 func (Recipient) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (Recipient) Length() int64 {
-	return 1
+	return 2
 }
 func (Recipient) IsAbsent() bool {
 	return false
@@ -1964,17 +2837,20 @@ type _Recipient__Assembler struct {
 	f     int
 
 	cm               schema.Maybe
+	ca_header        _Map__Assembler
 	ca_encrypted_key _String__Assembler
 }
 
 func (na *_Recipient__Assembler) reset() {
 	na.state = maState_initial
 	na.s = 0
+	na.ca_header.reset()
 	na.ca_encrypted_key.reset()
 }
 
 var (
-	fieldBit__Recipient_Encrypted_key = 1 << 0
+	fieldBit__Recipient_Header        = 1 << 0
+	fieldBit__Recipient_Encrypted_key = 1 << 1
 	fieldBits__Recipient_sufficient   = 0
 )
 
@@ -2070,6 +2946,14 @@ func (_Recipient__Assembler) Prototype() datamodel.NodePrototype {
 func (ma *_Recipient__Assembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
+		switch ma.w.header.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 1:
 		switch ma.w.encrypted_key.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -2097,13 +2981,23 @@ func (ma *_Recipient__Assembler) AssembleEntry(k string) (datamodel.NodeAssemble
 		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
 	}
 	switch k {
+	case "header":
+		if ma.s&fieldBit__Recipient_Header != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Header}
+		}
+		ma.s += fieldBit__Recipient_Header
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+		return &ma.ca_header, nil
 	case "encrypted_key":
 		if ma.s&fieldBit__Recipient_Encrypted_key != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Encrypted_key}
 		}
 		ma.s += fieldBit__Recipient_Encrypted_key
 		ma.state = maState_midValue
-		ma.f = 0
+		ma.f = 1
 		ma.ca_encrypted_key.w = &ma.w.encrypted_key.v
 		ma.ca_encrypted_key.m = &ma.w.encrypted_key.m
 		return &ma.ca_encrypted_key, nil
@@ -2144,6 +3038,10 @@ func (ma *_Recipient__Assembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+		return &ma.ca_header
+	case 1:
 		ma.ca_encrypted_key.w = &ma.w.encrypted_key.v
 		ma.ca_encrypted_key.m = &ma.w.encrypted_key.m
 		return &ma.ca_encrypted_key
@@ -2206,13 +3104,21 @@ func (ka *_Recipient__KeyAssembler) AssignString(k string) error {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
+	case "header":
+		if ka.s&fieldBit__Recipient_Header != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Header}
+		}
+		ka.s += fieldBit__Recipient_Header
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
 	case "encrypted_key":
 		if ka.s&fieldBit__Recipient_Encrypted_key != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Encrypted_key}
 		}
 		ka.s += fieldBit__Recipient_Encrypted_key
 		ka.state = maState_expectValue
-		ka.f = 0
+		ka.f = 1
 		return nil
 	default:
 		return schema.ErrInvalidKey{TypeName: "dagjose.Recipient", Key: &_String{k}}
@@ -2244,6 +3150,7 @@ func (n Recipient) Representation() datamodel.Node {
 type _Recipient__Repr _Recipient
 
 var (
+	fieldName__Recipient_Header_serial        = _String{"header"}
 	fieldName__Recipient_Encrypted_key_serial = _String{"encrypted_key"}
 )
 var _ datamodel.Node = &_Recipient__Repr{}
@@ -2253,6 +3160,11 @@ func (_Recipient__Repr) Kind() datamodel.Kind {
 }
 func (n *_Recipient__Repr) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
+	case "header":
+		if n.header.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.header.v.Representation(), nil
 	case "encrypted_key":
 		if n.encrypted_key.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -2276,8 +3188,13 @@ func (n _Recipient__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.
 	return n.LookupByString(seg.String())
 }
 func (n *_Recipient__Repr) MapIterator() datamodel.MapIterator {
-	end := 1
+	end := 2
 	if n.encrypted_key.m == schema.Maybe_Absent {
+		end = 1
+	} else {
+		goto done
+	}
+	if n.header.m == schema.Maybe_Absent {
 		end = 0
 	} else {
 		goto done
@@ -2294,11 +3211,18 @@ type _Recipient__ReprMapItr struct {
 
 func (itr *_Recipient__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 1 {
+	if itr.idx >= 2 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
+		k = &fieldName__Recipient_Header_serial
+		if itr.n.header.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.header.v.Representation()
+	case 1:
 		k = &fieldName__Recipient_Encrypted_key_serial
 		if itr.n.encrypted_key.m == schema.Maybe_Absent {
 			itr.idx++
@@ -2318,7 +3242,10 @@ func (_Recipient__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (rn *_Recipient__Repr) Length() int64 {
-	l := 1
+	l := 2
+	if rn.header.m == schema.Maybe_Absent {
+		l--
+	}
 	if rn.encrypted_key.m == schema.Maybe_Absent {
 		l--
 	}
@@ -2384,12 +3311,14 @@ type _Recipient__ReprAssembler struct {
 	f     int
 
 	cm               schema.Maybe
+	ca_header        _Map__ReprAssembler
 	ca_encrypted_key _String__ReprAssembler
 }
 
 func (na *_Recipient__ReprAssembler) reset() {
 	na.state = maState_initial
 	na.s = 0
+	na.ca_header.reset()
 	na.ca_encrypted_key.reset()
 }
 func (na *_Recipient__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -2484,6 +3413,14 @@ func (_Recipient__ReprAssembler) Prototype() datamodel.NodePrototype {
 func (ma *_Recipient__ReprAssembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
+		switch ma.w.header.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 1:
 		switch ma.w.encrypted_key.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -2511,13 +3448,24 @@ func (ma *_Recipient__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
 	}
 	switch k {
+	case "header":
+		if ma.s&fieldBit__Recipient_Header != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Header_serial}
+		}
+		ma.s += fieldBit__Recipient_Header
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+
+		return &ma.ca_header, nil
 	case "encrypted_key":
 		if ma.s&fieldBit__Recipient_Encrypted_key != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Encrypted_key_serial}
 		}
 		ma.s += fieldBit__Recipient_Encrypted_key
 		ma.state = maState_midValue
-		ma.f = 0
+		ma.f = 1
 		ma.ca_encrypted_key.w = &ma.w.encrypted_key.v
 		ma.ca_encrypted_key.m = &ma.w.encrypted_key.m
 
@@ -2560,6 +3508,11 @@ func (ma *_Recipient__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+
+		return &ma.ca_header
+	case 1:
 		ma.ca_encrypted_key.w = &ma.w.encrypted_key.v
 		ma.ca_encrypted_key.m = &ma.w.encrypted_key.m
 
@@ -2623,13 +3576,21 @@ func (ka *_Recipient__ReprKeyAssembler) AssignString(k string) error {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
+	case "header":
+		if ka.s&fieldBit__Recipient_Header != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Header_serial}
+		}
+		ka.s += fieldBit__Recipient_Header
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
 	case "encrypted_key":
 		if ka.s&fieldBit__Recipient_Encrypted_key != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Recipient_Encrypted_key_serial}
 		}
 		ka.s += fieldBit__Recipient_Encrypted_key
 		ka.state = maState_expectValue
-		ka.f = 0
+		ka.f = 1
 		return nil
 	}
 	return schema.ErrInvalidKey{TypeName: "dagjose.Recipient.Repr", Key: &_String{k}}
@@ -3242,6 +4203,9 @@ func (la *_Recipients__ReprAssembler) ValuePrototype(_ int64) datamodel.NodeProt
 	return _Recipient__ReprPrototype{}
 }
 
+func (n _Signature) FieldHeader() MaybeMap {
+	return &n.header
+}
 func (n _Signature) FieldProtected() MaybeString {
 	return &n.protected
 }
@@ -3284,6 +4248,7 @@ func (m MaybeSignature) Must() Signature {
 }
 
 var (
+	fieldName__Signature_Header    = _String{"header"}
 	fieldName__Signature_Protected = _String{"protected"}
 	fieldName__Signature_Signature = _String{"signature"}
 )
@@ -3295,6 +4260,11 @@ func (Signature) Kind() datamodel.Kind {
 }
 func (n Signature) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
+	case "header":
+		if n.header.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.header.v, nil
 	case "protected":
 		if n.protected.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -3329,18 +4299,25 @@ type _Signature__MapItr struct {
 }
 
 func (itr *_Signature__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 2 {
+	if itr.idx >= 3 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
+		k = &fieldName__Signature_Header
+		if itr.n.header.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.header.v
+	case 1:
 		k = &fieldName__Signature_Protected
 		if itr.n.protected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.protected.v
-	case 1:
+	case 2:
 		k = &fieldName__Signature_Signature
 		v = &itr.n.signature
 	default:
@@ -3350,14 +4327,14 @@ func (itr *_Signature__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ err
 	return
 }
 func (itr *_Signature__MapItr) Done() bool {
-	return itr.idx >= 2
+	return itr.idx >= 3
 }
 
 func (Signature) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (Signature) Length() int64 {
-	return 2
+	return 3
 }
 func (Signature) IsAbsent() bool {
 	return false
@@ -3419,6 +4396,7 @@ type _Signature__Assembler struct {
 	f     int
 
 	cm           schema.Maybe
+	ca_header    _Map__Assembler
 	ca_protected _String__Assembler
 	ca_signature _String__Assembler
 }
@@ -3426,14 +4404,16 @@ type _Signature__Assembler struct {
 func (na *_Signature__Assembler) reset() {
 	na.state = maState_initial
 	na.s = 0
+	na.ca_header.reset()
 	na.ca_protected.reset()
 	na.ca_signature.reset()
 }
 
 var (
-	fieldBit__Signature_Protected   = 1 << 0
-	fieldBit__Signature_Signature   = 1 << 1
-	fieldBits__Signature_sufficient = 0 + 1<<1
+	fieldBit__Signature_Header      = 1 << 0
+	fieldBit__Signature_Protected   = 1 << 1
+	fieldBit__Signature_Signature   = 1 << 2
+	fieldBits__Signature_sufficient = 0 + 1<<2
 )
 
 func (na *_Signature__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -3528,7 +4508,7 @@ func (_Signature__Assembler) Prototype() datamodel.NodePrototype {
 func (ma *_Signature__Assembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
-		switch ma.w.protected.m {
+		switch ma.w.header.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -3536,6 +4516,14 @@ func (ma *_Signature__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
+		switch ma.w.protected.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 2:
 		switch ma.cm {
 		case schema.Maybe_Value:
 			ma.ca_signature.w = nil
@@ -3565,13 +4553,23 @@ func (ma *_Signature__Assembler) AssembleEntry(k string) (datamodel.NodeAssemble
 		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
 	}
 	switch k {
+	case "header":
+		if ma.s&fieldBit__Signature_Header != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Header}
+		}
+		ma.s += fieldBit__Signature_Header
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+		return &ma.ca_header, nil
 	case "protected":
 		if ma.s&fieldBit__Signature_Protected != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Protected}
 		}
 		ma.s += fieldBit__Signature_Protected
 		ma.state = maState_midValue
-		ma.f = 0
+		ma.f = 1
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected, nil
@@ -3581,7 +4579,7 @@ func (ma *_Signature__Assembler) AssembleEntry(k string) (datamodel.NodeAssemble
 		}
 		ma.s += fieldBit__Signature_Signature
 		ma.state = maState_midValue
-		ma.f = 1
+		ma.f = 2
 		ma.ca_signature.w = &ma.w.signature
 		ma.ca_signature.m = &ma.cm
 		return &ma.ca_signature, nil
@@ -3622,10 +4620,14 @@ func (ma *_Signature__Assembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+		return &ma.ca_header
+	case 1:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected
-	case 1:
+	case 2:
 		ma.ca_signature.w = &ma.w.signature
 		ma.ca_signature.m = &ma.cm
 		return &ma.ca_signature
@@ -3691,13 +4693,21 @@ func (ka *_Signature__KeyAssembler) AssignString(k string) error {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
+	case "header":
+		if ka.s&fieldBit__Signature_Header != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Header}
+		}
+		ka.s += fieldBit__Signature_Header
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
 	case "protected":
 		if ka.s&fieldBit__Signature_Protected != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Protected}
 		}
 		ka.s += fieldBit__Signature_Protected
 		ka.state = maState_expectValue
-		ka.f = 0
+		ka.f = 1
 		return nil
 	case "signature":
 		if ka.s&fieldBit__Signature_Signature != 0 {
@@ -3705,7 +4715,7 @@ func (ka *_Signature__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__Signature_Signature
 		ka.state = maState_expectValue
-		ka.f = 1
+		ka.f = 2
 		return nil
 	default:
 		return schema.ErrInvalidKey{TypeName: "dagjose.Signature", Key: &_String{k}}
@@ -3737,6 +4747,7 @@ func (n Signature) Representation() datamodel.Node {
 type _Signature__Repr _Signature
 
 var (
+	fieldName__Signature_Header_serial    = _String{"header"}
 	fieldName__Signature_Protected_serial = _String{"protected"}
 	fieldName__Signature_Signature_serial = _String{"signature"}
 )
@@ -3747,6 +4758,11 @@ func (_Signature__Repr) Kind() datamodel.Kind {
 }
 func (n *_Signature__Repr) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
+	case "header":
+		if n.header.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.header.v.Representation(), nil
 	case "protected":
 		if n.protected.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -3782,18 +4798,25 @@ type _Signature__ReprMapItr struct {
 
 func (itr *_Signature__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 2 {
+	if itr.idx >= 3 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
+		k = &fieldName__Signature_Header_serial
+		if itr.n.header.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.header.v.Representation()
+	case 1:
 		k = &fieldName__Signature_Protected_serial
 		if itr.n.protected.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.protected.v.Representation()
-	case 1:
+	case 2:
 		k = &fieldName__Signature_Signature_serial
 		v = itr.n.signature.Representation()
 	default:
@@ -3803,13 +4826,16 @@ advance:
 	return
 }
 func (itr *_Signature__ReprMapItr) Done() bool {
-	return itr.idx >= 2
+	return itr.idx >= 3
 }
 func (_Signature__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (rn *_Signature__Repr) Length() int64 {
-	l := 2
+	l := 3
+	if rn.header.m == schema.Maybe_Absent {
+		l--
+	}
 	if rn.protected.m == schema.Maybe_Absent {
 		l--
 	}
@@ -3875,6 +4901,7 @@ type _Signature__ReprAssembler struct {
 	f     int
 
 	cm           schema.Maybe
+	ca_header    _Map__ReprAssembler
 	ca_protected _String__ReprAssembler
 	ca_signature _String__ReprAssembler
 }
@@ -3882,6 +4909,7 @@ type _Signature__ReprAssembler struct {
 func (na *_Signature__ReprAssembler) reset() {
 	na.state = maState_initial
 	na.s = 0
+	na.ca_header.reset()
 	na.ca_protected.reset()
 	na.ca_signature.reset()
 }
@@ -3977,7 +5005,7 @@ func (_Signature__ReprAssembler) Prototype() datamodel.NodePrototype {
 func (ma *_Signature__ReprAssembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
-		switch ma.w.protected.m {
+		switch ma.w.header.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -3985,6 +5013,14 @@ func (ma *_Signature__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
+		switch ma.w.protected.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 2:
 		switch ma.cm {
 		case schema.Maybe_Value:
 			ma.cm = schema.Maybe_Absent
@@ -4013,13 +5049,24 @@ func (ma *_Signature__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
 	}
 	switch k {
+	case "header":
+		if ma.s&fieldBit__Signature_Header != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Header_serial}
+		}
+		ma.s += fieldBit__Signature_Header
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+
+		return &ma.ca_header, nil
 	case "protected":
 		if ma.s&fieldBit__Signature_Protected != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Protected_serial}
 		}
 		ma.s += fieldBit__Signature_Protected
 		ma.state = maState_midValue
-		ma.f = 0
+		ma.f = 1
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
@@ -4030,7 +5077,7 @@ func (ma *_Signature__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		}
 		ma.s += fieldBit__Signature_Signature
 		ma.state = maState_midValue
-		ma.f = 1
+		ma.f = 2
 		ma.ca_signature.w = &ma.w.signature
 		ma.ca_signature.m = &ma.cm
 		return &ma.ca_signature, nil
@@ -4072,11 +5119,16 @@ func (ma *_Signature__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
+		ma.ca_header.w = &ma.w.header.v
+		ma.ca_header.m = &ma.w.header.m
+
+		return &ma.ca_header
+	case 1:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected
-	case 1:
+	case 2:
 		ma.ca_signature.w = &ma.w.signature
 		ma.ca_signature.m = &ma.cm
 		return &ma.ca_signature
@@ -4142,13 +5194,21 @@ func (ka *_Signature__ReprKeyAssembler) AssignString(k string) error {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
+	case "header":
+		if ka.s&fieldBit__Signature_Header != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Header_serial}
+		}
+		ka.s += fieldBit__Signature_Header
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
 	case "protected":
 		if ka.s&fieldBit__Signature_Protected != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__Signature_Protected_serial}
 		}
 		ka.s += fieldBit__Signature_Protected
 		ka.state = maState_expectValue
-		ka.f = 0
+		ka.f = 1
 		return nil
 	case "signature":
 		if ka.s&fieldBit__Signature_Signature != 0 {
@@ -4156,7 +5216,7 @@ func (ka *_Signature__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__Signature_Signature
 		ka.state = maState_expectValue
-		ka.f = 1
+		ka.f = 2
 		return nil
 	}
 	return schema.ErrInvalidKey{TypeName: "dagjose.Signature.Repr", Key: &_String{k}}

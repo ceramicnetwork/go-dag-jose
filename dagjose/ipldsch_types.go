@@ -24,6 +24,8 @@ type typeSlab struct {
 	Bytes__Repr      _Bytes__ReprPrototype
 	JOSE             _JOSE__Prototype
 	JOSE__Repr       _JOSE__ReprPrototype
+	Map              _Map__Prototype
+	Map__Repr        _Map__ReprPrototype
 	Recipient        _Recipient__Prototype
 	Recipient__Repr  _Recipient__ReprPrototype
 	Recipients       _Recipients__Prototype
@@ -45,19 +47,32 @@ type _Bytes struct{ x []byte }
 // JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
-	aad        _String__Maybe
-	ciphertext _String__Maybe
-	iv         _String__Maybe
-	payload    _String__Maybe
-	protected  _String__Maybe
-	recipients _Recipients__Maybe
-	signatures _Signatures__Maybe
-	tag        _String__Maybe
+	aad         _String__Maybe
+	ciphertext  _String__Maybe
+	iv          _String__Maybe
+	payload     _String__Maybe
+	protected   _String__Maybe
+	recipients  _Recipients__Maybe
+	signatures  _Signatures__Maybe
+	tag         _String__Maybe
+	unprotected _Map__Maybe
+}
+
+// Map matches the IPLD Schema type "Map".  It has map kind.
+type Map = *_Map
+type _Map struct {
+	m map[_String]*_String
+	t []_Map__entry
+}
+type _Map__entry struct {
+	k _String
+	v _String
 }
 
 // Recipient matches the IPLD Schema type "Recipient".  It has struct type-kind, and may be interrogated like map kind.
 type Recipient = *_Recipient
 type _Recipient struct {
+	header        _Map__Maybe
 	encrypted_key _String__Maybe
 }
 
@@ -70,6 +85,7 @@ type _Recipients struct {
 // Signature matches the IPLD Schema type "Signature".  It has struct type-kind, and may be interrogated like map kind.
 type Signature = *_Signature
 type _Signature struct {
+	header    _Map__Maybe
 	protected _String__Maybe
 	signature _String
 }

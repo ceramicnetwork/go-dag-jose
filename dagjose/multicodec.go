@@ -4,6 +4,7 @@ package dagjose
 //go:generate go fmt ./
 
 import (
+	//"bytes"
 	"github.com/ipld/go-ipld-prime/codec/cbor"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/multicodec"
@@ -19,16 +20,16 @@ func init() {
 // given datamodel.NodeAssembler. Decode fits the codec.Decoder function
 // interface.
 func Decode(na datamodel.NodeAssembler, r io.Reader) error {
-	// CBOR is a superset of DAG-JOSE and can be used to decode valid DAG-JOSE
-	// objects without decoding the CID (as expected by the DAG-JOSE spec:
-	// https://specs.ipld.io/block-layer/codecs/dag-jose.html).
-	if _, castWasOk := na.(*_JOSE__ReprAssembler); castWasOk {
+	// If the passed `NodeAssembler` is not of type `_JOSE__ReprBuilder`,
+	// create one of the latter type, use it, then copy the constructed
+	// `_JOSE__Repr` into the caller's `NodeAssembler`.
+	if _, ok := na.(*_JOSE__ReprAssembler); ok {
 		return cbor.Decode(na, r)
 	} else {
-		// If the passed `NodeAssembler` is not of type `_JOSE__ReprBuilder`,
-		// create one of the latter type, use it, then copy the constructed
-		// `_JOSE__Repr` into the caller's `NodeAssembler`.
-		dagJOSEBuilder := Type.JOSE.NewBuilder()
+		dagJOSEBuilder := Type.JOSE__Repr.NewBuilder()
+		// CBOR is a superset of DAG-JOSE and can be used to decode valid DAG-JOSE
+		// objects without decoding the CID (as expected by the DAG-JOSE spec:
+		// https://specs.ipld.io/block-layer/codecs/dag-jose.html).
 		err := cbor.Decode(dagJOSEBuilder, r)
 		if err != nil {
 			return err
@@ -42,7 +43,7 @@ func Decode(na datamodel.NodeAssembler, r io.Reader) error {
 func Encode(n datamodel.Node, w io.Writer) error {
 	// If the passed `datamodel.Node` is already of type `dagjose.dagJOSENode`,
 	// skip conversion to the latter type.
-	if _, castWasOk := n.(*_JOSE__Repr); !castWasOk {
+	if _, ok := n.(*_JOSE__Repr); !ok {
 		// Use `datamodel.Copy` to convert the passed `Node` into a
 		// `JOSE__Repr` via `dagjose.dagJOSENodeBuilder`, which applies
 		// all the necessary validations required to construct a proper DAG-JOSE
@@ -57,5 +58,8 @@ func Encode(n datamodel.Node, w io.Writer) error {
 	// CBOR is a superset of DAG-JOSE and can be used to encode valid DAG-JOSE
 	// objects without encoding the CID (as expected by the DAG-JOSE spec:
 	// https://specs.ipld.io/block-layer/codecs/dag-jose.html).
+	//buf := new(bytes.Buffer)
+	//err := cbor.Encode(n, buf)
+	//return err
 	return cbor.Encode(n, w)
 }
