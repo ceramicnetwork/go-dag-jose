@@ -45,20 +45,20 @@ type _Bytes struct{ x []byte }
 // JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
-	aad        _Bytes__Maybe
-	ciphertext _Bytes__Maybe
-	iv         _Bytes__Maybe
-	payload    _Bytes__Maybe
-	protected  _Bytes__Maybe
+	aad        _String__Maybe
+	ciphertext _String__Maybe
+	iv         _String__Maybe
+	payload    _String__Maybe
+	protected  _String__Maybe
 	recipients _Recipients__Maybe
 	signatures _Signatures__Maybe
-	tag        _Bytes__Maybe
+	tag        _String__Maybe
 }
 
 // Recipient matches the IPLD Schema type "Recipient".  It has struct type-kind, and may be interrogated like map kind.
 type Recipient = *_Recipient
 type _Recipient struct {
-	encrypted_key _Bytes__Maybe
+	encrypted_key _String__Maybe
 }
 
 // Recipients matches the IPLD Schema type "Recipients".  It has list kind.
@@ -70,8 +70,8 @@ type _Recipients struct {
 // Signature matches the IPLD Schema type "Signature".  It has struct type-kind, and may be interrogated like map kind.
 type Signature = *_Signature
 type _Signature struct {
-	protected _Bytes__Maybe
-	signature _Bytes
+	protected _String__Maybe
+	signature _String
 }
 
 // Signatures matches the IPLD Schema type "Signatures".  It has list kind.

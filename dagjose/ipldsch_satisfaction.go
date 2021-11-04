@@ -213,19 +213,19 @@ var _ datamodel.Node = &_Bytes__Repr{}
 type _Bytes__ReprPrototype = _Bytes__Prototype
 type _Bytes__ReprAssembler = _Bytes__Assembler
 
-func (n _JOSE) FieldAad() MaybeBytes {
+func (n _JOSE) FieldAad() MaybeString {
 	return &n.aad
 }
-func (n _JOSE) FieldCiphertext() MaybeBytes {
+func (n _JOSE) FieldCiphertext() MaybeString {
 	return &n.ciphertext
 }
-func (n _JOSE) FieldIv() MaybeBytes {
+func (n _JOSE) FieldIv() MaybeString {
 	return &n.iv
 }
-func (n _JOSE) FieldPayload() MaybeBytes {
+func (n _JOSE) FieldPayload() MaybeString {
 	return &n.payload
 }
-func (n _JOSE) FieldProtected() MaybeBytes {
+func (n _JOSE) FieldProtected() MaybeString {
 	return &n.protected
 }
 func (n _JOSE) FieldRecipients() MaybeRecipients {
@@ -234,7 +234,7 @@ func (n _JOSE) FieldRecipients() MaybeRecipients {
 func (n _JOSE) FieldSignatures() MaybeSignatures {
 	return &n.signatures
 }
-func (n _JOSE) FieldTag() MaybeBytes {
+func (n _JOSE) FieldTag() MaybeString {
 	return &n.tag
 }
 
@@ -493,14 +493,14 @@ type _JOSE__Assembler struct {
 	f     int
 
 	cm            schema.Maybe
-	ca_aad        _Bytes__Assembler
-	ca_ciphertext _Bytes__Assembler
-	ca_iv         _Bytes__Assembler
-	ca_payload    _Bytes__Assembler
-	ca_protected  _Bytes__Assembler
+	ca_aad        _String__Assembler
+	ca_ciphertext _String__Assembler
+	ca_iv         _String__Assembler
+	ca_payload    _String__Assembler
+	ca_protected  _String__Assembler
 	ca_recipients _Recipients__Assembler
 	ca_signatures _Signatures__Assembler
-	ca_tag        _Bytes__Assembler
+	ca_tag        _String__Assembler
 }
 
 func (na *_JOSE__Assembler) reset() {
@@ -1291,14 +1291,14 @@ type _JOSE__ReprAssembler struct {
 	f     int
 
 	cm            schema.Maybe
-	ca_aad        _Bytes__ReprAssembler
-	ca_ciphertext _Bytes__ReprAssembler
-	ca_iv         _Bytes__ReprAssembler
-	ca_payload    _Bytes__ReprAssembler
-	ca_protected  _Bytes__ReprAssembler
+	ca_aad        _String__ReprAssembler
+	ca_ciphertext _String__ReprAssembler
+	ca_iv         _String__ReprAssembler
+	ca_payload    _String__ReprAssembler
+	ca_protected  _String__ReprAssembler
 	ca_recipients _Recipients__ReprAssembler
 	ca_signatures _Signatures__ReprAssembler
-	ca_tag        _Bytes__ReprAssembler
+	ca_tag        _String__ReprAssembler
 }
 
 func (na *_JOSE__ReprAssembler) reset() {
@@ -1796,7 +1796,7 @@ func (_JOSE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
 
-func (n _Recipient) FieldEncrypted_key() MaybeBytes {
+func (n _Recipient) FieldEncrypted_key() MaybeString {
 	return &n.encrypted_key
 }
 
@@ -1964,7 +1964,7 @@ type _Recipient__Assembler struct {
 	f     int
 
 	cm               schema.Maybe
-	ca_encrypted_key _Bytes__Assembler
+	ca_encrypted_key _String__Assembler
 }
 
 func (na *_Recipient__Assembler) reset() {
@@ -2384,7 +2384,7 @@ type _Recipient__ReprAssembler struct {
 	f     int
 
 	cm               schema.Maybe
-	ca_encrypted_key _Bytes__ReprAssembler
+	ca_encrypted_key _String__ReprAssembler
 }
 
 func (na *_Recipient__ReprAssembler) reset() {
@@ -3242,10 +3242,10 @@ func (la *_Recipients__ReprAssembler) ValuePrototype(_ int64) datamodel.NodeProt
 	return _Recipient__ReprPrototype{}
 }
 
-func (n _Signature) FieldProtected() MaybeBytes {
+func (n _Signature) FieldProtected() MaybeString {
 	return &n.protected
 }
-func (n _Signature) FieldSignature() Bytes {
+func (n _Signature) FieldSignature() String {
 	return &n.signature
 }
 
@@ -3419,8 +3419,8 @@ type _Signature__Assembler struct {
 	f     int
 
 	cm           schema.Maybe
-	ca_protected _Bytes__Assembler
-	ca_signature _Bytes__Assembler
+	ca_protected _String__Assembler
+	ca_signature _String__Assembler
 }
 
 func (na *_Signature__Assembler) reset() {
@@ -3875,8 +3875,8 @@ type _Signature__ReprAssembler struct {
 	f     int
 
 	cm           schema.Maybe
-	ca_protected _Bytes__ReprAssembler
-	ca_signature _Bytes__ReprAssembler
+	ca_protected _String__ReprAssembler
+	ca_signature _String__ReprAssembler
 }
 
 func (na *_Signature__ReprAssembler) reset() {
