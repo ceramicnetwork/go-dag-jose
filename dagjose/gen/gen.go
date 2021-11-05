@@ -13,9 +13,35 @@ func main() {
 	ts.Init()
 
 	// Common
+	ts.Accumulate(schema.SpawnBool("Bool"))
 	ts.Accumulate(schema.SpawnString("String"))
 	ts.Accumulate(schema.SpawnBytes("Bytes"))
-	ts.Accumulate(schema.SpawnMap("Map", "String", "String", false))
+	ts.Accumulate(schema.SpawnInt("Int"))
+	ts.Accumulate(schema.SpawnFloat("Float"))
+
+	ts.Accumulate(schema.SpawnMap("Map", "String", "Any", false))
+	ts.Accumulate(schema.SpawnList("List", "Any", false))
+
+	ts.Accumulate(schema.SpawnUnion("Any",
+		[]schema.TypeName{
+			"Bool",
+			"String",
+			"Bytes",
+			"Int",
+			"Float",
+			"Map",
+			"List",
+		},
+		schema.SpawnUnionRepresentationKeyed(map[string]schema.TypeName{
+			"bool":   "Bool",
+			"string": "String",
+			"bytes":  "Bytes",
+			"int":    "Int",
+			"float":  "Float",
+			"map":    "Map",
+			"list":   "List",
+		}),
+	))
 
 	// JWS
 	ts.Accumulate(schema.SpawnStruct("Signature", []schema.StructField{
@@ -53,5 +79,7 @@ func main() {
 		panic("not happening")
 	}
 
-	gengo.Generate(os.Args[1], "dagjose", ts, &gengo.AdjunctCfg{})
+	gengo.Generate(os.Args[1], "dagjose", ts, &gengo.AdjunctCfg{
+		CfgUnionMemlayout: map[schema.TypeName]string{"Any": "interface"},
+	})
 }
