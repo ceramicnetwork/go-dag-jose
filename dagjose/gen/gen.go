@@ -13,35 +13,8 @@ func main() {
 	ts.Init()
 
 	// Common
-	ts.Accumulate(schema.SpawnBool("Bool"))
 	ts.Accumulate(schema.SpawnString("String"))
-	ts.Accumulate(schema.SpawnBytes("Bytes"))
-	ts.Accumulate(schema.SpawnInt("Int"))
-	ts.Accumulate(schema.SpawnFloat("Float"))
-
-	ts.Accumulate(schema.SpawnMap("Map", "String", "Any", false))
-	ts.Accumulate(schema.SpawnList("List", "Any", false))
-
-	ts.Accumulate(schema.SpawnUnion("Any",
-		[]schema.TypeName{
-			"Bool",
-			"String",
-			"Bytes",
-			"Int",
-			"Float",
-			"Map",
-			"List",
-		},
-		schema.SpawnUnionRepresentationKeyed(map[string]schema.TypeName{
-			"bool":   "Bool",
-			"string": "String",
-			"bytes":  "Bytes",
-			"int":    "Int",
-			"float":  "Float",
-			"map":    "Map",
-			"list":   "List",
-		}),
-	))
+	ts.Accumulate(schema.SpawnMap("Map", "String", "String", false))
 
 	// JWS
 	ts.Accumulate(schema.SpawnStruct("Signature", []schema.StructField{
@@ -72,6 +45,7 @@ func main() {
 		schema.SpawnStructField("tag", "String", true, false),
 		schema.SpawnStructField("unprotected", "Map", true, false),
 	}, nil))
+
 	if errs := ts.ValidateGraph(); errs != nil {
 		for _, err := range errs {
 			fmt.Printf("- %s\n", err)
@@ -79,7 +53,5 @@ func main() {
 		panic("not happening")
 	}
 
-	gengo.Generate(os.Args[1], "dagjose", ts, &gengo.AdjunctCfg{
-		CfgUnionMemlayout: map[schema.TypeName]string{"Any": "interface"},
-	})
+	gengo.Generate(os.Args[1], "dagjose", ts, &gengo.AdjunctCfg{})
 }
