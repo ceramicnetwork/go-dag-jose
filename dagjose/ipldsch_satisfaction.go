@@ -1575,7 +1575,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Aad
 		ma.state = maState_midValue
 		ma.f = 0
-		ma.ca_aad.w = (*_String__Repr)(&ma.w.aad.v)
+		ma.ca_aad.w = &ma.w.aad.v
 		ma.ca_aad.m = &ma.w.aad.m
 
 		return &ma.ca_aad, nil
@@ -1586,7 +1586,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_ciphertext.w = (*_String__Repr)(&ma.w.ciphertext.v)
+		ma.ca_ciphertext.w = &ma.w.ciphertext.v
 		ma.ca_ciphertext.m = &ma.w.ciphertext.m
 
 		return &ma.ca_ciphertext, nil
@@ -1597,7 +1597,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Iv
 		ma.state = maState_midValue
 		ma.f = 2
-		ma.ca_iv.w = (*_String__Repr)(&ma.w.iv.v)
+		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 
 		return &ma.ca_iv, nil
@@ -1608,7 +1608,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Payload
 		ma.state = maState_midValue
 		ma.f = 3
-		ma.ca_payload.w = (*_String__Repr)(&ma.w.payload.v)
+		ma.ca_payload.w = &ma.w.payload.v
 		ma.ca_payload.m = &ma.w.payload.m
 
 		return &ma.ca_payload, nil
@@ -1619,7 +1619,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Protected
 		ma.state = maState_midValue
 		ma.f = 4
-		ma.ca_protected.w = (*_String__Repr)(&ma.w.protected.v)
+		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected, nil
@@ -1630,7 +1630,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Recipients
 		ma.state = maState_midValue
 		ma.f = 5
-		ma.ca_recipients.w = (*_Recipients__Repr)(&ma.w.recipients.v)
+		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients, nil
@@ -1641,7 +1641,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Signatures
 		ma.state = maState_midValue
 		ma.f = 6
-		ma.ca_signatures.w = (*_Signatures__Repr)(&ma.w.signatures.v)
+		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 
 		return &ma.ca_signatures, nil
@@ -1652,7 +1652,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Tag
 		ma.state = maState_midValue
 		ma.f = 7
-		ma.ca_tag.w = (*_String__Repr)(&ma.w.tag.v)
+		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag, nil
@@ -1663,7 +1663,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.s += fieldBit__JOSE_Unprotected
 		ma.state = maState_midValue
 		ma.f = 8
-		ma.ca_unprotected.w = (*_Map__Repr)(&ma.w.unprotected.v)
+		ma.ca_unprotected.w = &ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
 		return &ma.ca_unprotected, nil
@@ -1705,47 +1705,47 @@ func (ma *_JOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
-		ma.ca_aad.w = (*_String__Repr)(&ma.w.aad.v)
+		ma.ca_aad.w = &ma.w.aad.v
 		ma.ca_aad.m = &ma.w.aad.m
 
 		return &ma.ca_aad
 	case 1:
-		ma.ca_ciphertext.w = (*_String__Repr)(&ma.w.ciphertext.v)
+		ma.ca_ciphertext.w = &ma.w.ciphertext.v
 		ma.ca_ciphertext.m = &ma.w.ciphertext.m
 
 		return &ma.ca_ciphertext
 	case 2:
-		ma.ca_iv.w = (*_String__Repr)(&ma.w.iv.v)
+		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 
 		return &ma.ca_iv
 	case 3:
-		ma.ca_payload.w = (*_String__Repr)(&ma.w.payload.v)
+		ma.ca_payload.w = &ma.w.payload.v
 		ma.ca_payload.m = &ma.w.payload.m
 
 		return &ma.ca_payload
 	case 4:
-		ma.ca_protected.w = (*_String__Repr)(&ma.w.protected.v)
+		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected
 	case 5:
-		ma.ca_recipients.w = (*_Recipients__Repr)(&ma.w.recipients.v)
+		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients
 	case 6:
-		ma.ca_signatures.w = (*_Signatures__Repr)(&ma.w.signatures.v)
+		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 
 		return &ma.ca_signatures
 	case 7:
-		ma.ca_tag.w = (*_String__Repr)(&ma.w.tag.v)
+		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag
 	case 8:
-		ma.ca_unprotected.w = (*_Map__Repr)(&ma.w.unprotected.v)
+		ma.ca_unprotected.w = &ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
 		return &ma.ca_unprotected
@@ -2422,13 +2422,13 @@ func (nb *_Map__ReprBuilder) Build() datamodel.Node {
 	return nb.w
 }
 func (nb *_Map__ReprBuilder) Reset() {
-	var w _Map__Repr
+	var w _Map
 	var m schema.Maybe
 	*nb = _Map__ReprBuilder{_Map__ReprAssembler{w: &w, m: &m}}
 }
 
 type _Map__ReprAssembler struct {
-	w     *_Map__Repr
+	w     *_Map
 	m     *schema.Maybe
 	state maState
 
@@ -2496,7 +2496,7 @@ func (na *_Map__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_Map__Repr); ok {
+	if v2, ok := v.(*_Map); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -3298,13 +3298,13 @@ func (nb *_Recipient__ReprBuilder) Build() datamodel.Node {
 	return nb.w
 }
 func (nb *_Recipient__ReprBuilder) Reset() {
-	var w _Recipient__Repr
+	var w _Recipient
 	var m schema.Maybe
 	*nb = _Recipient__ReprBuilder{_Recipient__ReprAssembler{w: &w, m: &m}}
 }
 
 type _Recipient__ReprAssembler struct {
-	w     *_Recipient__Repr
+	w     *_Recipient
 	m     *schema.Maybe
 	state maState
 	s     int
@@ -3330,7 +3330,7 @@ func (na *_Recipient__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, er
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_Recipient__Repr{}
+		na.w = &_Recipient{}
 	}
 	return na, nil
 }
@@ -3373,7 +3373,7 @@ func (na *_Recipient__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_Recipient__Repr); ok {
+	if v2, ok := v.(*_Recipient); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -3455,7 +3455,7 @@ func (ma *_Recipient__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		ma.s += fieldBit__Recipient_Header
 		ma.state = maState_midValue
 		ma.f = 0
-		ma.ca_header.w = (*_Map__Repr)(&ma.w.header.v)
+		ma.ca_header.w = &ma.w.header.v
 		ma.ca_header.m = &ma.w.header.m
 
 		return &ma.ca_header, nil
@@ -3466,7 +3466,7 @@ func (ma *_Recipient__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		ma.s += fieldBit__Recipient_Encrypted_key
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_encrypted_key.w = (*_String__Repr)(&ma.w.encrypted_key.v)
+		ma.ca_encrypted_key.w = &ma.w.encrypted_key.v
 		ma.ca_encrypted_key.m = &ma.w.encrypted_key.m
 
 		return &ma.ca_encrypted_key, nil
@@ -3508,12 +3508,12 @@ func (ma *_Recipient__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
-		ma.ca_header.w = (*_Map__Repr)(&ma.w.header.v)
+		ma.ca_header.w = &ma.w.header.v
 		ma.ca_header.m = &ma.w.header.m
 
 		return &ma.ca_header
 	case 1:
-		ma.ca_encrypted_key.w = (*_String__Repr)(&ma.w.encrypted_key.v)
+		ma.ca_encrypted_key.w = &ma.w.encrypted_key.v
 		ma.ca_encrypted_key.m = &ma.w.encrypted_key.m
 
 		return &ma.ca_encrypted_key
@@ -3922,7 +3922,7 @@ func (la *_Recipients__Assembler) AssembleValue() datamodel.NodeAssembler {
 	la.w.x = append(la.w.x, _Recipient{})
 	la.state = laState_midValue
 	row := &la.w.x[len(la.w.x)-1]
-	la.va.w = (*_Recipient)(row)
+	la.va.w = row
 	la.va.m = &la.cm
 	return &la.va
 }
@@ -4052,13 +4052,13 @@ func (nb *_Recipients__ReprBuilder) Build() datamodel.Node {
 	return nb.w
 }
 func (nb *_Recipients__ReprBuilder) Reset() {
-	var w _Recipients__Repr
+	var w _Recipients
 	var m schema.Maybe
 	*nb = _Recipients__ReprBuilder{_Recipients__ReprAssembler{w: &w, m: &m}}
 }
 
 type _Recipients__ReprAssembler struct {
-	w     *_Recipients__Repr
+	w     *_Recipients
 	m     *schema.Maybe
 	state laState
 
@@ -4125,7 +4125,7 @@ func (na *_Recipients__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_Recipients__Repr); ok {
+	if v2, ok := v.(*_Recipients); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -4180,7 +4180,7 @@ func (la *_Recipients__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	la.w.x = append(la.w.x, _Recipient{})
 	la.state = laState_midValue
 	row := &la.w.x[len(la.w.x)-1]
-	la.va.w = (*_Recipient__Repr)(row)
+	la.va.w = row
 	la.va.m = &la.cm
 	return &la.va
 }
@@ -4888,13 +4888,13 @@ func (nb *_Signature__ReprBuilder) Build() datamodel.Node {
 	return nb.w
 }
 func (nb *_Signature__ReprBuilder) Reset() {
-	var w _Signature__Repr
+	var w _Signature
 	var m schema.Maybe
 	*nb = _Signature__ReprBuilder{_Signature__ReprAssembler{w: &w, m: &m}}
 }
 
 type _Signature__ReprAssembler struct {
-	w     *_Signature__Repr
+	w     *_Signature
 	m     *schema.Maybe
 	state maState
 	s     int
@@ -4922,7 +4922,7 @@ func (na *_Signature__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, er
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_Signature__Repr{}
+		na.w = &_Signature{}
 	}
 	return na, nil
 }
@@ -4965,7 +4965,7 @@ func (na *_Signature__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_Signature__Repr); ok {
+	if v2, ok := v.(*_Signature); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -5056,7 +5056,7 @@ func (ma *_Signature__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		ma.s += fieldBit__Signature_Header
 		ma.state = maState_midValue
 		ma.f = 0
-		ma.ca_header.w = (*_Map__Repr)(&ma.w.header.v)
+		ma.ca_header.w = &ma.w.header.v
 		ma.ca_header.m = &ma.w.header.m
 
 		return &ma.ca_header, nil
@@ -5067,7 +5067,7 @@ func (ma *_Signature__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		ma.s += fieldBit__Signature_Protected
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_protected.w = (*_String__Repr)(&ma.w.protected.v)
+		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected, nil
@@ -5078,7 +5078,7 @@ func (ma *_Signature__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAsse
 		ma.s += fieldBit__Signature_Signature
 		ma.state = maState_midValue
 		ma.f = 2
-		ma.ca_signature.w = (*_String__Repr)(&ma.w.signature)
+		ma.ca_signature.w = &ma.w.signature
 		ma.ca_signature.m = &ma.cm
 		return &ma.ca_signature, nil
 	default:
@@ -5119,17 +5119,17 @@ func (ma *_Signature__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
-		ma.ca_header.w = (*_Map__Repr)(&ma.w.header.v)
+		ma.ca_header.w = &ma.w.header.v
 		ma.ca_header.m = &ma.w.header.m
 
 		return &ma.ca_header
 	case 1:
-		ma.ca_protected.w = (*_String__Repr)(&ma.w.protected.v)
+		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected
 	case 2:
-		ma.ca_signature.w = (*_String__Repr)(&ma.w.signature)
+		ma.ca_signature.w = &ma.w.signature
 		ma.ca_signature.m = &ma.cm
 		return &ma.ca_signature
 	default:
@@ -5548,7 +5548,7 @@ func (la *_Signatures__Assembler) AssembleValue() datamodel.NodeAssembler {
 	la.w.x = append(la.w.x, _Signature{})
 	la.state = laState_midValue
 	row := &la.w.x[len(la.w.x)-1]
-	la.va.w = (*_Signature)(row)
+	la.va.w = row
 	la.va.m = &la.cm
 	return &la.va
 }
@@ -5678,13 +5678,13 @@ func (nb *_Signatures__ReprBuilder) Build() datamodel.Node {
 	return nb.w
 }
 func (nb *_Signatures__ReprBuilder) Reset() {
-	var w _Signatures__Repr
+	var w _Signatures
 	var m schema.Maybe
 	*nb = _Signatures__ReprBuilder{_Signatures__ReprAssembler{w: &w, m: &m}}
 }
 
 type _Signatures__ReprAssembler struct {
-	w     *_Signatures__Repr
+	w     *_Signatures
 	m     *schema.Maybe
 	state laState
 
@@ -5751,7 +5751,7 @@ func (na *_Signatures__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_Signatures__Repr); ok {
+	if v2, ok := v.(*_Signatures); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -5806,7 +5806,7 @@ func (la *_Signatures__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	la.w.x = append(la.w.x, _Signature{})
 	la.state = laState_midValue
 	row := &la.w.x[len(la.w.x)-1]
-	la.va.w = (*_Signature__Repr)(row)
+	la.va.w = row
 	la.va.m = &la.cm
 	return &la.va
 }
