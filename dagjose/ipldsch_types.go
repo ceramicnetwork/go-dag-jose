@@ -20,8 +20,18 @@ var _ datamodel.Node = nil // suppress errors when this dependency is not refere
 var Type typeSlab
 
 type typeSlab struct {
+	Any              _Any__Prototype
+	Any__Repr        _Any__ReprPrototype
+	Bytes            _Bytes__Prototype
+	Bytes__Repr      _Bytes__ReprPrototype
+	Float            _Float__Prototype
+	Float__Repr      _Float__ReprPrototype
+	Int              _Int__Prototype
+	Int__Repr        _Int__ReprPrototype
 	JOSE             _JOSE__Prototype
 	JOSE__Repr       _JOSE__ReprPrototype
+	List             _List__Prototype
+	List__Repr       _List__ReprPrototype
 	Map              _Map__Prototype
 	Map__Repr        _Map__ReprPrototype
 	Recipient        _Recipient__Prototype
@@ -38,6 +48,35 @@ type typeSlab struct {
 
 // --- type definitions follow ---
 
+// Any matches the IPLD Schema type "Any".
+// Any has Union typekind, which means its data model behaviors are that of a map kind.
+type Any = *_Any
+type _Any struct {
+	x _Any__iface
+}
+type _Any__iface interface {
+	_Any__member()
+}
+
+func (_String) _Any__member() {}
+func (_Bytes) _Any__member()  {}
+func (_Int) _Any__member()    {}
+func (_Float) _Any__member()  {}
+func (_Map) _Any__member()    {}
+func (_List) _Any__member()   {}
+
+// Bytes matches the IPLD Schema type "Bytes".  It has bytes kind.
+type Bytes = *_Bytes
+type _Bytes struct{ x []byte }
+
+// Float matches the IPLD Schema type "Float".  It has float kind.
+type Float = *_Float
+type _Float struct{ x float64 }
+
+// Int matches the IPLD Schema type "Int".  It has int kind.
+type Int = *_Int
+type _Int struct{ x int64 }
+
 // JOSE matches the IPLD Schema type "JOSE".  It has Struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
@@ -49,24 +88,30 @@ type _JOSE struct {
 	recipients  _Recipients__Maybe
 	signatures  _Signatures__Maybe
 	tag         _String__Maybe
-	unprotected _Map__Maybe
+	unprotected _Any__Maybe
+}
+
+// List matches the IPLD Schema type "List".  It has list kind.
+type List = *_List
+type _List struct {
+	x []_Any
 }
 
 // Map matches the IPLD Schema type "Map".  It has map kind.
 type Map = *_Map
 type _Map struct {
-	m map[_String]*_String
+	m map[_String]*_Any
 	t []_Map__entry
 }
 type _Map__entry struct {
 	k _String
-	v _String
+	v _Any
 }
 
 // Recipient matches the IPLD Schema type "Recipient".  It has Struct type-kind, and may be interrogated like map kind.
 type Recipient = *_Recipient
 type _Recipient struct {
-	header        _Map__Maybe
+	header        _Any__Maybe
 	encrypted_key _String__Maybe
 }
 
@@ -79,7 +124,7 @@ type _Recipients struct {
 // Signature matches the IPLD Schema type "Signature".  It has Struct type-kind, and may be interrogated like map kind.
 type Signature = *_Signature
 type _Signature struct {
-	header    _Map__Maybe
+	header    _Any__Maybe
 	protected _String__Maybe
 	signature _String
 }
