@@ -21,7 +21,7 @@ func main() {
 		schema.SpawnStructField("header", "Map", true, false),
 		schema.SpawnStructField("protected", "String", true, false),
 		schema.SpawnStructField("signature", "String", false, false),
-	}, nil))
+	}, schema.SpawnStructRepresentationMap(nil)))
 
 	ts.Accumulate(schema.SpawnList("Signatures", "Signature", false))
 
@@ -29,7 +29,7 @@ func main() {
 	ts.Accumulate(schema.SpawnStruct("Recipient", []schema.StructField{
 		schema.SpawnStructField("header", "Map", true, false),
 		schema.SpawnStructField("encrypted_key", "String", true, false),
-	}, nil))
+	}, schema.SpawnStructRepresentationMap(nil)))
 
 	ts.Accumulate(schema.SpawnList("Recipients", "Recipient", false))
 
@@ -44,7 +44,7 @@ func main() {
 		schema.SpawnStructField("signatures", "Signatures", true, false),
 		schema.SpawnStructField("tag", "String", true, false),
 		schema.SpawnStructField("unprotected", "Map", true, false),
-	}, nil))
+	}, schema.SpawnStructRepresentationMap(nil)))
 
 	if errs := ts.ValidateGraph(); errs != nil {
 		for _, err := range errs {

@@ -38,7 +38,7 @@ type typeSlab struct {
 
 // --- type definitions follow ---
 
-// JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
+// JOSE matches the IPLD Schema type "JOSE".  It has Struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
 	aad         _String__Maybe
@@ -63,7 +63,7 @@ type _Map__entry struct {
 	v _String
 }
 
-// Recipient matches the IPLD Schema type "Recipient".  It has struct type-kind, and may be interrogated like map kind.
+// Recipient matches the IPLD Schema type "Recipient".  It has Struct type-kind, and may be interrogated like map kind.
 type Recipient = *_Recipient
 type _Recipient struct {
 	header        _Map__Maybe
@@ -76,7 +76,7 @@ type _Recipients struct {
 	x []_Recipient
 }
 
-// Signature matches the IPLD Schema type "Signature".  It has struct type-kind, and may be interrogated like map kind.
+// Signature matches the IPLD Schema type "Signature".  It has Struct type-kind, and may be interrogated like map kind.
 type Signature = *_Signature
 type _Signature struct {
 	header    _Map__Maybe
