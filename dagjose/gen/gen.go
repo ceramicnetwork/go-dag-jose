@@ -13,7 +13,7 @@ func main() {
 	ts := schema.TypeSystem{}
 	ts.Init()
 
-	// Common
+	// Common types
 	ts.Accumulate(schema.SpawnString("String"))
 	ts.Accumulate(schema.SpawnBytes("Bytes"))
 	ts.Accumulate(schema.SpawnInt("Int"))
@@ -21,6 +21,8 @@ func main() {
 	ts.Accumulate(schema.SpawnMap("Map", "String", "Any", false))
 	ts.Accumulate(schema.SpawnList("List", "Any", false))
 
+	// The `Any` union represents a wildcard nested type that can contain any
+	// type of information including itself (as map values or list elements).
 	ts.Accumulate(schema.SpawnUnion("Any",
 		[]schema.TypeName{
 			"String",
@@ -78,6 +80,7 @@ func main() {
 	}
 
 	gengo.Generate(os.Args[1], "dagjose", ts, &gengo.AdjunctCfg{
+		// This is important for the `Any` union to work correctly
 		CfgUnionMemlayout: map[schema.TypeName]string{"Any": "interface"},
 	})
 }
