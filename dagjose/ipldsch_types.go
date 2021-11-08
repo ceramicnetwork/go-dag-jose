@@ -49,7 +49,7 @@ type typeSlab struct {
 // --- type definitions follow ---
 
 // Any matches the IPLD Schema type "Any".
-// Any has Union typekind, which means its data model behaviors are that of a map kind.
+// Any has union typekind, which means its data model behaviors are that of a map kind.
 type Any = *_Any
 type _Any struct {
 	x _Any__iface
@@ -77,7 +77,7 @@ type _Float struct{ x float64 }
 type Int = *_Int
 type _Int struct{ x int64 }
 
-// JOSE matches the IPLD Schema type "JOSE".  It has Struct type-kind, and may be interrogated like map kind.
+// JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
 	aad         _String__Maybe
@@ -108,7 +108,7 @@ type _Map__entry struct {
 	v _Any
 }
 
-// Recipient matches the IPLD Schema type "Recipient".  It has Struct type-kind, and may be interrogated like map kind.
+// Recipient matches the IPLD Schema type "Recipient".  It has struct type-kind, and may be interrogated like map kind.
 type Recipient = *_Recipient
 type _Recipient struct {
 	header        _Any__Maybe
@@ -121,7 +121,7 @@ type _Recipients struct {
 	x []_Recipient
 }
 
-// Signature matches the IPLD Schema type "Signature".  It has Struct type-kind, and may be interrogated like map kind.
+// Signature matches the IPLD Schema type "Signature".  It has struct type-kind, and may be interrogated like map kind.
 type Signature = *_Signature
 type _Signature struct {
 	header    _Any__Maybe
