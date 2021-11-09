@@ -22,7 +22,8 @@ func main() {
 	ts.Accumulate(schema.SpawnList("List", "Any", false))
 
 	// The `Any` union represents a wildcard nested type that can contain any
-	// type of information including itself (as map values or list elements).
+	// type of scalar or recursive information including itself (as map values
+	// or list elements).
 	ts.Accumulate(schema.SpawnUnion("Any",
 		[]schema.TypeName{
 			"String",
@@ -45,8 +46,8 @@ func main() {
 	// JWS
 	ts.Accumulate(schema.SpawnStruct("Signature", []schema.StructField{
 		schema.SpawnStructField("header", "Any", true, false),
-		schema.SpawnStructField("protected", "String", true, false),
-		schema.SpawnStructField("signature", "String", false, false),
+		schema.SpawnStructField("protected", "Bytes", true, false),
+		schema.SpawnStructField("signature", "Bytes", false, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
 	ts.Accumulate(schema.SpawnList("Signatures", "Signature", false))
@@ -54,21 +55,21 @@ func main() {
 	// JWE
 	ts.Accumulate(schema.SpawnStruct("Recipient", []schema.StructField{
 		schema.SpawnStructField("header", "Any", true, false),
-		schema.SpawnStructField("encrypted_key", "String", true, false),
+		schema.SpawnStructField("encrypted_key", "Bytes", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
 	ts.Accumulate(schema.SpawnList("Recipients", "Recipient", false))
 
 	// JOSE
 	ts.Accumulate(schema.SpawnStruct("JOSE", []schema.StructField{
-		schema.SpawnStructField("aad", "String", true, false),
-		schema.SpawnStructField("ciphertext", "String", true, false),
-		schema.SpawnStructField("iv", "String", true, false),
-		schema.SpawnStructField("payload", "String", true, false),
-		schema.SpawnStructField("protected", "String", true, false),
+		schema.SpawnStructField("aad", "Bytes", true, false),
+		schema.SpawnStructField("ciphertext", "Bytes", true, false),
+		schema.SpawnStructField("iv", "Bytes", true, false),
+		schema.SpawnStructField("payload", "Bytes", true, false),
+		schema.SpawnStructField("protected", "Bytes", true, false),
 		schema.SpawnStructField("recipients", "Recipients", true, false),
 		schema.SpawnStructField("signatures", "Signatures", true, false),
-		schema.SpawnStructField("tag", "String", true, false),
+		schema.SpawnStructField("tag", "Bytes", true, false),
 		schema.SpawnStructField("unprotected", "Any", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 

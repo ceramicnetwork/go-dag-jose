@@ -21,10 +21,10 @@ func init() {
 // given datamodel.NodeAssembler. Decode fits the codec.Decoder function
 // interface.
 func Decode(na datamodel.NodeAssembler, r io.Reader) error {
-	// If the passed `NodeAssembler` is not of type `_JOSE__ReprBuilder`, create
-	// one of the latter type, use it, then copy the constructed `_JOSE__Repr`
-	// into the caller's `NodeAssembler`.
-	if _, ok := na.(*_JOSE__ReprBuilder); ok {
+	// If the passed `NodeAssembler` is not of type `_JOSE__Builder`, create one
+	// of the latter type, use it, then copy the constructed `_JOSE__Repr` into
+	// the caller's `NodeAssembler`.
+	if _, ok := na.(*_JOSE__Builder); ok {
 		return cbor.Decode(na, r)
 	} else {
 		dagJOSEBuilder := Type.JOSE__Repr.NewBuilder()
@@ -51,8 +51,7 @@ func Encode(n datamodel.Node, w io.Writer) error {
 		// which applies all the necessary validations required to construct a
 		// proper DAG-JOSE Node.
 		dagJOSEBuilder := Type.JOSE__Repr.NewBuilder()
-		err := datamodel.Copy(n, dagJOSEBuilder)
-		if err != nil {
+		if err := datamodel.Copy(n, dagJOSEBuilder); err != nil {
 			return err
 		}
 		n = dagJOSEBuilder.Build().(schema.TypedNode).Representation()
