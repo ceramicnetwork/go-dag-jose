@@ -77,6 +77,10 @@ type _Bytes struct{ x []byte }
 type Float = *_Float
 type _Float struct{ x float64 }
 
+// IgnoreLink matches the IPLD Schema type "IgnoreLink".  It has link kind.
+type IgnoreLink = *_IgnoreLink
+type _IgnoreLink struct{ x datamodel.Link }
+
 // Int matches the IPLD Schema type "Int".  It has int kind.
 type Int = *_Int
 type _Int struct{ x int64 }
