@@ -20,30 +20,34 @@ var _ datamodel.Node = nil // suppress errors when this dependency is not refere
 var Type typeSlab
 
 type typeSlab struct {
-	Any              _Any__Prototype
-	Any__Repr        _Any__ReprPrototype
-	Bytes            _Bytes__Prototype
-	Bytes__Repr      _Bytes__ReprPrototype
-	Float            _Float__Prototype
-	Float__Repr      _Float__ReprPrototype
-	Int              _Int__Prototype
-	Int__Repr        _Int__ReprPrototype
-	JOSE             _JOSE__Prototype
-	JOSE__Repr       _JOSE__ReprPrototype
-	List             _List__Prototype
-	List__Repr       _List__ReprPrototype
-	Map              _Map__Prototype
-	Map__Repr        _Map__ReprPrototype
-	Recipient        _Recipient__Prototype
-	Recipient__Repr  _Recipient__ReprPrototype
-	Recipients       _Recipients__Prototype
-	Recipients__Repr _Recipients__ReprPrototype
-	Signature        _Signature__Prototype
-	Signature__Repr  _Signature__ReprPrototype
-	Signatures       _Signatures__Prototype
-	Signatures__Repr _Signatures__ReprPrototype
-	String           _String__Prototype
-	String__Repr     _String__ReprPrototype
+	Any                _Any__Prototype
+	Any__Repr          _Any__ReprPrototype
+	Bytes              _Bytes__Prototype
+	Bytes__Repr        _Bytes__ReprPrototype
+	Float              _Float__Prototype
+	Float__Repr        _Float__ReprPrototype
+	IgnoreLink         _IgnoreLink__Prototype
+	IgnoreLink__Repr   _IgnoreLink__ReprPrototype
+	Int                _Int__Prototype
+	Int__Repr          _Int__ReprPrototype
+	JOSE               _JOSE__Prototype
+	JOSE__Repr         _JOSE__ReprPrototype
+	List               _List__Prototype
+	List__Repr         _List__ReprPrototype
+	Map                _Map__Prototype
+	Map__Repr          _Map__ReprPrototype
+	Recipient          _Recipient__Prototype
+	Recipient__Repr    _Recipient__ReprPrototype
+	Recipients         _Recipients__Prototype
+	Recipients__Repr   _Recipients__ReprPrototype
+	Signature          _Signature__Prototype
+	Signature__Repr    _Signature__ReprPrototype
+	Signatures         _Signatures__Prototype
+	Signatures__Repr   _Signatures__ReprPrototype
+	String             _String__Prototype
+	String__Repr       _String__ReprPrototype
+	String2Bytes       _String2Bytes__Prototype
+	String2Bytes__Repr _String2Bytes__ReprPrototype
 }
 
 // --- type definitions follow ---
@@ -80,14 +84,15 @@ type _Int struct{ x int64 }
 // JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
-	aad         _Bytes__Maybe
-	ciphertext  _Bytes__Maybe
-	iv          _Bytes__Maybe
-	payload     _Bytes__Maybe
-	protected   _Bytes__Maybe
+	aad         _String2Bytes__Maybe
+	ciphertext  _String2Bytes__Maybe
+	iv          _String2Bytes__Maybe
+	link        _IgnoreLink__Maybe
+	payload     _String2Bytes__Maybe
+	protected   _String2Bytes__Maybe
 	recipients  _Recipients__Maybe
 	signatures  _Signatures__Maybe
-	tag         _Bytes__Maybe
+	tag         _String2Bytes__Maybe
 	unprotected _Any__Maybe
 }
 
@@ -112,7 +117,7 @@ type _Map__entry struct {
 type Recipient = *_Recipient
 type _Recipient struct {
 	header        _Any__Maybe
-	encrypted_key _Bytes__Maybe
+	encrypted_key _String2Bytes__Maybe
 }
 
 // Recipients matches the IPLD Schema type "Recipients".  It has list kind.
@@ -125,8 +130,8 @@ type _Recipients struct {
 type Signature = *_Signature
 type _Signature struct {
 	header    _Any__Maybe
-	protected _Bytes__Maybe
-	signature _Bytes
+	protected _String2Bytes__Maybe
+	signature _String2Bytes
 }
 
 // Signatures matches the IPLD Schema type "Signatures".  It has list kind.

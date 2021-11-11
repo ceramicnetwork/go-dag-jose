@@ -1689,19 +1689,22 @@ var _ datamodel.Node = &_Int__Repr{}
 type _Int__ReprPrototype = _Int__Prototype
 type _Int__ReprAssembler = _Int__Assembler
 
-func (n _JOSE) FieldAad() MaybeBytes {
+func (n _JOSE) FieldAad() MaybeString2Bytes {
 	return &n.aad
 }
-func (n _JOSE) FieldCiphertext() MaybeBytes {
+func (n _JOSE) FieldCiphertext() MaybeString2Bytes {
 	return &n.ciphertext
 }
-func (n _JOSE) FieldIv() MaybeBytes {
+func (n _JOSE) FieldIv() MaybeString2Bytes {
 	return &n.iv
 }
-func (n _JOSE) FieldPayload() MaybeBytes {
+func (n _JOSE) FieldLink() MaybeIgnoreLink {
+	return &n.link
+}
+func (n _JOSE) FieldPayload() MaybeString2Bytes {
 	return &n.payload
 }
-func (n _JOSE) FieldProtected() MaybeBytes {
+func (n _JOSE) FieldProtected() MaybeString2Bytes {
 	return &n.protected
 }
 func (n _JOSE) FieldRecipients() MaybeRecipients {
@@ -1710,7 +1713,7 @@ func (n _JOSE) FieldRecipients() MaybeRecipients {
 func (n _JOSE) FieldSignatures() MaybeSignatures {
 	return &n.signatures
 }
-func (n _JOSE) FieldTag() MaybeBytes {
+func (n _JOSE) FieldTag() MaybeString2Bytes {
 	return &n.tag
 }
 func (n _JOSE) FieldUnprotected() MaybeAny {
@@ -1755,6 +1758,7 @@ var (
 	fieldName__JOSE_Aad         = _String{"aad"}
 	fieldName__JOSE_Ciphertext  = _String{"ciphertext"}
 	fieldName__JOSE_Iv          = _String{"iv"}
+	fieldName__JOSE_Link        = _String{"link"}
 	fieldName__JOSE_Payload     = _String{"payload"}
 	fieldName__JOSE_Protected   = _String{"protected"}
 	fieldName__JOSE_Recipients  = _String{"recipients"}
@@ -1785,6 +1789,11 @@ func (n JOSE) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, nil
 		}
 		return &n.iv.v, nil
+	case "link":
+		if n.link.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.link.v, nil
 	case "payload":
 		if n.payload.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -1842,7 +1851,7 @@ type _JOSE__MapItr struct {
 }
 
 func (itr *_JOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 9 {
+	if itr.idx >= 10 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
@@ -1868,41 +1877,48 @@ func (itr *_JOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 		}
 		v = &itr.n.iv.v
 	case 3:
+		k = &fieldName__JOSE_Link
+		if itr.n.link.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.link.v
+	case 4:
 		k = &fieldName__JOSE_Payload
 		if itr.n.payload.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.payload.v
-	case 4:
+	case 5:
 		k = &fieldName__JOSE_Protected
 		if itr.n.protected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.protected.v
-	case 5:
+	case 6:
 		k = &fieldName__JOSE_Recipients
 		if itr.n.recipients.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.recipients.v
-	case 6:
+	case 7:
 		k = &fieldName__JOSE_Signatures
 		if itr.n.signatures.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.signatures.v
-	case 7:
+	case 8:
 		k = &fieldName__JOSE_Tag
 		if itr.n.tag.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.tag.v
-	case 8:
+	case 9:
 		k = &fieldName__JOSE_Unprotected
 		if itr.n.unprotected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
@@ -1916,14 +1932,14 @@ func (itr *_JOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 	return
 }
 func (itr *_JOSE__MapItr) Done() bool {
-	return itr.idx >= 9
+	return itr.idx >= 10
 }
 
 func (JOSE) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (JOSE) Length() int64 {
-	return 9
+	return 10
 }
 func (JOSE) IsAbsent() bool {
 	return false
@@ -1985,14 +2001,15 @@ type _JOSE__Assembler struct {
 	f     int
 
 	cm             schema.Maybe
-	ca_aad         _Bytes__Assembler
-	ca_ciphertext  _Bytes__Assembler
-	ca_iv          _Bytes__Assembler
-	ca_payload     _Bytes__Assembler
-	ca_protected   _Bytes__Assembler
+	ca_aad         _String2Bytes__Assembler
+	ca_ciphertext  _String2Bytes__Assembler
+	ca_iv          _String2Bytes__Assembler
+	ca_link        _IgnoreLink__Assembler
+	ca_payload     _String2Bytes__Assembler
+	ca_protected   _String2Bytes__Assembler
 	ca_recipients  _Recipients__Assembler
 	ca_signatures  _Signatures__Assembler
-	ca_tag         _Bytes__Assembler
+	ca_tag         _String2Bytes__Assembler
 	ca_unprotected _Any__Assembler
 }
 
@@ -2002,6 +2019,7 @@ func (na *_JOSE__Assembler) reset() {
 	na.ca_aad.reset()
 	na.ca_ciphertext.reset()
 	na.ca_iv.reset()
+	na.ca_link.reset()
 	na.ca_payload.reset()
 	na.ca_protected.reset()
 	na.ca_recipients.reset()
@@ -2014,12 +2032,13 @@ var (
 	fieldBit__JOSE_Aad         = 1 << 0
 	fieldBit__JOSE_Ciphertext  = 1 << 1
 	fieldBit__JOSE_Iv          = 1 << 2
-	fieldBit__JOSE_Payload     = 1 << 3
-	fieldBit__JOSE_Protected   = 1 << 4
-	fieldBit__JOSE_Recipients  = 1 << 5
-	fieldBit__JOSE_Signatures  = 1 << 6
-	fieldBit__JOSE_Tag         = 1 << 7
-	fieldBit__JOSE_Unprotected = 1 << 8
+	fieldBit__JOSE_Link        = 1 << 3
+	fieldBit__JOSE_Payload     = 1 << 4
+	fieldBit__JOSE_Protected   = 1 << 5
+	fieldBit__JOSE_Recipients  = 1 << 6
+	fieldBit__JOSE_Signatures  = 1 << 7
+	fieldBit__JOSE_Tag         = 1 << 8
+	fieldBit__JOSE_Unprotected = 1 << 9
 	fieldBits__JOSE_sufficient = 0
 )
 
@@ -2139,7 +2158,7 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 3:
-		switch ma.w.payload.m {
+		switch ma.w.link.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2147,7 +2166,7 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 4:
-		switch ma.w.protected.m {
+		switch ma.w.payload.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2155,7 +2174,7 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 5:
-		switch ma.w.recipients.m {
+		switch ma.w.protected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2163,7 +2182,7 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 6:
-		switch ma.w.signatures.m {
+		switch ma.w.recipients.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2171,7 +2190,7 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 7:
-		switch ma.w.tag.m {
+		switch ma.w.signatures.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2179,6 +2198,14 @@ func (ma *_JOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 8:
+		switch ma.w.tag.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 9:
 		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.w.unprotected.v = ma.ca_unprotected.w
@@ -2237,13 +2264,23 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 		return &ma.ca_iv, nil
+	case "link":
+		if ma.s&fieldBit__JOSE_Link != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Link}
+		}
+		ma.s += fieldBit__JOSE_Link
+		ma.state = maState_midValue
+		ma.f = 3
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+		return &ma.ca_link, nil
 	case "payload":
 		if ma.s&fieldBit__JOSE_Payload != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Payload}
 		}
 		ma.s += fieldBit__JOSE_Payload
 		ma.state = maState_midValue
-		ma.f = 3
+		ma.f = 4
 		ma.ca_payload.w = &ma.w.payload.v
 		ma.ca_payload.m = &ma.w.payload.m
 		return &ma.ca_payload, nil
@@ -2253,7 +2290,7 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		}
 		ma.s += fieldBit__JOSE_Protected
 		ma.state = maState_midValue
-		ma.f = 4
+		ma.f = 5
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected, nil
@@ -2263,7 +2300,7 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		}
 		ma.s += fieldBit__JOSE_Recipients
 		ma.state = maState_midValue
-		ma.f = 5
+		ma.f = 6
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 		return &ma.ca_recipients, nil
@@ -2273,7 +2310,7 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		}
 		ma.s += fieldBit__JOSE_Signatures
 		ma.state = maState_midValue
-		ma.f = 6
+		ma.f = 7
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 		return &ma.ca_signatures, nil
@@ -2283,7 +2320,7 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		}
 		ma.s += fieldBit__JOSE_Tag
 		ma.state = maState_midValue
-		ma.f = 7
+		ma.f = 8
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag, nil
@@ -2293,7 +2330,7 @@ func (ma *_JOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, er
 		}
 		ma.s += fieldBit__JOSE_Unprotected
 		ma.state = maState_midValue
-		ma.f = 8
+		ma.f = 9
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 		return &ma.ca_unprotected, nil
@@ -2346,26 +2383,30 @@ func (ma *_JOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_iv.m = &ma.w.iv.m
 		return &ma.ca_iv
 	case 3:
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+		return &ma.ca_link
+	case 4:
 		ma.ca_payload.w = &ma.w.payload.v
 		ma.ca_payload.m = &ma.w.payload.m
 		return &ma.ca_payload
-	case 4:
+	case 5:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected
-	case 5:
+	case 6:
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 		return &ma.ca_recipients
-	case 6:
+	case 7:
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 		return &ma.ca_signatures
-	case 7:
+	case 8:
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag
-	case 8:
+	case 9:
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 		return &ma.ca_unprotected
@@ -2452,13 +2493,21 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		ka.state = maState_expectValue
 		ka.f = 2
 		return nil
+	case "link":
+		if ka.s&fieldBit__JOSE_Link != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Link}
+		}
+		ka.s += fieldBit__JOSE_Link
+		ka.state = maState_expectValue
+		ka.f = 3
+		return nil
 	case "payload":
 		if ka.s&fieldBit__JOSE_Payload != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Payload}
 		}
 		ka.s += fieldBit__JOSE_Payload
 		ka.state = maState_expectValue
-		ka.f = 3
+		ka.f = 4
 		return nil
 	case "protected":
 		if ka.s&fieldBit__JOSE_Protected != 0 {
@@ -2466,7 +2515,7 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Protected
 		ka.state = maState_expectValue
-		ka.f = 4
+		ka.f = 5
 		return nil
 	case "recipients":
 		if ka.s&fieldBit__JOSE_Recipients != 0 {
@@ -2474,7 +2523,7 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Recipients
 		ka.state = maState_expectValue
-		ka.f = 5
+		ka.f = 6
 		return nil
 	case "signatures":
 		if ka.s&fieldBit__JOSE_Signatures != 0 {
@@ -2482,7 +2531,7 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Signatures
 		ka.state = maState_expectValue
-		ka.f = 6
+		ka.f = 7
 		return nil
 	case "tag":
 		if ka.s&fieldBit__JOSE_Tag != 0 {
@@ -2490,7 +2539,7 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Tag
 		ka.state = maState_expectValue
-		ka.f = 7
+		ka.f = 8
 		return nil
 	case "unprotected":
 		if ka.s&fieldBit__JOSE_Unprotected != 0 {
@@ -2498,7 +2547,7 @@ func (ka *_JOSE__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Unprotected
 		ka.state = maState_expectValue
-		ka.f = 8
+		ka.f = 9
 		return nil
 	default:
 		return schema.ErrInvalidKey{TypeName: "dagjose.JOSE", Key: &_String{k}}
@@ -2533,6 +2582,7 @@ var (
 	fieldName__JOSE_Aad_serial         = _String{"aad"}
 	fieldName__JOSE_Ciphertext_serial  = _String{"ciphertext"}
 	fieldName__JOSE_Iv_serial          = _String{"iv"}
+	fieldName__JOSE_Link_serial        = _String{"link"}
 	fieldName__JOSE_Payload_serial     = _String{"payload"}
 	fieldName__JOSE_Protected_serial   = _String{"protected"}
 	fieldName__JOSE_Recipients_serial  = _String{"recipients"}
@@ -2562,6 +2612,11 @@ func (n *_JOSE__Repr) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 		}
 		return n.iv.v.Representation(), nil
+	case "link":
+		if n.link.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.link.v.Representation(), nil
 	case "payload":
 		if n.payload.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -2610,33 +2665,38 @@ func (n _JOSE__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node,
 	return n.LookupByString(seg.String())
 }
 func (n *_JOSE__Repr) MapIterator() datamodel.MapIterator {
-	end := 9
+	end := 10
 	if n.unprotected.m == schema.Maybe_Absent {
-		end = 8
+		end = 9
 	} else {
 		goto done
 	}
 	if n.tag.m == schema.Maybe_Absent {
-		end = 7
+		end = 8
 	} else {
 		goto done
 	}
 	if n.signatures.m == schema.Maybe_Absent {
-		end = 6
+		end = 7
 	} else {
 		goto done
 	}
 	if n.recipients.m == schema.Maybe_Absent {
-		end = 5
+		end = 6
 	} else {
 		goto done
 	}
 	if n.protected.m == schema.Maybe_Absent {
-		end = 4
+		end = 5
 	} else {
 		goto done
 	}
 	if n.payload.m == schema.Maybe_Absent {
+		end = 4
+	} else {
+		goto done
+	}
+	if n.link.m == schema.Maybe_Absent {
 		end = 3
 	} else {
 		goto done
@@ -2668,7 +2728,7 @@ type _JOSE__ReprMapItr struct {
 
 func (itr *_JOSE__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 9 {
+	if itr.idx >= 10 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
@@ -2694,41 +2754,48 @@ advance:
 		}
 		v = itr.n.iv.v.Representation()
 	case 3:
+		k = &fieldName__JOSE_Link_serial
+		if itr.n.link.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.link.v.Representation()
+	case 4:
 		k = &fieldName__JOSE_Payload_serial
 		if itr.n.payload.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.payload.v.Representation()
-	case 4:
+	case 5:
 		k = &fieldName__JOSE_Protected_serial
 		if itr.n.protected.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.protected.v.Representation()
-	case 5:
+	case 6:
 		k = &fieldName__JOSE_Recipients_serial
 		if itr.n.recipients.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.recipients.v.Representation()
-	case 6:
+	case 7:
 		k = &fieldName__JOSE_Signatures_serial
 		if itr.n.signatures.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.signatures.v.Representation()
-	case 7:
+	case 8:
 		k = &fieldName__JOSE_Tag_serial
 		if itr.n.tag.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.tag.v.Representation()
-	case 8:
+	case 9:
 		k = &fieldName__JOSE_Unprotected_serial
 		if itr.n.unprotected.m == schema.Maybe_Absent {
 			itr.idx++
@@ -2748,7 +2815,7 @@ func (_JOSE__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (rn *_JOSE__Repr) Length() int64 {
-	l := 9
+	l := 10
 	if rn.aad.m == schema.Maybe_Absent {
 		l--
 	}
@@ -2756,6 +2823,9 @@ func (rn *_JOSE__Repr) Length() int64 {
 		l--
 	}
 	if rn.iv.m == schema.Maybe_Absent {
+		l--
+	}
+	if rn.link.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.payload.m == schema.Maybe_Absent {
@@ -2838,14 +2908,15 @@ type _JOSE__ReprAssembler struct {
 	f     int
 
 	cm             schema.Maybe
-	ca_aad         _Bytes__ReprAssembler
-	ca_ciphertext  _Bytes__ReprAssembler
-	ca_iv          _Bytes__ReprAssembler
-	ca_payload     _Bytes__ReprAssembler
-	ca_protected   _Bytes__ReprAssembler
+	ca_aad         _String2Bytes__ReprAssembler
+	ca_ciphertext  _String2Bytes__ReprAssembler
+	ca_iv          _String2Bytes__ReprAssembler
+	ca_link        _IgnoreLink__ReprAssembler
+	ca_payload     _String2Bytes__ReprAssembler
+	ca_protected   _String2Bytes__ReprAssembler
 	ca_recipients  _Recipients__ReprAssembler
 	ca_signatures  _Signatures__ReprAssembler
-	ca_tag         _Bytes__ReprAssembler
+	ca_tag         _String2Bytes__ReprAssembler
 	ca_unprotected _Any__ReprAssembler
 }
 
@@ -2855,6 +2926,7 @@ func (na *_JOSE__ReprAssembler) reset() {
 	na.ca_aad.reset()
 	na.ca_ciphertext.reset()
 	na.ca_iv.reset()
+	na.ca_link.reset()
 	na.ca_payload.reset()
 	na.ca_protected.reset()
 	na.ca_recipients.reset()
@@ -2978,7 +3050,7 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 3:
-		switch ma.w.payload.m {
+		switch ma.w.link.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2986,7 +3058,7 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 4:
-		switch ma.w.protected.m {
+		switch ma.w.payload.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -2994,7 +3066,7 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 5:
-		switch ma.w.recipients.m {
+		switch ma.w.protected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -3002,7 +3074,7 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 6:
-		switch ma.w.signatures.m {
+		switch ma.w.recipients.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -3010,7 +3082,7 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 7:
-		switch ma.w.tag.m {
+		switch ma.w.signatures.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
 			return true
@@ -3018,6 +3090,14 @@ func (ma *_JOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 8:
+		switch ma.w.tag.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 9:
 		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.w.unprotected.v = ma.ca_unprotected.w
@@ -3079,13 +3159,24 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		ma.ca_iv.m = &ma.w.iv.m
 
 		return &ma.ca_iv, nil
+	case "link":
+		if ma.s&fieldBit__JOSE_Link != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Link_serial}
+		}
+		ma.s += fieldBit__JOSE_Link
+		ma.state = maState_midValue
+		ma.f = 3
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+
+		return &ma.ca_link, nil
 	case "payload":
 		if ma.s&fieldBit__JOSE_Payload != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Payload_serial}
 		}
 		ma.s += fieldBit__JOSE_Payload
 		ma.state = maState_midValue
-		ma.f = 3
+		ma.f = 4
 		ma.ca_payload.w = &ma.w.payload.v
 		ma.ca_payload.m = &ma.w.payload.m
 
@@ -3096,7 +3187,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		}
 		ma.s += fieldBit__JOSE_Protected
 		ma.state = maState_midValue
-		ma.f = 4
+		ma.f = 5
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
@@ -3107,7 +3198,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		}
 		ma.s += fieldBit__JOSE_Recipients
 		ma.state = maState_midValue
-		ma.f = 5
+		ma.f = 6
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
@@ -3118,7 +3209,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		}
 		ma.s += fieldBit__JOSE_Signatures
 		ma.state = maState_midValue
-		ma.f = 6
+		ma.f = 7
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 
@@ -3129,7 +3220,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		}
 		ma.s += fieldBit__JOSE_Tag
 		ma.state = maState_midValue
-		ma.f = 7
+		ma.f = 8
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
@@ -3140,7 +3231,7 @@ func (ma *_JOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler
 		}
 		ma.s += fieldBit__JOSE_Unprotected
 		ma.state = maState_midValue
-		ma.f = 8
+		ma.f = 9
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
@@ -3198,31 +3289,36 @@ func (ma *_JOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_iv
 	case 3:
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+
+		return &ma.ca_link
+	case 4:
 		ma.ca_payload.w = &ma.w.payload.v
 		ma.ca_payload.m = &ma.w.payload.m
 
 		return &ma.ca_payload
-	case 4:
+	case 5:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected
-	case 5:
+	case 6:
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients
-	case 6:
+	case 7:
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 
 		return &ma.ca_signatures
-	case 7:
+	case 8:
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag
-	case 8:
+	case 9:
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
@@ -3310,13 +3406,21 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		ka.state = maState_expectValue
 		ka.f = 2
 		return nil
+	case "link":
+		if ka.s&fieldBit__JOSE_Link != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Link_serial}
+		}
+		ka.s += fieldBit__JOSE_Link
+		ka.state = maState_expectValue
+		ka.f = 3
+		return nil
 	case "payload":
 		if ka.s&fieldBit__JOSE_Payload != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__JOSE_Payload_serial}
 		}
 		ka.s += fieldBit__JOSE_Payload
 		ka.state = maState_expectValue
-		ka.f = 3
+		ka.f = 4
 		return nil
 	case "protected":
 		if ka.s&fieldBit__JOSE_Protected != 0 {
@@ -3324,7 +3428,7 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Protected
 		ka.state = maState_expectValue
-		ka.f = 4
+		ka.f = 5
 		return nil
 	case "recipients":
 		if ka.s&fieldBit__JOSE_Recipients != 0 {
@@ -3332,7 +3436,7 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Recipients
 		ka.state = maState_expectValue
-		ka.f = 5
+		ka.f = 6
 		return nil
 	case "signatures":
 		if ka.s&fieldBit__JOSE_Signatures != 0 {
@@ -3340,7 +3444,7 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Signatures
 		ka.state = maState_expectValue
-		ka.f = 6
+		ka.f = 7
 		return nil
 	case "tag":
 		if ka.s&fieldBit__JOSE_Tag != 0 {
@@ -3348,7 +3452,7 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Tag
 		ka.state = maState_expectValue
-		ka.f = 7
+		ka.f = 8
 		return nil
 	case "unprotected":
 		if ka.s&fieldBit__JOSE_Unprotected != 0 {
@@ -3356,7 +3460,7 @@ func (ka *_JOSE__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__JOSE_Unprotected
 		ka.state = maState_expectValue
-		ka.f = 8
+		ka.f = 9
 		return nil
 	}
 	return schema.ErrInvalidKey{TypeName: "dagjose.JOSE.Repr", Key: &_String{k}}
@@ -4725,7 +4829,7 @@ func (ma *_Map__ReprAssembler) ValuePrototype(_ string) datamodel.NodePrototype 
 func (n _Recipient) FieldHeader() MaybeAny {
 	return &n.header
 }
-func (n _Recipient) FieldEncrypted_key() MaybeBytes {
+func (n _Recipient) FieldEncrypted_key() MaybeString2Bytes {
 	return &n.encrypted_key
 }
 
@@ -4907,7 +5011,7 @@ type _Recipient__Assembler struct {
 
 	cm               schema.Maybe
 	ca_header        _Any__Assembler
-	ca_encrypted_key _Bytes__Assembler
+	ca_encrypted_key _String2Bytes__Assembler
 }
 
 func (na *_Recipient__Assembler) reset() {
@@ -5382,7 +5486,7 @@ type _Recipient__ReprAssembler struct {
 
 	cm               schema.Maybe
 	ca_header        _Any__ReprAssembler
-	ca_encrypted_key _Bytes__ReprAssembler
+	ca_encrypted_key _String2Bytes__ReprAssembler
 }
 
 func (na *_Recipient__ReprAssembler) reset() {
@@ -6277,10 +6381,10 @@ func (la *_Recipients__ReprAssembler) ValuePrototype(_ int64) datamodel.NodeProt
 func (n _Signature) FieldHeader() MaybeAny {
 	return &n.header
 }
-func (n _Signature) FieldProtected() MaybeBytes {
+func (n _Signature) FieldProtected() MaybeString2Bytes {
 	return &n.protected
 }
-func (n _Signature) FieldSignature() Bytes {
+func (n _Signature) FieldSignature() String2Bytes {
 	return &n.signature
 }
 
@@ -6468,8 +6572,8 @@ type _Signature__Assembler struct {
 
 	cm           schema.Maybe
 	ca_header    _Any__Assembler
-	ca_protected _Bytes__Assembler
-	ca_signature _Bytes__Assembler
+	ca_protected _String2Bytes__Assembler
+	ca_signature _String2Bytes__Assembler
 }
 
 func (na *_Signature__Assembler) reset() {
@@ -6974,8 +7078,8 @@ type _Signature__ReprAssembler struct {
 
 	cm           schema.Maybe
 	ca_header    _Any__ReprAssembler
-	ca_protected _Bytes__ReprAssembler
-	ca_signature _Bytes__ReprAssembler
+	ca_protected _String2Bytes__ReprAssembler
+	ca_signature _String2Bytes__ReprAssembler
 }
 
 func (na *_Signature__ReprAssembler) reset() {
