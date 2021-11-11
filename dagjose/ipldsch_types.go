@@ -26,8 +26,8 @@ type typeSlab struct {
 	Bytes__Repr        _Bytes__ReprPrototype
 	Float              _Float__Prototype
 	Float__Repr        _Float__ReprPrototype
-	IgnoreLink         _IgnoreLink__Prototype
-	IgnoreLink__Repr   _IgnoreLink__ReprPrototype
+	IgnoreMe           _IgnoreMe__Prototype
+	IgnoreMe__Repr     _IgnoreMe__ReprPrototype
 	Int                _Int__Prototype
 	Int__Repr          _Int__ReprPrototype
 	JOSE               _JOSE__Prototype
@@ -77,10 +77,6 @@ type _Bytes struct{ x []byte }
 type Float = *_Float
 type _Float struct{ x float64 }
 
-// IgnoreLink matches the IPLD Schema type "IgnoreLink".  It has link kind.
-type IgnoreLink = *_IgnoreLink
-type _IgnoreLink struct{ x datamodel.Link }
-
 // Int matches the IPLD Schema type "Int".  It has int kind.
 type Int = *_Int
 type _Int struct{ x int64 }
@@ -91,7 +87,7 @@ type _JOSE struct {
 	aad         _String2Bytes__Maybe
 	ciphertext  _String2Bytes__Maybe
 	iv          _String2Bytes__Maybe
-	link        _IgnoreLink__Maybe
+	link        _IgnoreMe__Maybe
 	payload     _String2Bytes__Maybe
 	protected   _String2Bytes__Maybe
 	recipients  _Recipients__Maybe

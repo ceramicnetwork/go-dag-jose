@@ -45,7 +45,7 @@ func main() {
 
 	//
 	ts.Accumulate(schema.SpawnString("String2Bytes"))
-	ts.Accumulate(schema.SpawnLink("IgnoreLink"))
+	ts.Accumulate(schema.SpawnString("IgnoreMe"))
 
 	// JWS
 	ts.Accumulate(schema.SpawnStruct("Signature", []schema.StructField{
@@ -69,7 +69,7 @@ func main() {
 		schema.SpawnStructField("aad", "String2Bytes", true, false),
 		schema.SpawnStructField("ciphertext", "String2Bytes", true, false),
 		schema.SpawnStructField("iv", "String2Bytes", true, false),
-		schema.SpawnStructField("link", "IgnoreLink", true, false),
+		schema.SpawnStructField("link", "IgnoreMe", true, false),
 		schema.SpawnStructField("payload", "String2Bytes", true, false),
 		schema.SpawnStructField("protected", "String2Bytes", true, false),
 		schema.SpawnStructField("recipients", "Recipients", true, false),
