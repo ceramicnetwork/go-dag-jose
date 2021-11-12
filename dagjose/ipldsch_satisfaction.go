@@ -1689,22 +1689,22 @@ var _ datamodel.Node = &_Int__Repr{}
 type _Int__ReprPrototype = _Int__Prototype
 type _Int__ReprAssembler = _Int__Assembler
 
-func (n _JOSE) FieldAad() MaybeString2Bytes {
+func (n _JOSE) FieldAad() MaybeBase64String {
 	return &n.aad
 }
-func (n _JOSE) FieldCiphertext() MaybeString2Bytes {
+func (n _JOSE) FieldCiphertext() MaybeBase64String {
 	return &n.ciphertext
 }
-func (n _JOSE) FieldIv() MaybeString2Bytes {
+func (n _JOSE) FieldIv() MaybeBase64String {
 	return &n.iv
 }
-func (n _JOSE) FieldLink() MaybeIgnoreMe {
+func (n _JOSE) FieldLink() MaybeLink {
 	return &n.link
 }
-func (n _JOSE) FieldPayload() MaybeString2Bytes {
+func (n _JOSE) FieldPayload() MaybeBase64String {
 	return &n.payload
 }
-func (n _JOSE) FieldProtected() MaybeString2Bytes {
+func (n _JOSE) FieldProtected() MaybeBase64String {
 	return &n.protected
 }
 func (n _JOSE) FieldRecipients() MaybeRecipients {
@@ -1713,7 +1713,7 @@ func (n _JOSE) FieldRecipients() MaybeRecipients {
 func (n _JOSE) FieldSignatures() MaybeSignatures {
 	return &n.signatures
 }
-func (n _JOSE) FieldTag() MaybeString2Bytes {
+func (n _JOSE) FieldTag() MaybeBase64String {
 	return &n.tag
 }
 func (n _JOSE) FieldUnprotected() MaybeAny {
@@ -2001,15 +2001,15 @@ type _JOSE__Assembler struct {
 	f     int
 
 	cm             schema.Maybe
-	ca_aad         _String2Bytes__Assembler
-	ca_ciphertext  _String2Bytes__Assembler
-	ca_iv          _String2Bytes__Assembler
-	ca_link        _IgnoreMe__Assembler
-	ca_payload     _String2Bytes__Assembler
-	ca_protected   _String2Bytes__Assembler
+	ca_aad         _Base64String__Assembler
+	ca_ciphertext  _Base64String__Assembler
+	ca_iv          _Base64String__Assembler
+	ca_link        _Link__Assembler
+	ca_payload     _Base64String__Assembler
+	ca_protected   _Base64String__Assembler
 	ca_recipients  _Recipients__Assembler
 	ca_signatures  _Signatures__Assembler
-	ca_tag         _String2Bytes__Assembler
+	ca_tag         _Base64String__Assembler
 	ca_unprotected _Any__Assembler
 }
 
@@ -2908,15 +2908,15 @@ type _JOSE__ReprAssembler struct {
 	f     int
 
 	cm             schema.Maybe
-	ca_aad         _String2Bytes__ReprAssembler
-	ca_ciphertext  _String2Bytes__ReprAssembler
-	ca_iv          _String2Bytes__ReprAssembler
-	ca_link        _IgnoreMe__ReprAssembler
-	ca_payload     _String2Bytes__ReprAssembler
-	ca_protected   _String2Bytes__ReprAssembler
+	ca_aad         _Base64String__ReprAssembler
+	ca_ciphertext  _Base64String__ReprAssembler
+	ca_iv          _Base64String__ReprAssembler
+	ca_link        _Link__ReprAssembler
+	ca_payload     _Base64String__ReprAssembler
+	ca_protected   _Base64String__ReprAssembler
 	ca_recipients  _Recipients__ReprAssembler
 	ca_signatures  _Signatures__ReprAssembler
-	ca_tag         _String2Bytes__ReprAssembler
+	ca_tag         _Base64String__ReprAssembler
 	ca_unprotected _Any__ReprAssembler
 }
 
@@ -3481,6 +3481,211 @@ func (ka *_JOSE__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
 func (_JOSE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
+
+func (n Link) Link() datamodel.Link {
+	return n.x
+}
+func (_Link__Prototype) FromLink(v datamodel.Link) (Link, error) {
+	n := _Link{v}
+	return &n, nil
+}
+
+type _Link__Maybe struct {
+	m schema.Maybe
+	v _Link
+}
+type MaybeLink = *_Link__Maybe
+
+func (m MaybeLink) IsNull() bool {
+	return m.m == schema.Maybe_Null
+}
+func (m MaybeLink) IsAbsent() bool {
+	return m.m == schema.Maybe_Absent
+}
+func (m MaybeLink) Exists() bool {
+	return m.m == schema.Maybe_Value
+}
+func (m MaybeLink) AsNode() datamodel.Node {
+	switch m.m {
+	case schema.Maybe_Absent:
+		return datamodel.Absent
+	case schema.Maybe_Null:
+		return datamodel.Null
+	case schema.Maybe_Value:
+		return &m.v
+	default:
+		panic("unreachable")
+	}
+}
+func (m MaybeLink) Must() Link {
+	if !m.Exists() {
+		panic("unbox of a maybe rejected")
+	}
+	return &m.v
+}
+
+var _ datamodel.Node = (Link)(&_Link{})
+var _ schema.TypedNode = (Link)(&_Link{})
+
+func (Link) Kind() datamodel.Kind {
+	return datamodel.Kind_Link
+}
+func (Link) LookupByString(string) (datamodel.Node, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.LookupByString("")
+}
+func (Link) LookupByNode(datamodel.Node) (datamodel.Node, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.LookupByNode(nil)
+}
+func (Link) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.LookupByIndex(0)
+}
+func (Link) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.LookupBySegment(seg)
+}
+func (Link) MapIterator() datamodel.MapIterator {
+	return nil
+}
+func (Link) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (Link) Length() int64 {
+	return -1
+}
+func (Link) IsAbsent() bool {
+	return false
+}
+func (Link) IsNull() bool {
+	return false
+}
+func (Link) AsBool() (bool, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.AsBool()
+}
+func (Link) AsInt() (int64, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.AsInt()
+}
+func (Link) AsFloat() (float64, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.AsFloat()
+}
+func (Link) AsString() (string, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.AsString()
+}
+func (Link) AsBytes() ([]byte, error) {
+	return mixins.Link{TypeName: "dagjose.Link"}.AsBytes()
+}
+func (n Link) AsLink() (datamodel.Link, error) {
+	return n.x, nil
+}
+func (Link) Prototype() datamodel.NodePrototype {
+	return _Link__Prototype{}
+}
+
+type _Link__Prototype struct{}
+
+func (_Link__Prototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _Link__Builder
+	nb.Reset()
+	return &nb
+}
+
+type _Link__Builder struct {
+	_Link__Assembler
+}
+
+func (nb *_Link__Builder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_Link__Builder) Reset() {
+	var w _Link
+	var m schema.Maybe
+	*nb = _Link__Builder{_Link__Assembler{w: &w, m: &m}}
+}
+
+type _Link__Assembler struct {
+	w *_Link
+	m *schema.Maybe
+}
+
+func (na *_Link__Assembler) reset() {}
+func (_Link__Assembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.BeginMap(0)
+}
+func (_Link__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.BeginList(0)
+}
+func (na *_Link__Assembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.LinkAssembler{TypeName: "dagjose.Link"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	}
+	panic("unreachable")
+}
+func (_Link__Assembler) AssignBool(bool) error {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.AssignBool(false)
+}
+func (_Link__Assembler) AssignInt(int64) error {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.AssignInt(0)
+}
+func (_Link__Assembler) AssignFloat(float64) error {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.AssignFloat(0)
+}
+func (_Link__Assembler) AssignString(string) error {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.AssignString("")
+}
+func (_Link__Assembler) AssignBytes([]byte) error {
+	return mixins.LinkAssembler{TypeName: "dagjose.Link"}.AssignBytes(nil)
+}
+func (na *_Link__Assembler) AssignLink(v datamodel.Link) error {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	}
+	na.w.x = v
+	*na.m = schema.Maybe_Value
+	return nil
+}
+func (na *_Link__Assembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_Link); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v2, err := v.AsLink(); err != nil {
+		return err
+	} else {
+		return na.AssignLink(v2)
+	}
+}
+func (_Link__Assembler) Prototype() datamodel.NodePrototype {
+	return _Link__Prototype{}
+}
+func (Link) Type() schema.Type {
+	return nil /*TODO:typelit*/
+}
+func (n Link) Representation() datamodel.Node {
+	return (*_Link__Repr)(n)
+}
+
+type _Link__Repr = _Link
+
+var _ datamodel.Node = &_Link__Repr{}
+
+type _Link__ReprPrototype = _Link__Prototype
+type _Link__ReprAssembler = _Link__Assembler
 
 func (n *_List) Lookup(idx int64) Any {
 	if n.Length() <= idx {
@@ -4829,7 +5034,7 @@ func (ma *_Map__ReprAssembler) ValuePrototype(_ string) datamodel.NodePrototype 
 func (n _Recipient) FieldHeader() MaybeAny {
 	return &n.header
 }
-func (n _Recipient) FieldEncrypted_key() MaybeString2Bytes {
+func (n _Recipient) FieldEncrypted_key() MaybeBase64String {
 	return &n.encrypted_key
 }
 
@@ -5011,7 +5216,7 @@ type _Recipient__Assembler struct {
 
 	cm               schema.Maybe
 	ca_header        _Any__Assembler
-	ca_encrypted_key _String2Bytes__Assembler
+	ca_encrypted_key _Base64String__Assembler
 }
 
 func (na *_Recipient__Assembler) reset() {
@@ -5486,7 +5691,7 @@ type _Recipient__ReprAssembler struct {
 
 	cm               schema.Maybe
 	ca_header        _Any__ReprAssembler
-	ca_encrypted_key _String2Bytes__ReprAssembler
+	ca_encrypted_key _Base64String__ReprAssembler
 }
 
 func (na *_Recipient__ReprAssembler) reset() {
@@ -6381,10 +6586,10 @@ func (la *_Recipients__ReprAssembler) ValuePrototype(_ int64) datamodel.NodeProt
 func (n _Signature) FieldHeader() MaybeAny {
 	return &n.header
 }
-func (n _Signature) FieldProtected() MaybeString2Bytes {
+func (n _Signature) FieldProtected() MaybeBase64String {
 	return &n.protected
 }
-func (n _Signature) FieldSignature() String2Bytes {
+func (n _Signature) FieldSignature() Base64String {
 	return &n.signature
 }
 
@@ -6572,8 +6777,8 @@ type _Signature__Assembler struct {
 
 	cm           schema.Maybe
 	ca_header    _Any__Assembler
-	ca_protected _String2Bytes__Assembler
-	ca_signature _String2Bytes__Assembler
+	ca_protected _Base64String__Assembler
+	ca_signature _Base64String__Assembler
 }
 
 func (na *_Signature__Assembler) reset() {
@@ -7078,8 +7283,8 @@ type _Signature__ReprAssembler struct {
 
 	cm           schema.Maybe
 	ca_header    _Any__ReprAssembler
-	ca_protected _String2Bytes__ReprAssembler
-	ca_signature _String2Bytes__ReprAssembler
+	ca_protected _Base64String__ReprAssembler
+	ca_signature _Base64String__ReprAssembler
 }
 
 func (na *_Signature__ReprAssembler) reset() {

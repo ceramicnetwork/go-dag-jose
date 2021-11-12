@@ -22,16 +22,18 @@ var Type typeSlab
 type typeSlab struct {
 	Any                _Any__Prototype
 	Any__Repr          _Any__ReprPrototype
+	Base64String       _Base64String__Prototype
+	Base64String__Repr _Base64String__ReprPrototype
 	Bytes              _Bytes__Prototype
 	Bytes__Repr        _Bytes__ReprPrototype
 	Float              _Float__Prototype
 	Float__Repr        _Float__ReprPrototype
-	IgnoreMe           _IgnoreMe__Prototype
-	IgnoreMe__Repr     _IgnoreMe__ReprPrototype
 	Int                _Int__Prototype
 	Int__Repr          _Int__ReprPrototype
 	JOSE               _JOSE__Prototype
 	JOSE__Repr         _JOSE__ReprPrototype
+	Link               _Link__Prototype
+	Link__Repr         _Link__ReprPrototype
 	List               _List__Prototype
 	List__Repr         _List__ReprPrototype
 	Map                _Map__Prototype
@@ -46,8 +48,6 @@ type typeSlab struct {
 	Signatures__Repr   _Signatures__ReprPrototype
 	String             _String__Prototype
 	String__Repr       _String__ReprPrototype
-	String2Bytes       _String2Bytes__Prototype
-	String2Bytes__Repr _String2Bytes__ReprPrototype
 }
 
 // --- type definitions follow ---
@@ -69,6 +69,10 @@ func (_Float) _Any__member()  {}
 func (_Map) _Any__member()    {}
 func (_List) _Any__member()   {}
 
+// Base64String matches the IPLD Schema type "Base64String".  It has string kind.
+type Base64String = *_Base64String
+type _Base64String struct{ x string }
+
 // Bytes matches the IPLD Schema type "Bytes".  It has bytes kind.
 type Bytes = *_Bytes
 type _Bytes struct{ x []byte }
@@ -84,17 +88,21 @@ type _Int struct{ x int64 }
 // JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
-	aad         _String2Bytes__Maybe
-	ciphertext  _String2Bytes__Maybe
-	iv          _String2Bytes__Maybe
-	link        _IgnoreMe__Maybe
-	payload     _String2Bytes__Maybe
-	protected   _String2Bytes__Maybe
+	aad         _Base64String__Maybe
+	ciphertext  _Base64String__Maybe
+	iv          _Base64String__Maybe
+	link        _Link__Maybe
+	payload     _Base64String__Maybe
+	protected   _Base64String__Maybe
 	recipients  _Recipients__Maybe
 	signatures  _Signatures__Maybe
-	tag         _String2Bytes__Maybe
+	tag         _Base64String__Maybe
 	unprotected _Any__Maybe
 }
+
+// Link matches the IPLD Schema type "Link".  It has link kind.
+type Link = *_Link
+type _Link struct{ x datamodel.Link }
 
 // List matches the IPLD Schema type "List".  It has list kind.
 type List = *_List
@@ -117,7 +125,7 @@ type _Map__entry struct {
 type Recipient = *_Recipient
 type _Recipient struct {
 	header        _Any__Maybe
-	encrypted_key _String2Bytes__Maybe
+	encrypted_key _Base64String__Maybe
 }
 
 // Recipients matches the IPLD Schema type "Recipients".  It has list kind.
@@ -130,8 +138,8 @@ type _Recipients struct {
 type Signature = *_Signature
 type _Signature struct {
 	header    _Any__Maybe
-	protected _String2Bytes__Maybe
-	signature _String2Bytes
+	protected _Base64String__Maybe
+	signature _Base64String
 }
 
 // Signatures matches the IPLD Schema type "Signatures".  It has list kind.

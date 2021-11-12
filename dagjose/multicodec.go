@@ -4,8 +4,10 @@ package dagjose
 //go:generate go fmt ./
 
 import (
+	//"fmt"
 	"io"
 
+	//"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime/codec/cbor"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/multicodec"
@@ -53,6 +55,32 @@ func Encode(n datamodel.Node, w io.Writer) error {
 		dagJOSEBuilder := Type.JOSE__Repr.NewBuilder()
 		if err := datamodel.Copy(n, dagJOSEBuilder); err != nil {
 			return err
+		}
+		linkNode, err := n.LookupByString("link")
+		if linkNode == nil {
+			// It's ok for `link` to be absent, but if some other error occurred, return it.
+			if _, linkNotFound := err.(datamodel.ErrNotExists); !linkNotFound {
+				return err
+			}
+		} else {
+			//payloadNode, err := n.LookupByString("payload")
+			//// If `link` was present then `payload` must be present and the two must match. If any error occurs here
+			//// (including `payload` being missing) return it.
+			//if err != nil {
+			//	return err
+			//}
+			//payloadString, err := payloadNode.AsString()
+			//if err != nil {
+			//	return err
+			//}
+			//link, err := linkNode.AsLink()
+			//if err != nil {
+			//	return err
+			//}
+			//fmt.Print(link)
+			//fmt.Print(payloadString)
+			// Mark `link` as absent because we do not want to encode it
+			dagJOSEBuilder.(*_JOSE__ReprBuilder).w.link.m = schema.Maybe_Absent
 		}
 		n = dagJOSEBuilder.Build().(schema.TypedNode).Representation()
 	}
