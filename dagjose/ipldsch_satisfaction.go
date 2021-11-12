@@ -1689,22 +1689,22 @@ var _ datamodel.Node = &_Int__Repr{}
 type _Int__ReprPrototype = _Int__Prototype
 type _Int__ReprAssembler = _Int__Assembler
 
-func (n _JOSE) FieldAad() MaybeBase64String {
+func (n _JOSE) FieldAad() MaybeBase64Url {
 	return &n.aad
 }
-func (n _JOSE) FieldCiphertext() MaybeBase64String {
+func (n _JOSE) FieldCiphertext() MaybeBase64Url {
 	return &n.ciphertext
 }
-func (n _JOSE) FieldIv() MaybeBase64String {
+func (n _JOSE) FieldIv() MaybeBase64Url {
 	return &n.iv
 }
 func (n _JOSE) FieldLink() MaybeLink {
 	return &n.link
 }
-func (n _JOSE) FieldPayload() MaybeBase64String {
+func (n _JOSE) FieldPayload() MaybeBase64Url {
 	return &n.payload
 }
-func (n _JOSE) FieldProtected() MaybeBase64String {
+func (n _JOSE) FieldProtected() MaybeBase64Url {
 	return &n.protected
 }
 func (n _JOSE) FieldRecipients() MaybeRecipients {
@@ -1713,7 +1713,7 @@ func (n _JOSE) FieldRecipients() MaybeRecipients {
 func (n _JOSE) FieldSignatures() MaybeSignatures {
 	return &n.signatures
 }
-func (n _JOSE) FieldTag() MaybeBase64String {
+func (n _JOSE) FieldTag() MaybeBase64Url {
 	return &n.tag
 }
 func (n _JOSE) FieldUnprotected() MaybeAny {
@@ -2001,15 +2001,15 @@ type _JOSE__Assembler struct {
 	f     int
 
 	cm             schema.Maybe
-	ca_aad         _Base64String__Assembler
-	ca_ciphertext  _Base64String__Assembler
-	ca_iv          _Base64String__Assembler
+	ca_aad         _Base64Url__Assembler
+	ca_ciphertext  _Base64Url__Assembler
+	ca_iv          _Base64Url__Assembler
 	ca_link        _Link__Assembler
-	ca_payload     _Base64String__Assembler
-	ca_protected   _Base64String__Assembler
+	ca_payload     _Base64Url__Assembler
+	ca_protected   _Base64Url__Assembler
 	ca_recipients  _Recipients__Assembler
 	ca_signatures  _Signatures__Assembler
-	ca_tag         _Base64String__Assembler
+	ca_tag         _Base64Url__Assembler
 	ca_unprotected _Any__Assembler
 }
 
@@ -2908,15 +2908,15 @@ type _JOSE__ReprAssembler struct {
 	f     int
 
 	cm             schema.Maybe
-	ca_aad         _Base64String__ReprAssembler
-	ca_ciphertext  _Base64String__ReprAssembler
-	ca_iv          _Base64String__ReprAssembler
+	ca_aad         _Base64Url__ReprAssembler
+	ca_ciphertext  _Base64Url__ReprAssembler
+	ca_iv          _Base64Url__ReprAssembler
 	ca_link        _Link__ReprAssembler
-	ca_payload     _Base64String__ReprAssembler
-	ca_protected   _Base64String__ReprAssembler
+	ca_payload     _Base64Url__ReprAssembler
+	ca_protected   _Base64Url__ReprAssembler
 	ca_recipients  _Recipients__ReprAssembler
 	ca_signatures  _Signatures__ReprAssembler
-	ca_tag         _Base64String__ReprAssembler
+	ca_tag         _Base64Url__ReprAssembler
 	ca_unprotected _Any__ReprAssembler
 }
 
@@ -5034,7 +5034,7 @@ func (ma *_Map__ReprAssembler) ValuePrototype(_ string) datamodel.NodePrototype 
 func (n _Recipient) FieldHeader() MaybeAny {
 	return &n.header
 }
-func (n _Recipient) FieldEncrypted_key() MaybeBase64String {
+func (n _Recipient) FieldEncrypted_key() MaybeBase64Url {
 	return &n.encrypted_key
 }
 
@@ -5216,7 +5216,7 @@ type _Recipient__Assembler struct {
 
 	cm               schema.Maybe
 	ca_header        _Any__Assembler
-	ca_encrypted_key _Base64String__Assembler
+	ca_encrypted_key _Base64Url__Assembler
 }
 
 func (na *_Recipient__Assembler) reset() {
@@ -5691,7 +5691,7 @@ type _Recipient__ReprAssembler struct {
 
 	cm               schema.Maybe
 	ca_header        _Any__ReprAssembler
-	ca_encrypted_key _Base64String__ReprAssembler
+	ca_encrypted_key _Base64Url__ReprAssembler
 }
 
 func (na *_Recipient__ReprAssembler) reset() {
@@ -6586,10 +6586,10 @@ func (la *_Recipients__ReprAssembler) ValuePrototype(_ int64) datamodel.NodeProt
 func (n _Signature) FieldHeader() MaybeAny {
 	return &n.header
 }
-func (n _Signature) FieldProtected() MaybeBase64String {
+func (n _Signature) FieldProtected() MaybeBase64Url {
 	return &n.protected
 }
-func (n _Signature) FieldSignature() Base64String {
+func (n _Signature) FieldSignature() Base64Url {
 	return &n.signature
 }
 
@@ -6777,8 +6777,8 @@ type _Signature__Assembler struct {
 
 	cm           schema.Maybe
 	ca_header    _Any__Assembler
-	ca_protected _Base64String__Assembler
-	ca_signature _Base64String__Assembler
+	ca_protected _Base64Url__Assembler
+	ca_signature _Base64Url__Assembler
 }
 
 func (na *_Signature__Assembler) reset() {
@@ -7283,8 +7283,8 @@ type _Signature__ReprAssembler struct {
 
 	cm           schema.Maybe
 	ca_header    _Any__ReprAssembler
-	ca_protected _Base64String__ReprAssembler
-	ca_signature _Base64String__ReprAssembler
+	ca_protected _Base64Url__ReprAssembler
+	ca_signature _Base64Url__ReprAssembler
 }
 
 func (na *_Signature__ReprAssembler) reset() {

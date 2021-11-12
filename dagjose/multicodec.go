@@ -23,33 +23,41 @@ func init() {
 // given datamodel.NodeAssembler. Decode fits the codec.Decoder function
 // interface.
 func Decode(na datamodel.NodeAssembler, r io.Reader) error {
-	// If the passed `NodeAssembler` is not of type `_JOSE__Builder`, create one
-	// of the latter type, use it, then copy the constructed `_JOSE__Repr` into
-	// the caller's `NodeAssembler`.
-	if _, ok := na.(*_JOSE__Builder); ok {
-		return cbor.Decode(na, r)
-	} else {
-		dagJOSEBuilder := Type.JOSE__Repr.NewBuilder()
-		// CBOR is a superset of (DAG-)JOSE and can be used to decode valid
-		// DAG-JOSE objects without decoding the CID (as expected by the
-		// DAG-JOSE spec:
-		// https://specs.ipld.io/block-layer/codecs/dag-jose.html).
-		err := cbor.Decode(dagJOSEBuilder, r)
+	// If the passed `NodeAssembler` is not of type `_JOSE__ReprBuilder`, create
+	// and use a `_JOSE__ReprBuilder` to decode.
+	nodeBuilder, alreadyJose := na.(*_JOSE__ReprBuilder)
+	if !alreadyJose {
+		nodeBuilder = Type.JOSE__Repr.NewBuilder().(*_JOSE__ReprBuilder)
+	}
+	// CBOR is a superset of (DAG-)JOSE and can be used to decode valid
+	// DAG-JOSE objects without decoding the CID (as expected by the
+	// DAG-JOSE spec:
+	// https://specs.ipld.io/block-layer/codecs/dag-jose.html).
+	err := cbor.Decode(nodeBuilder, r)
+	if err != nil {
+		return err
+	}
+	// If `payload` is present but `link` is not, add `link` with the
+	// corresponding encoded CID.
+	payloadNode := &nodeBuilder.w.payload
+	linkNode := &nodeBuilder.w.link
+	if payloadNode.Exists() && !linkNode.Exists() {
+		link, err := Type.Base64Url.Link(&payloadNode.v)
 		if err != nil {
 			return err
 		}
-		joseRepr := dagJOSEBuilder.(*_JOSE__ReprBuilder).w
-		if joseRepr.payload.m == schema.Maybe_Value {
-			_, link, err := cid.CidFromBytes([]byte(joseRepr.payload.v.x))
-			if err != nil {
-				return err
-			}
-			joseRepr.link.m = joseRepr.payload.m
-			joseRepr.link.v = _Link{cidlink.Link{Cid: link}}
-		}
-		n := dagJOSEBuilder.Build().(schema.TypedNode).Representation()
+		linkNode.m = schema.Maybe_Value
+		linkNode.v = _Link{link}
+	}
+	// The "representation" node gives an accurate view of fields that are
+	// actually present.
+	n := nodeBuilder.Build().(schema.TypedNode).Representation()
+	// If the passed `NodeAssembler` is not of type `_JOSE__ReprBuilder`, copy
+	// the constructed `_JOSE__Repr` into the caller's `NodeAssembler`.
+	if !alreadyJose {
 		return datamodel.Copy(n, na)
 	}
+	return nil
 }
 
 // Encode walks the given datamodel.Node and serializes it to the given

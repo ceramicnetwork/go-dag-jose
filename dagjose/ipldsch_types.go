@@ -20,34 +20,34 @@ var _ datamodel.Node = nil // suppress errors when this dependency is not refere
 var Type typeSlab
 
 type typeSlab struct {
-	Any                _Any__Prototype
-	Any__Repr          _Any__ReprPrototype
-	Base64String       _Base64String__Prototype
-	Base64String__Repr _Base64String__ReprPrototype
-	Bytes              _Bytes__Prototype
-	Bytes__Repr        _Bytes__ReprPrototype
-	Float              _Float__Prototype
-	Float__Repr        _Float__ReprPrototype
-	Int                _Int__Prototype
-	Int__Repr          _Int__ReprPrototype
-	JOSE               _JOSE__Prototype
-	JOSE__Repr         _JOSE__ReprPrototype
-	Link               _Link__Prototype
-	Link__Repr         _Link__ReprPrototype
-	List               _List__Prototype
-	List__Repr         _List__ReprPrototype
-	Map                _Map__Prototype
-	Map__Repr          _Map__ReprPrototype
-	Recipient          _Recipient__Prototype
-	Recipient__Repr    _Recipient__ReprPrototype
-	Recipients         _Recipients__Prototype
-	Recipients__Repr   _Recipients__ReprPrototype
-	Signature          _Signature__Prototype
-	Signature__Repr    _Signature__ReprPrototype
-	Signatures         _Signatures__Prototype
-	Signatures__Repr   _Signatures__ReprPrototype
-	String             _String__Prototype
-	String__Repr       _String__ReprPrototype
+	Any              _Any__Prototype
+	Any__Repr        _Any__ReprPrototype
+	Base64Url        _Base64Url__Prototype
+	Base64Url__Repr  _Base64Url__ReprPrototype
+	Bytes            _Bytes__Prototype
+	Bytes__Repr      _Bytes__ReprPrototype
+	Float            _Float__Prototype
+	Float__Repr      _Float__ReprPrototype
+	Int              _Int__Prototype
+	Int__Repr        _Int__ReprPrototype
+	JOSE             _JOSE__Prototype
+	JOSE__Repr       _JOSE__ReprPrototype
+	Link             _Link__Prototype
+	Link__Repr       _Link__ReprPrototype
+	List             _List__Prototype
+	List__Repr       _List__ReprPrototype
+	Map              _Map__Prototype
+	Map__Repr        _Map__ReprPrototype
+	Recipient        _Recipient__Prototype
+	Recipient__Repr  _Recipient__ReprPrototype
+	Recipients       _Recipients__Prototype
+	Recipients__Repr _Recipients__ReprPrototype
+	Signature        _Signature__Prototype
+	Signature__Repr  _Signature__ReprPrototype
+	Signatures       _Signatures__Prototype
+	Signatures__Repr _Signatures__ReprPrototype
+	String           _String__Prototype
+	String__Repr     _String__ReprPrototype
 }
 
 // --- type definitions follow ---
@@ -69,9 +69,9 @@ func (_Float) _Any__member()  {}
 func (_Map) _Any__member()    {}
 func (_List) _Any__member()   {}
 
-// Base64String matches the IPLD Schema type "Base64String".  It has string kind.
-type Base64String = *_Base64String
-type _Base64String struct{ x string }
+// Base64Url matches the IPLD Schema type "Base64Url".  It has string kind.
+type Base64Url = *_Base64Url
+type _Base64Url struct{ x string }
 
 // Bytes matches the IPLD Schema type "Bytes".  It has bytes kind.
 type Bytes = *_Bytes
@@ -88,15 +88,15 @@ type _Int struct{ x int64 }
 // JOSE matches the IPLD Schema type "JOSE".  It has struct type-kind, and may be interrogated like map kind.
 type JOSE = *_JOSE
 type _JOSE struct {
-	aad         _Base64String__Maybe
-	ciphertext  _Base64String__Maybe
-	iv          _Base64String__Maybe
+	aad         _Base64Url__Maybe
+	ciphertext  _Base64Url__Maybe
+	iv          _Base64Url__Maybe
 	link        _Link__Maybe
-	payload     _Base64String__Maybe
-	protected   _Base64String__Maybe
+	payload     _Base64Url__Maybe
+	protected   _Base64Url__Maybe
 	recipients  _Recipients__Maybe
 	signatures  _Signatures__Maybe
-	tag         _Base64String__Maybe
+	tag         _Base64Url__Maybe
 	unprotected _Any__Maybe
 }
 
@@ -125,7 +125,7 @@ type _Map__entry struct {
 type Recipient = *_Recipient
 type _Recipient struct {
 	header        _Any__Maybe
-	encrypted_key _Base64String__Maybe
+	encrypted_key _Base64Url__Maybe
 }
 
 // Recipients matches the IPLD Schema type "Recipients".  It has list kind.
@@ -138,8 +138,8 @@ type _Recipients struct {
 type Signature = *_Signature
 type _Signature struct {
 	header    _Any__Maybe
-	protected _Base64String__Maybe
-	signature _Base64String
+	protected _Base64Url__Maybe
+	signature _Base64Url
 }
 
 // Signatures matches the IPLD Schema type "Signatures".  It has list kind.

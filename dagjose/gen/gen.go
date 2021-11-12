@@ -44,14 +44,16 @@ func main() {
 		}),
 	))
 
-	//
-	ts.Accumulate(schema.SpawnString("Base64String"))
+	// While `Base64Url` is a `String` type and part of, and thus generated
+	// through, the schema, it has some (surgical) modifications that allow it
+	// to be treated as a base64url "lens" looking at raw, un-encoded bytes.
+	ts.Accumulate(schema.SpawnString("Base64Url"))
 
 	// JWS
 	ts.Accumulate(schema.SpawnStruct("Signature", []schema.StructField{
 		schema.SpawnStructField("header", "Any", true, false),
-		schema.SpawnStructField("protected", "Base64String", true, false),
-		schema.SpawnStructField("signature", "Base64String", false, false),
+		schema.SpawnStructField("protected", "Base64Url", true, false),
+		schema.SpawnStructField("signature", "Base64Url", false, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
 	ts.Accumulate(schema.SpawnList("Signatures", "Signature", false))
@@ -59,22 +61,22 @@ func main() {
 	// JWE
 	ts.Accumulate(schema.SpawnStruct("Recipient", []schema.StructField{
 		schema.SpawnStructField("header", "Any", true, false),
-		schema.SpawnStructField("encrypted_key", "Base64String", true, false),
+		schema.SpawnStructField("encrypted_key", "Base64Url", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
 	ts.Accumulate(schema.SpawnList("Recipients", "Recipient", false))
 
 	// JOSE
 	ts.Accumulate(schema.SpawnStruct("JOSE", []schema.StructField{
-		schema.SpawnStructField("aad", "Base64String", true, false),
-		schema.SpawnStructField("ciphertext", "Base64String", true, false),
-		schema.SpawnStructField("iv", "Base64String", true, false),
+		schema.SpawnStructField("aad", "Base64Url", true, false),
+		schema.SpawnStructField("ciphertext", "Base64Url", true, false),
+		schema.SpawnStructField("iv", "Base64Url", true, false),
 		schema.SpawnStructField("link", "Link", true, false),
-		schema.SpawnStructField("payload", "Base64String", true, false),
-		schema.SpawnStructField("protected", "Base64String", true, false),
+		schema.SpawnStructField("payload", "Base64Url", true, false),
+		schema.SpawnStructField("protected", "Base64Url", true, false),
 		schema.SpawnStructField("recipients", "Recipients", true, false),
 		schema.SpawnStructField("signatures", "Signatures", true, false),
-		schema.SpawnStructField("tag", "Base64String", true, false),
+		schema.SpawnStructField("tag", "Base64Url", true, false),
 		schema.SpawnStructField("unprotected", "Any", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
