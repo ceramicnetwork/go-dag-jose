@@ -4,12 +4,12 @@ package dagjose
 //go:generate go fmt ./
 
 import (
-	//"fmt"
 	"io"
 
-	//"github.com/ipfs/go-cid"
+	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime/codec/cbor"
 	"github.com/ipld/go-ipld-prime/datamodel"
+	"github.com/ipld/go-ipld-prime/linking/cid"
 	"github.com/ipld/go-ipld-prime/multicodec"
 	"github.com/ipld/go-ipld-prime/schema"
 )
@@ -38,6 +38,15 @@ func Decode(na datamodel.NodeAssembler, r io.Reader) error {
 		if err != nil {
 			return err
 		}
+		joseRepr := dagJOSEBuilder.(*_JOSE__ReprBuilder).w
+		if joseRepr.payload.m == schema.Maybe_Value {
+			_, link, err := cid.CidFromBytes([]byte(joseRepr.payload.v.x))
+			if err != nil {
+				return err
+			}
+			joseRepr.link.m = joseRepr.payload.m
+			joseRepr.link.v = _Link{cidlink.Link{Cid: link}}
+		}
 		n := dagJOSEBuilder.Build().(schema.TypedNode).Representation()
 		return datamodel.Copy(n, na)
 	}
@@ -63,22 +72,28 @@ func Encode(n datamodel.Node, w io.Writer) error {
 				return err
 			}
 		} else {
-			//payloadNode, err := n.LookupByString("payload")
-			//// If `link` was present then `payload` must be present and the two must match. If any error occurs here
-			//// (including `payload` being missing) return it.
-			//if err != nil {
-			//	return err
-			//}
-			//payloadString, err := payloadNode.AsString()
-			//if err != nil {
-			//	return err
-			//}
-			//link, err := linkNode.AsLink()
-			//if err != nil {
-			//	return err
-			//}
-			//fmt.Print(link)
-			//fmt.Print(payloadString)
+			payloadNode, err := n.LookupByString("payload")
+			// If `link` was present then `payload` must be present and the two must match. If any error occurs here
+			// (including `payload` being missing) return it.
+			if err != nil {
+				return err
+			}
+			payloadString, err := payloadNode.AsString()
+			if err != nil {
+				return err
+			}
+			cidFromPayload, err := cid.Decode("u" + payloadString)
+			if err != nil {
+				return err
+			}
+			linkFromPayload := cidlink.Link{Cid: cidFromPayload}
+			linkFromNode, err := linkNode.AsLink()
+			if err != nil {
+				return err
+			}
+			if linkFromPayload != linkFromNode {
+				return cid.ErrCidTooShort
+			}
 			// Mark `link` as absent because we do not want to encode it
 			dagJOSEBuilder.(*_JOSE__ReprBuilder).w.link.m = schema.Maybe_Absent
 		}
