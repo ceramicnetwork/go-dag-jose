@@ -63,35 +63,48 @@ func Decode(na datamodel.NodeAssembler, r io.Reader) error {
 // Encode walks the given datamodel.Node and serializes it to the given io.Writer. Encode fits the codec.Encoder
 // function interface.
 func Encode(n datamodel.Node, w io.Writer) error {
+	if n, err := sanitizeNodeForEncode(n); err != nil {
+		return err
+	} else {
+		// DAG-CBOR is a superset of DAG-JOSE and can be used to encode valid DAG-JOSE objects. Use DAG-CBOR's Map sorting
+		// but do not allow IPLD Links. See: https://specs.ipld.io/block-layer/codecs/dag-jose.html
+		return dagcbor.EncodeOptions{
+			AllowLinks:  false,
+			MapSortMode: codec.MapSortMode_RFC7049,
+		}.Encode(n, w)
+	}
+}
+
+func sanitizeNodeForEncode(n datamodel.Node) (datamodel.Node, error) {
 	rebuildRequired := false
 	// If `link` and `payload` are present, make sure they match.
 	if linkNode, err := n.LookupByString("link"); err != nil {
 		// It's ok for `link` to be absent (even if `payload` was present), but if some other error occurred,
 		// return it.
 		if _, linkNotFound := err.(datamodel.ErrNotExists); !linkNotFound {
-			return err
+			return nil, err
 		}
 	} else {
 		// If `link` was present then `payload` must be present and the two must match. If any error occurs here
 		// (including `payload` being absent) return it.
 		payloadNode, err := n.LookupByString("payload")
 		if err != nil {
-			return err
+			return nil, err
 		}
 		payloadString, err := payloadNode.AsString()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		cidFromPayload, err := cid.Decode(string(multibase.Base64url) + payloadString)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		linkFromNode, err := linkNode.AsLink()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if linkFromNode.(cidlink.Link).Cid != cidFromPayload {
-			return errors.New("cid mismatch")
+			return nil, errors.New("cid mismatch")
 		}
 		// The node needs to be rebuilt without `link` before it can be encoded
 		rebuildRequired = true
@@ -102,7 +115,7 @@ func Encode(n datamodel.Node, w io.Writer) error {
 		// Copy the passed `Node` into `_EncodedJOSE__ReprBuilder`, which applies all the necessary validations required
 		// to construct a `_EncodedJOSE__Repr` node.
 		if err := datamodel.Copy(n, joseBuilder); err != nil {
-			return err
+			return nil, err
 		}
 		// Mark `link` as absent because we do not want to encode it
 		joseBuilder.w.link.m = schema.Maybe_Absent
@@ -110,10 +123,5 @@ func Encode(n datamodel.Node, w io.Writer) error {
 		// The "representation" node gives an accurate view of fields that are actually present
 		n = joseBuilder.Build().(schema.TypedNode).Representation()
 	}
-	// DAG-CBOR is a superset of DAG-JOSE and can be used to encode valid DAG-JOSE objects. Use DAG-CBOR's Map sorting
-	// but do not allow IPLD Links. See: https://specs.ipld.io/block-layer/codecs/dag-jose.html
-	return dagcbor.EncodeOptions{
-		AllowLinks:  false,
-		MapSortMode: codec.MapSortMode_RFC7049,
-	}.Encode(n, w)
+	return n, nil
 }

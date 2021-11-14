@@ -72,13 +72,11 @@ func main() {
 		schema.SpawnStructField("aad", "Base64Url", true, false),
 		schema.SpawnStructField("ciphertext", "Base64Url", true, false),
 		schema.SpawnStructField("iv", "Base64Url", true, false),
-
 		// `link` is not encoded as part of DAG-JOSE because it is not included in the DAG-JOSE spec but is included
 		// here in the schema because it is required when decoding/encoding from/to other encodings (e.g. DAG-JSON).
 		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
 		// during encode, it is validated against `payload` and then ignored.
 		schema.SpawnStructField("link", "Link", true, false),
-
 		schema.SpawnStructField("payload", "Base64Url", true, false),
 		schema.SpawnStructField("protected", "Base64Url", true, false),
 		schema.SpawnStructField("recipients", "DecodedRecipients", true, false),
@@ -115,13 +113,11 @@ func main() {
 		schema.SpawnStructField("aad", "Raw", true, false),
 		schema.SpawnStructField("ciphertext", "Raw", true, false),
 		schema.SpawnStructField("iv", "Raw", true, false),
-
 		// `link` is not encoded as part of DAG-JOSE because it is not included in the DAG-JOSE spec but is included
 		// here in the schema because it is required when decoding/encoding from/to other encodings (e.g. DAG-JSON).
 		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
 		// during encode, it is validated against `payload` and then ignored.
 		schema.SpawnStructField("link", "Link", true, false),
-
 		schema.SpawnStructField("payload", "Raw", true, false),
 		schema.SpawnStructField("protected", "Raw", true, false),
 		schema.SpawnStructField("recipients", "EncodedRecipients", true, false),

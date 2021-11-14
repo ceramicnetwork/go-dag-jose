@@ -10,6 +10,10 @@ import (
 	"github.com/ipld/go-ipld-prime/schema"
 )
 
+// Base64Url matches the IPLD Schema type "Base64Url".  It has string kind.
+type Base64Url = *_Base64Url
+type _Base64Url struct{ x string }
+
 type _Base64Url__Maybe struct {
 	m schema.Maybe
 	v _Base64Url
@@ -231,6 +235,10 @@ func (_Base64Url__Prototype) Link(n Base64Url) (Link, error) {
 	}
 	return &_Link{cidlink.Link{Cid: c}}, nil
 }
+
+// Raw matches the IPLD Schema type "Raw".  It has bytes kind.
+type Raw = *_Raw
+type _Raw struct{ x []byte }
 
 type _Raw__Maybe struct {
 	m schema.Maybe

@@ -81,10 +81,6 @@ func (_Float) _Any__member()  {}
 func (_Map) _Any__member()    {}
 func (_List) _Any__member()   {}
 
-// Base64Url matches the IPLD Schema type "Base64Url".  It has string kind.
-type Base64Url = *_Base64Url
-type _Base64Url struct{ x string }
-
 // Bytes matches the IPLD Schema type "Bytes".  It has bytes kind.
 type Bytes = *_Bytes
 type _Bytes struct{ x []byte }
@@ -201,10 +197,6 @@ type _Map__entry struct {
 	k _String
 	v _Any
 }
-
-// Raw matches the IPLD Schema type "Raw".  It has bytes kind.
-type Raw = *_Raw
-type _Raw struct{ x []byte }
 
 // String matches the IPLD Schema type "String".  It has string kind.
 type String = *_String
