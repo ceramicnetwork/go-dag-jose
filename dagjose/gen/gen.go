@@ -50,7 +50,27 @@ func main() {
 	// allow it to be treated as a base64url-encoded string "lens" looking at raw, un-encoded bytes being decoded.
 	ts.Accumulate(schema.SpawnString("Base64Url"))
 
-	// JWS
+	// -- JWE Decode -->
+
+	ts.Accumulate(schema.SpawnStruct("DecodedRecipient", []schema.StructField{
+		schema.SpawnStructField("header", "Any", true, false),
+		schema.SpawnStructField("encrypted_key", "Base64Url", true, false),
+	}, schema.SpawnStructRepresentationMap(nil)))
+
+	ts.Accumulate(schema.SpawnList("DecodedRecipients", "DecodedRecipient", false))
+
+	ts.Accumulate(schema.SpawnStruct("DecodedJWE", []schema.StructField{
+		schema.SpawnStructField("aad", "Base64Url", true, false),
+		schema.SpawnStructField("ciphertext", "Base64Url", true, false),
+		schema.SpawnStructField("iv", "Base64Url", true, false),
+		schema.SpawnStructField("protected", "Base64Url", true, false),
+		schema.SpawnStructField("recipients", "DecodedRecipients", true, false),
+		schema.SpawnStructField("tag", "Base64Url", true, false),
+		schema.SpawnStructField("unprotected", "Any", true, false),
+	}, schema.SpawnStructRepresentationMap(nil)))
+
+	// -- JWS Decode -->
+
 	ts.Accumulate(schema.SpawnStruct("DecodedSignature", []schema.StructField{
 		schema.SpawnStructField("header", "Any", true, false),
 		schema.SpawnStructField("protected", "Base64Url", true, false),
@@ -59,30 +79,14 @@ func main() {
 
 	ts.Accumulate(schema.SpawnList("DecodedSignatures", "DecodedSignature", false))
 
-	// JWE
-	ts.Accumulate(schema.SpawnStruct("DecodedRecipient", []schema.StructField{
-		schema.SpawnStructField("header", "Any", true, false),
-		schema.SpawnStructField("encrypted_key", "Base64Url", true, false),
-	}, schema.SpawnStructRepresentationMap(nil)))
-
-	ts.Accumulate(schema.SpawnList("DecodedRecipients", "DecodedRecipient", false))
-
-	// JOSE
-	ts.Accumulate(schema.SpawnStruct("DecodedJOSE", []schema.StructField{
-		schema.SpawnStructField("aad", "Base64Url", true, false),
-		schema.SpawnStructField("ciphertext", "Base64Url", true, false),
-		schema.SpawnStructField("iv", "Base64Url", true, false),
+	ts.Accumulate(schema.SpawnStruct("DecodedJWS", []schema.StructField{
 		// `link` is not encoded as part of DAG-JOSE because it is not included in the DAG-JOSE spec but is included
 		// here in the schema because it is required when decoding/encoding from/to other encodings (e.g. DAG-JSON).
 		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
 		// during encode, it is validated against `payload` and then ignored.
 		schema.SpawnStructField("link", "Link", true, false),
 		schema.SpawnStructField("payload", "Base64Url", true, false),
-		schema.SpawnStructField("protected", "Base64Url", true, false),
-		schema.SpawnStructField("recipients", "DecodedRecipients", true, false),
 		schema.SpawnStructField("signatures", "DecodedSignatures", true, false),
-		schema.SpawnStructField("tag", "Base64Url", true, false),
-		schema.SpawnStructField("unprotected", "Any", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
 	// -- Encode types -->
@@ -91,7 +95,27 @@ func main() {
 	// it to be treated as a raw, un-encoded bytes "lens" looking at base64url-encoded strings being encoded.
 	ts.Accumulate(schema.SpawnBytes("Raw"))
 
-	// JWS
+	// -- JWE Encode -->
+
+	ts.Accumulate(schema.SpawnStruct("EncodedRecipient", []schema.StructField{
+		schema.SpawnStructField("header", "Any", true, false),
+		schema.SpawnStructField("encrypted_key", "Raw", true, false),
+	}, schema.SpawnStructRepresentationMap(nil)))
+
+	ts.Accumulate(schema.SpawnList("EncodedRecipients", "EncodedRecipient", false))
+
+	ts.Accumulate(schema.SpawnStruct("EncodedJWE", []schema.StructField{
+		schema.SpawnStructField("aad", "Raw", true, false),
+		schema.SpawnStructField("ciphertext", "Raw", true, false),
+		schema.SpawnStructField("iv", "Raw", true, false),
+		schema.SpawnStructField("protected", "Raw", true, false),
+		schema.SpawnStructField("recipients", "EncodedRecipients", true, false),
+		schema.SpawnStructField("tag", "Raw", true, false),
+		schema.SpawnStructField("unprotected", "Any", true, false),
+	}, schema.SpawnStructRepresentationMap(nil)))
+
+	// -- JWS Encode -->
+
 	ts.Accumulate(schema.SpawnStruct("EncodedSignature", []schema.StructField{
 		schema.SpawnStructField("header", "Any", true, false),
 		schema.SpawnStructField("protected", "Raw", true, false),
@@ -100,30 +124,14 @@ func main() {
 
 	ts.Accumulate(schema.SpawnList("EncodedSignatures", "EncodedSignature", false))
 
-	// JWE
-	ts.Accumulate(schema.SpawnStruct("EncodedRecipient", []schema.StructField{
-		schema.SpawnStructField("header", "Any", true, false),
-		schema.SpawnStructField("encrypted_key", "Raw", true, false),
-	}, schema.SpawnStructRepresentationMap(nil)))
-
-	ts.Accumulate(schema.SpawnList("EncodedRecipients", "EncodedRecipient", false))
-
-	// JOSE
-	ts.Accumulate(schema.SpawnStruct("EncodedJOSE", []schema.StructField{
-		schema.SpawnStructField("aad", "Raw", true, false),
-		schema.SpawnStructField("ciphertext", "Raw", true, false),
-		schema.SpawnStructField("iv", "Raw", true, false),
+	ts.Accumulate(schema.SpawnStruct("EncodedJWS", []schema.StructField{
 		// `link` is not encoded as part of DAG-JOSE because it is not included in the DAG-JOSE spec but is included
 		// here in the schema because it is required when decoding/encoding from/to other encodings (e.g. DAG-JSON).
 		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
 		// during encode, it is validated against `payload` and then ignored.
 		schema.SpawnStructField("link", "Link", true, false),
 		schema.SpawnStructField("payload", "Raw", true, false),
-		schema.SpawnStructField("protected", "Raw", true, false),
-		schema.SpawnStructField("recipients", "EncodedRecipients", true, false),
 		schema.SpawnStructField("signatures", "EncodedSignatures", true, false),
-		schema.SpawnStructField("tag", "Raw", true, false),
-		schema.SpawnStructField("unprotected", "Any", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
 	if errs := ts.ValidateGraph(); errs != nil {

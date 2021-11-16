@@ -26,8 +26,10 @@ type typeSlab struct {
 	Base64Url__Repr         _Base64Url__ReprPrototype
 	Bytes                   _Bytes__Prototype
 	Bytes__Repr             _Bytes__ReprPrototype
-	DecodedJOSE             _DecodedJOSE__Prototype
-	DecodedJOSE__Repr       _DecodedJOSE__ReprPrototype
+	DecodedJWE              _DecodedJWE__Prototype
+	DecodedJWE__Repr        _DecodedJWE__ReprPrototype
+	DecodedJWS              _DecodedJWS__Prototype
+	DecodedJWS__Repr        _DecodedJWS__ReprPrototype
 	DecodedRecipient        _DecodedRecipient__Prototype
 	DecodedRecipient__Repr  _DecodedRecipient__ReprPrototype
 	DecodedRecipients       _DecodedRecipients__Prototype
@@ -36,8 +38,10 @@ type typeSlab struct {
 	DecodedSignature__Repr  _DecodedSignature__ReprPrototype
 	DecodedSignatures       _DecodedSignatures__Prototype
 	DecodedSignatures__Repr _DecodedSignatures__ReprPrototype
-	EncodedJOSE             _EncodedJOSE__Prototype
-	EncodedJOSE__Repr       _EncodedJOSE__ReprPrototype
+	EncodedJWE              _EncodedJWE__Prototype
+	EncodedJWE__Repr        _EncodedJWE__ReprPrototype
+	EncodedJWS              _EncodedJWS__Prototype
+	EncodedJWS__Repr        _EncodedJWS__ReprPrototype
 	EncodedRecipient        _EncodedRecipient__Prototype
 	EncodedRecipient__Repr  _EncodedRecipient__ReprPrototype
 	EncodedRecipients       _EncodedRecipients__Prototype
@@ -85,19 +89,24 @@ func (_List) _Any__member()   {}
 type Bytes = *_Bytes
 type _Bytes struct{ x []byte }
 
-// DecodedJOSE matches the IPLD Schema type "DecodedJOSE".  It has struct type-kind, and may be interrogated like map kind.
-type DecodedJOSE = *_DecodedJOSE
-type _DecodedJOSE struct {
+// DecodedJWE matches the IPLD Schema type "DecodedJWE".  It has struct type-kind, and may be interrogated like map kind.
+type DecodedJWE = *_DecodedJWE
+type _DecodedJWE struct {
 	aad         _Base64Url__Maybe
 	ciphertext  _Base64Url__Maybe
 	iv          _Base64Url__Maybe
-	link        _Link__Maybe
-	payload     _Base64Url__Maybe
 	protected   _Base64Url__Maybe
 	recipients  _DecodedRecipients__Maybe
-	signatures  _DecodedSignatures__Maybe
 	tag         _Base64Url__Maybe
 	unprotected _Any__Maybe
+}
+
+// DecodedJWS matches the IPLD Schema type "DecodedJWS".  It has struct type-kind, and may be interrogated like map kind.
+type DecodedJWS = *_DecodedJWS
+type _DecodedJWS struct {
+	link       _Link__Maybe
+	payload    _Base64Url__Maybe
+	signatures _DecodedSignatures__Maybe
 }
 
 // DecodedRecipient matches the IPLD Schema type "DecodedRecipient".  It has struct type-kind, and may be interrogated like map kind.
@@ -127,19 +136,24 @@ type _DecodedSignatures struct {
 	x []_DecodedSignature
 }
 
-// EncodedJOSE matches the IPLD Schema type "EncodedJOSE".  It has struct type-kind, and may be interrogated like map kind.
-type EncodedJOSE = *_EncodedJOSE
-type _EncodedJOSE struct {
+// EncodedJWE matches the IPLD Schema type "EncodedJWE".  It has struct type-kind, and may be interrogated like map kind.
+type EncodedJWE = *_EncodedJWE
+type _EncodedJWE struct {
 	aad         _Raw__Maybe
 	ciphertext  _Raw__Maybe
 	iv          _Raw__Maybe
-	link        _Link__Maybe
-	payload     _Raw__Maybe
 	protected   _Raw__Maybe
 	recipients  _EncodedRecipients__Maybe
-	signatures  _EncodedSignatures__Maybe
 	tag         _Raw__Maybe
 	unprotected _Any__Maybe
+}
+
+// EncodedJWS matches the IPLD Schema type "EncodedJWS".  It has struct type-kind, and may be interrogated like map kind.
+type EncodedJWS = *_EncodedJWS
+type _EncodedJWS struct {
+	link       _Link__Maybe
+	payload    _Raw__Maybe
+	signatures _EncodedSignatures__Maybe
 }
 
 // EncodedRecipient matches the IPLD Schema type "EncodedRecipient".  It has struct type-kind, and may be interrogated like map kind.

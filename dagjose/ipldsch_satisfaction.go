@@ -1279,53 +1279,44 @@ var _ datamodel.Node = &_Bytes__Repr{}
 type _Bytes__ReprPrototype = _Bytes__Prototype
 type _Bytes__ReprAssembler = _Bytes__Assembler
 
-func (n _DecodedJOSE) FieldAad() MaybeBase64Url {
+func (n _DecodedJWE) FieldAad() MaybeBase64Url {
 	return &n.aad
 }
-func (n _DecodedJOSE) FieldCiphertext() MaybeBase64Url {
+func (n _DecodedJWE) FieldCiphertext() MaybeBase64Url {
 	return &n.ciphertext
 }
-func (n _DecodedJOSE) FieldIv() MaybeBase64Url {
+func (n _DecodedJWE) FieldIv() MaybeBase64Url {
 	return &n.iv
 }
-func (n _DecodedJOSE) FieldLink() MaybeLink {
-	return &n.link
-}
-func (n _DecodedJOSE) FieldPayload() MaybeBase64Url {
-	return &n.payload
-}
-func (n _DecodedJOSE) FieldProtected() MaybeBase64Url {
+func (n _DecodedJWE) FieldProtected() MaybeBase64Url {
 	return &n.protected
 }
-func (n _DecodedJOSE) FieldRecipients() MaybeDecodedRecipients {
+func (n _DecodedJWE) FieldRecipients() MaybeDecodedRecipients {
 	return &n.recipients
 }
-func (n _DecodedJOSE) FieldSignatures() MaybeDecodedSignatures {
-	return &n.signatures
-}
-func (n _DecodedJOSE) FieldTag() MaybeBase64Url {
+func (n _DecodedJWE) FieldTag() MaybeBase64Url {
 	return &n.tag
 }
-func (n _DecodedJOSE) FieldUnprotected() MaybeAny {
+func (n _DecodedJWE) FieldUnprotected() MaybeAny {
 	return &n.unprotected
 }
 
-type _DecodedJOSE__Maybe struct {
+type _DecodedJWE__Maybe struct {
 	m schema.Maybe
-	v DecodedJOSE
+	v DecodedJWE
 }
-type MaybeDecodedJOSE = *_DecodedJOSE__Maybe
+type MaybeDecodedJWE = *_DecodedJWE__Maybe
 
-func (m MaybeDecodedJOSE) IsNull() bool {
+func (m MaybeDecodedJWE) IsNull() bool {
 	return m.m == schema.Maybe_Null
 }
-func (m MaybeDecodedJOSE) IsAbsent() bool {
+func (m MaybeDecodedJWE) IsAbsent() bool {
 	return m.m == schema.Maybe_Absent
 }
-func (m MaybeDecodedJOSE) Exists() bool {
+func (m MaybeDecodedJWE) Exists() bool {
 	return m.m == schema.Maybe_Value
 }
-func (m MaybeDecodedJOSE) AsNode() datamodel.Node {
+func (m MaybeDecodedJWE) AsNode() datamodel.Node {
 	switch m.m {
 	case schema.Maybe_Absent:
 		return datamodel.Absent
@@ -1337,7 +1328,7 @@ func (m MaybeDecodedJOSE) AsNode() datamodel.Node {
 		panic("unreachable")
 	}
 }
-func (m MaybeDecodedJOSE) Must() DecodedJOSE {
+func (m MaybeDecodedJWE) Must() DecodedJWE {
 	if !m.Exists() {
 		panic("unbox of a maybe rejected")
 	}
@@ -1345,24 +1336,21 @@ func (m MaybeDecodedJOSE) Must() DecodedJOSE {
 }
 
 var (
-	fieldName__DecodedJOSE_Aad         = _String{"aad"}
-	fieldName__DecodedJOSE_Ciphertext  = _String{"ciphertext"}
-	fieldName__DecodedJOSE_Iv          = _String{"iv"}
-	fieldName__DecodedJOSE_Link        = _String{"link"}
-	fieldName__DecodedJOSE_Payload     = _String{"payload"}
-	fieldName__DecodedJOSE_Protected   = _String{"protected"}
-	fieldName__DecodedJOSE_Recipients  = _String{"recipients"}
-	fieldName__DecodedJOSE_Signatures  = _String{"signatures"}
-	fieldName__DecodedJOSE_Tag         = _String{"tag"}
-	fieldName__DecodedJOSE_Unprotected = _String{"unprotected"}
+	fieldName__DecodedJWE_Aad         = _String{"aad"}
+	fieldName__DecodedJWE_Ciphertext  = _String{"ciphertext"}
+	fieldName__DecodedJWE_Iv          = _String{"iv"}
+	fieldName__DecodedJWE_Protected   = _String{"protected"}
+	fieldName__DecodedJWE_Recipients  = _String{"recipients"}
+	fieldName__DecodedJWE_Tag         = _String{"tag"}
+	fieldName__DecodedJWE_Unprotected = _String{"unprotected"}
 )
-var _ datamodel.Node = (DecodedJOSE)(&_DecodedJOSE{})
-var _ schema.TypedNode = (DecodedJOSE)(&_DecodedJOSE{})
+var _ datamodel.Node = (DecodedJWE)(&_DecodedJWE{})
+var _ schema.TypedNode = (DecodedJWE)(&_DecodedJWE{})
 
-func (DecodedJOSE) Kind() datamodel.Kind {
+func (DecodedJWE) Kind() datamodel.Kind {
 	return datamodel.Kind_Map
 }
-func (n DecodedJOSE) LookupByString(key string) (datamodel.Node, error) {
+func (n DecodedJWE) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
 	case "aad":
 		if n.aad.m == schema.Maybe_Absent {
@@ -1379,16 +1367,6 @@ func (n DecodedJOSE) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, nil
 		}
 		return &n.iv.v, nil
-	case "link":
-		if n.link.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.link.v, nil
-	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.payload.v, nil
 	case "protected":
 		if n.protected.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -1399,11 +1377,6 @@ func (n DecodedJOSE) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, nil
 		}
 		return &n.recipients.v, nil
-	case "signatures":
-		if n.signatures.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.signatures.v, nil
 	case "tag":
 		if n.tag.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -1418,98 +1391,77 @@ func (n DecodedJOSE) LookupByString(key string) (datamodel.Node, error) {
 		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
 	}
 }
-func (n DecodedJOSE) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+func (n DecodedJWE) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
 	ks, err := key.AsString()
 	if err != nil {
 		return nil, err
 	}
 	return n.LookupByString(ks)
 }
-func (DecodedJOSE) LookupByIndex(idx int64) (datamodel.Node, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.LookupByIndex(0)
+func (DecodedJWE) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.LookupByIndex(0)
 }
-func (n DecodedJOSE) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+func (n DecodedJWE) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
 	return n.LookupByString(seg.String())
 }
-func (n DecodedJOSE) MapIterator() datamodel.MapIterator {
-	return &_DecodedJOSE__MapItr{n, 0}
+func (n DecodedJWE) MapIterator() datamodel.MapIterator {
+	return &_DecodedJWE__MapItr{n, 0}
 }
 
-type _DecodedJOSE__MapItr struct {
-	n   DecodedJOSE
+type _DecodedJWE__MapItr struct {
+	n   DecodedJWE
 	idx int
 }
 
-func (itr *_DecodedJOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 10 {
+func (itr *_DecodedJWE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+	if itr.idx >= 7 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
-		k = &fieldName__DecodedJOSE_Aad
+		k = &fieldName__DecodedJWE_Aad
 		if itr.n.aad.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.aad.v
 	case 1:
-		k = &fieldName__DecodedJOSE_Ciphertext
+		k = &fieldName__DecodedJWE_Ciphertext
 		if itr.n.ciphertext.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.ciphertext.v
 	case 2:
-		k = &fieldName__DecodedJOSE_Iv
+		k = &fieldName__DecodedJWE_Iv
 		if itr.n.iv.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.iv.v
 	case 3:
-		k = &fieldName__DecodedJOSE_Link
-		if itr.n.link.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.link.v
-	case 4:
-		k = &fieldName__DecodedJOSE_Payload
-		if itr.n.payload.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.payload.v
-	case 5:
-		k = &fieldName__DecodedJOSE_Protected
+		k = &fieldName__DecodedJWE_Protected
 		if itr.n.protected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.protected.v
-	case 6:
-		k = &fieldName__DecodedJOSE_Recipients
+	case 4:
+		k = &fieldName__DecodedJWE_Recipients
 		if itr.n.recipients.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.recipients.v
-	case 7:
-		k = &fieldName__DecodedJOSE_Signatures
-		if itr.n.signatures.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.signatures.v
-	case 8:
-		k = &fieldName__DecodedJOSE_Tag
+	case 5:
+		k = &fieldName__DecodedJWE_Tag
 		if itr.n.tag.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.tag.v
-	case 9:
-		k = &fieldName__DecodedJOSE_Unprotected
+	case 6:
+		k = &fieldName__DecodedJWE_Unprotected
 		if itr.n.unprotected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
@@ -1521,70 +1473,70 @@ func (itr *_DecodedJOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ e
 	itr.idx++
 	return
 }
-func (itr *_DecodedJOSE__MapItr) Done() bool {
-	return itr.idx >= 10
+func (itr *_DecodedJWE__MapItr) Done() bool {
+	return itr.idx >= 7
 }
 
-func (DecodedJOSE) ListIterator() datamodel.ListIterator {
+func (DecodedJWE) ListIterator() datamodel.ListIterator {
 	return nil
 }
-func (DecodedJOSE) Length() int64 {
-	return 10
+func (DecodedJWE) Length() int64 {
+	return 7
 }
-func (DecodedJOSE) IsAbsent() bool {
+func (DecodedJWE) IsAbsent() bool {
 	return false
 }
-func (DecodedJOSE) IsNull() bool {
+func (DecodedJWE) IsNull() bool {
 	return false
 }
-func (DecodedJOSE) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.AsBool()
+func (DecodedJWE) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.AsBool()
 }
-func (DecodedJOSE) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.AsInt()
+func (DecodedJWE) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.AsInt()
 }
-func (DecodedJOSE) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.AsFloat()
+func (DecodedJWE) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.AsFloat()
 }
-func (DecodedJOSE) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.AsString()
+func (DecodedJWE) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.AsString()
 }
-func (DecodedJOSE) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.AsBytes()
+func (DecodedJWE) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.AsBytes()
 }
-func (DecodedJOSE) AsLink() (datamodel.Link, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE"}.AsLink()
+func (DecodedJWE) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE"}.AsLink()
 }
-func (DecodedJOSE) Prototype() datamodel.NodePrototype {
-	return _DecodedJOSE__Prototype{}
+func (DecodedJWE) Prototype() datamodel.NodePrototype {
+	return _DecodedJWE__Prototype{}
 }
 
-type _DecodedJOSE__Prototype struct{}
+type _DecodedJWE__Prototype struct{}
 
-func (_DecodedJOSE__Prototype) NewBuilder() datamodel.NodeBuilder {
-	var nb _DecodedJOSE__Builder
+func (_DecodedJWE__Prototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _DecodedJWE__Builder
 	nb.Reset()
 	return &nb
 }
 
-type _DecodedJOSE__Builder struct {
-	_DecodedJOSE__Assembler
+type _DecodedJWE__Builder struct {
+	_DecodedJWE__Assembler
 }
 
-func (nb *_DecodedJOSE__Builder) Build() datamodel.Node {
+func (nb *_DecodedJWE__Builder) Build() datamodel.Node {
 	if *nb.m != schema.Maybe_Value {
 		panic("invalid state: cannot call Build on an assembler that's not finished")
 	}
 	return nb.w
 }
-func (nb *_DecodedJOSE__Builder) Reset() {
-	var w _DecodedJOSE
+func (nb *_DecodedJWE__Builder) Reset() {
+	var w _DecodedJWE
 	var m schema.Maybe
-	*nb = _DecodedJOSE__Builder{_DecodedJOSE__Assembler{w: &w, m: &m}}
+	*nb = _DecodedJWE__Builder{_DecodedJWE__Assembler{w: &w, m: &m}}
 }
 
-type _DecodedJOSE__Assembler struct {
-	w     *_DecodedJOSE
+type _DecodedJWE__Assembler struct {
+	w     *_DecodedJWE
 	m     *schema.Maybe
 	state maState
 	s     int
@@ -1594,45 +1546,36 @@ type _DecodedJOSE__Assembler struct {
 	ca_aad         _Base64Url__Assembler
 	ca_ciphertext  _Base64Url__Assembler
 	ca_iv          _Base64Url__Assembler
-	ca_link        _Link__Assembler
-	ca_payload     _Base64Url__Assembler
 	ca_protected   _Base64Url__Assembler
 	ca_recipients  _DecodedRecipients__Assembler
-	ca_signatures  _DecodedSignatures__Assembler
 	ca_tag         _Base64Url__Assembler
 	ca_unprotected _Any__Assembler
 }
 
-func (na *_DecodedJOSE__Assembler) reset() {
+func (na *_DecodedJWE__Assembler) reset() {
 	na.state = maState_initial
 	na.s = 0
 	na.ca_aad.reset()
 	na.ca_ciphertext.reset()
 	na.ca_iv.reset()
-	na.ca_link.reset()
-	na.ca_payload.reset()
 	na.ca_protected.reset()
 	na.ca_recipients.reset()
-	na.ca_signatures.reset()
 	na.ca_tag.reset()
 	na.ca_unprotected.reset()
 }
 
 var (
-	fieldBit__DecodedJOSE_Aad         = 1 << 0
-	fieldBit__DecodedJOSE_Ciphertext  = 1 << 1
-	fieldBit__DecodedJOSE_Iv          = 1 << 2
-	fieldBit__DecodedJOSE_Link        = 1 << 3
-	fieldBit__DecodedJOSE_Payload     = 1 << 4
-	fieldBit__DecodedJOSE_Protected   = 1 << 5
-	fieldBit__DecodedJOSE_Recipients  = 1 << 6
-	fieldBit__DecodedJOSE_Signatures  = 1 << 7
-	fieldBit__DecodedJOSE_Tag         = 1 << 8
-	fieldBit__DecodedJOSE_Unprotected = 1 << 9
-	fieldBits__DecodedJOSE_sufficient = 0
+	fieldBit__DecodedJWE_Aad         = 1 << 0
+	fieldBit__DecodedJWE_Ciphertext  = 1 << 1
+	fieldBit__DecodedJWE_Iv          = 1 << 2
+	fieldBit__DecodedJWE_Protected   = 1 << 3
+	fieldBit__DecodedJWE_Recipients  = 1 << 4
+	fieldBit__DecodedJWE_Tag         = 1 << 5
+	fieldBit__DecodedJWE_Unprotected = 1 << 6
+	fieldBits__DecodedJWE_sufficient = 0
 )
 
-func (na *_DecodedJOSE__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+func (na *_DecodedJWE__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
 	switch *na.m {
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
@@ -1641,20 +1584,20 @@ func (na *_DecodedJOSE__Assembler) BeginMap(int64) (datamodel.MapAssembler, erro
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_DecodedJOSE{}
+		na.w = &_DecodedJWE{}
 	}
 	return na, nil
 }
-func (_DecodedJOSE__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.BeginList(0)
+func (_DecodedJWE__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.BeginList(0)
 }
-func (na *_DecodedJOSE__Assembler) AssignNull() error {
+func (na *_DecodedJWE__Assembler) AssignNull() error {
 	switch *na.m {
 	case allowNull:
 		*na.m = schema.Maybe_Null
 		return nil
 	case schema.Maybe_Absent:
-		return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignNull()
+		return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignNull()
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
 	case midvalue:
@@ -1662,29 +1605,29 @@ func (na *_DecodedJOSE__Assembler) AssignNull() error {
 	}
 	panic("unreachable")
 }
-func (_DecodedJOSE__Assembler) AssignBool(bool) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignBool(false)
+func (_DecodedJWE__Assembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignBool(false)
 }
-func (_DecodedJOSE__Assembler) AssignInt(int64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignInt(0)
+func (_DecodedJWE__Assembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignInt(0)
 }
-func (_DecodedJOSE__Assembler) AssignFloat(float64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignFloat(0)
+func (_DecodedJWE__Assembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignFloat(0)
 }
-func (_DecodedJOSE__Assembler) AssignString(string) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignString("")
+func (_DecodedJWE__Assembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignString("")
 }
-func (_DecodedJOSE__Assembler) AssignBytes([]byte) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignBytes(nil)
+func (_DecodedJWE__Assembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignBytes(nil)
 }
-func (_DecodedJOSE__Assembler) AssignLink(datamodel.Link) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE"}.AssignLink(nil)
+func (_DecodedJWE__Assembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE"}.AssignLink(nil)
 }
-func (na *_DecodedJOSE__Assembler) AssignNode(v datamodel.Node) error {
+func (na *_DecodedJWE__Assembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_DecodedJOSE); ok {
+	if v2, ok := v.(*_DecodedJWE); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -1701,7 +1644,7 @@ func (na *_DecodedJOSE__Assembler) AssignNode(v datamodel.Node) error {
 		return nil
 	}
 	if v.Kind() != datamodel.Kind_Map {
-		return datamodel.ErrWrongKind{TypeName: "dagjose.DecodedJOSE", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+		return datamodel.ErrWrongKind{TypeName: "dagjose.DecodedJWE", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
 	}
 	itr := v.MapIterator()
 	for !itr.Done() {
@@ -1718,10 +1661,10 @@ func (na *_DecodedJOSE__Assembler) AssignNode(v datamodel.Node) error {
 	}
 	return na.Finish()
 }
-func (_DecodedJOSE__Assembler) Prototype() datamodel.NodePrototype {
-	return _DecodedJOSE__Prototype{}
+func (_DecodedJWE__Assembler) Prototype() datamodel.NodePrototype {
+	return _DecodedJWE__Prototype{}
 }
-func (ma *_DecodedJOSE__Assembler) valueFinishTidy() bool {
+func (ma *_DecodedJWE__Assembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
 		switch ma.w.aad.m {
@@ -1748,22 +1691,6 @@ func (ma *_DecodedJOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 3:
-		switch ma.w.link.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 4:
-		switch ma.w.payload.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 5:
 		switch ma.w.protected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -1771,7 +1698,7 @@ func (ma *_DecodedJOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 6:
+	case 4:
 		switch ma.w.recipients.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -1779,15 +1706,7 @@ func (ma *_DecodedJOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 7:
-		switch ma.w.signatures.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 8:
+	case 5:
 		switch ma.w.tag.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -1795,7 +1714,7 @@ func (ma *_DecodedJOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 9:
+	case 6:
 		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.w.unprotected.v = ma.ca_unprotected.w
@@ -1808,7 +1727,7 @@ func (ma *_DecodedJOSE__Assembler) valueFinishTidy() bool {
 		panic("unreachable")
 	}
 }
-func (ma *_DecodedJOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+func (ma *_DecodedJWE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -1825,109 +1744,79 @@ func (ma *_DecodedJOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssemb
 	}
 	switch k {
 	case "aad":
-		if ma.s&fieldBit__DecodedJOSE_Aad != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Aad}
+		if ma.s&fieldBit__DecodedJWE_Aad != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Aad}
 		}
-		ma.s += fieldBit__DecodedJOSE_Aad
+		ma.s += fieldBit__DecodedJWE_Aad
 		ma.state = maState_midValue
 		ma.f = 0
 		ma.ca_aad.w = &ma.w.aad.v
 		ma.ca_aad.m = &ma.w.aad.m
 		return &ma.ca_aad, nil
 	case "ciphertext":
-		if ma.s&fieldBit__DecodedJOSE_Ciphertext != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Ciphertext}
+		if ma.s&fieldBit__DecodedJWE_Ciphertext != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Ciphertext}
 		}
-		ma.s += fieldBit__DecodedJOSE_Ciphertext
+		ma.s += fieldBit__DecodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
 		ma.ca_ciphertext.w = &ma.w.ciphertext.v
 		ma.ca_ciphertext.m = &ma.w.ciphertext.m
 		return &ma.ca_ciphertext, nil
 	case "iv":
-		if ma.s&fieldBit__DecodedJOSE_Iv != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Iv}
+		if ma.s&fieldBit__DecodedJWE_Iv != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Iv}
 		}
-		ma.s += fieldBit__DecodedJOSE_Iv
+		ma.s += fieldBit__DecodedJWE_Iv
 		ma.state = maState_midValue
 		ma.f = 2
 		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 		return &ma.ca_iv, nil
-	case "link":
-		if ma.s&fieldBit__DecodedJOSE_Link != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Link}
+	case "protected":
+		if ma.s&fieldBit__DecodedJWE_Protected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Protected}
 		}
-		ma.s += fieldBit__DecodedJOSE_Link
+		ma.s += fieldBit__DecodedJWE_Protected
 		ma.state = maState_midValue
 		ma.f = 3
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-		return &ma.ca_link, nil
-	case "payload":
-		if ma.s&fieldBit__DecodedJOSE_Payload != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Payload}
-		}
-		ma.s += fieldBit__DecodedJOSE_Payload
-		ma.state = maState_midValue
-		ma.f = 4
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-		return &ma.ca_payload, nil
-	case "protected":
-		if ma.s&fieldBit__DecodedJOSE_Protected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Protected}
-		}
-		ma.s += fieldBit__DecodedJOSE_Protected
-		ma.state = maState_midValue
-		ma.f = 5
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected, nil
 	case "recipients":
-		if ma.s&fieldBit__DecodedJOSE_Recipients != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Recipients}
+		if ma.s&fieldBit__DecodedJWE_Recipients != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Recipients}
 		}
-		ma.s += fieldBit__DecodedJOSE_Recipients
+		ma.s += fieldBit__DecodedJWE_Recipients
 		ma.state = maState_midValue
-		ma.f = 6
+		ma.f = 4
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 		return &ma.ca_recipients, nil
-	case "signatures":
-		if ma.s&fieldBit__DecodedJOSE_Signatures != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Signatures}
-		}
-		ma.s += fieldBit__DecodedJOSE_Signatures
-		ma.state = maState_midValue
-		ma.f = 7
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-		return &ma.ca_signatures, nil
 	case "tag":
-		if ma.s&fieldBit__DecodedJOSE_Tag != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Tag}
+		if ma.s&fieldBit__DecodedJWE_Tag != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Tag}
 		}
-		ma.s += fieldBit__DecodedJOSE_Tag
+		ma.s += fieldBit__DecodedJWE_Tag
 		ma.state = maState_midValue
-		ma.f = 8
+		ma.f = 5
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag, nil
 	case "unprotected":
-		if ma.s&fieldBit__DecodedJOSE_Unprotected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Unprotected}
+		if ma.s&fieldBit__DecodedJWE_Unprotected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Unprotected}
 		}
-		ma.s += fieldBit__DecodedJOSE_Unprotected
+		ma.s += fieldBit__DecodedJWE_Unprotected
 		ma.state = maState_midValue
-		ma.f = 9
+		ma.f = 6
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 		return &ma.ca_unprotected, nil
 	}
-	return nil, schema.ErrInvalidKey{TypeName: "dagjose.DecodedJOSE", Key: &_String{k}}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWE", Key: &_String{k}}
 }
-func (ma *_DecodedJOSE__Assembler) AssembleKey() datamodel.NodeAssembler {
+func (ma *_DecodedJWE__Assembler) AssembleKey() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -1943,9 +1832,9 @@ func (ma *_DecodedJOSE__Assembler) AssembleKey() datamodel.NodeAssembler {
 		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
 	}
 	ma.state = maState_midKey
-	return (*_DecodedJOSE__KeyAssembler)(ma)
+	return (*_DecodedJWE__KeyAssembler)(ma)
 }
-func (ma *_DecodedJOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
+func (ma *_DecodedJWE__Assembler) AssembleValue() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		panic("invalid state: AssembleValue cannot be called when no key is primed")
@@ -1973,30 +1862,18 @@ func (ma *_DecodedJOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_iv.m = &ma.w.iv.m
 		return &ma.ca_iv
 	case 3:
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-		return &ma.ca_link
-	case 4:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-		return &ma.ca_payload
-	case 5:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected
-	case 6:
+	case 4:
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 		return &ma.ca_recipients
-	case 7:
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-		return &ma.ca_signatures
-	case 8:
+	case 5:
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag
-	case 9:
+	case 6:
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 		return &ma.ca_unprotected
@@ -2004,7 +1881,7 @@ func (ma *_DecodedJOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		panic("unreachable")
 	}
 }
-func (ma *_DecodedJOSE__Assembler) Finish() error {
+func (ma *_DecodedJWE__Assembler) Finish() error {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -2019,7 +1896,7 @@ func (ma *_DecodedJOSE__Assembler) Finish() error {
 	case maState_finished:
 		panic("invalid state: Finish cannot be called on an assembler that's already finished")
 	}
-	if ma.s&fieldBits__DecodedJOSE_sufficient != fieldBits__DecodedJOSE_sufficient {
+	if ma.s&fieldBits__DecodedJWE_sufficient != fieldBits__DecodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
 		return err
 	}
@@ -2027,165 +1904,138 @@ func (ma *_DecodedJOSE__Assembler) Finish() error {
 	*ma.m = schema.Maybe_Value
 	return nil
 }
-func (ma *_DecodedJOSE__Assembler) KeyPrototype() datamodel.NodePrototype {
+func (ma *_DecodedJWE__Assembler) KeyPrototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
-func (ma *_DecodedJOSE__Assembler) ValuePrototype(k string) datamodel.NodePrototype {
+func (ma *_DecodedJWE__Assembler) ValuePrototype(k string) datamodel.NodePrototype {
 	panic("todo structbuilder mapassembler valueprototype")
 }
 
-type _DecodedJOSE__KeyAssembler _DecodedJOSE__Assembler
+type _DecodedJWE__KeyAssembler _DecodedJWE__Assembler
 
-func (_DecodedJOSE__KeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.BeginMap(0)
+func (_DecodedJWE__KeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.BeginMap(0)
 }
-func (_DecodedJOSE__KeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.BeginList(0)
+func (_DecodedJWE__KeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.BeginList(0)
 }
-func (na *_DecodedJOSE__KeyAssembler) AssignNull() error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.AssignNull()
+func (na *_DecodedJWE__KeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.AssignNull()
 }
-func (_DecodedJOSE__KeyAssembler) AssignBool(bool) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.AssignBool(false)
+func (_DecodedJWE__KeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.AssignBool(false)
 }
-func (_DecodedJOSE__KeyAssembler) AssignInt(int64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.AssignInt(0)
+func (_DecodedJWE__KeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.AssignInt(0)
 }
-func (_DecodedJOSE__KeyAssembler) AssignFloat(float64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.AssignFloat(0)
+func (_DecodedJWE__KeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.AssignFloat(0)
 }
-func (ka *_DecodedJOSE__KeyAssembler) AssignString(k string) error {
+func (ka *_DecodedJWE__KeyAssembler) AssignString(k string) error {
 	if ka.state != maState_midKey {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
 	case "aad":
-		if ka.s&fieldBit__DecodedJOSE_Aad != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Aad}
+		if ka.s&fieldBit__DecodedJWE_Aad != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Aad}
 		}
-		ka.s += fieldBit__DecodedJOSE_Aad
+		ka.s += fieldBit__DecodedJWE_Aad
 		ka.state = maState_expectValue
 		ka.f = 0
 		return nil
 	case "ciphertext":
-		if ka.s&fieldBit__DecodedJOSE_Ciphertext != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Ciphertext}
+		if ka.s&fieldBit__DecodedJWE_Ciphertext != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Ciphertext}
 		}
-		ka.s += fieldBit__DecodedJOSE_Ciphertext
+		ka.s += fieldBit__DecodedJWE_Ciphertext
 		ka.state = maState_expectValue
 		ka.f = 1
 		return nil
 	case "iv":
-		if ka.s&fieldBit__DecodedJOSE_Iv != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Iv}
+		if ka.s&fieldBit__DecodedJWE_Iv != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Iv}
 		}
-		ka.s += fieldBit__DecodedJOSE_Iv
+		ka.s += fieldBit__DecodedJWE_Iv
 		ka.state = maState_expectValue
 		ka.f = 2
 		return nil
-	case "link":
-		if ka.s&fieldBit__DecodedJOSE_Link != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Link}
+	case "protected":
+		if ka.s&fieldBit__DecodedJWE_Protected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Protected}
 		}
-		ka.s += fieldBit__DecodedJOSE_Link
+		ka.s += fieldBit__DecodedJWE_Protected
 		ka.state = maState_expectValue
 		ka.f = 3
 		return nil
-	case "payload":
-		if ka.s&fieldBit__DecodedJOSE_Payload != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Payload}
+	case "recipients":
+		if ka.s&fieldBit__DecodedJWE_Recipients != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Recipients}
 		}
-		ka.s += fieldBit__DecodedJOSE_Payload
+		ka.s += fieldBit__DecodedJWE_Recipients
 		ka.state = maState_expectValue
 		ka.f = 4
 		return nil
-	case "protected":
-		if ka.s&fieldBit__DecodedJOSE_Protected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Protected}
+	case "tag":
+		if ka.s&fieldBit__DecodedJWE_Tag != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Tag}
 		}
-		ka.s += fieldBit__DecodedJOSE_Protected
+		ka.s += fieldBit__DecodedJWE_Tag
 		ka.state = maState_expectValue
 		ka.f = 5
 		return nil
-	case "recipients":
-		if ka.s&fieldBit__DecodedJOSE_Recipients != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Recipients}
+	case "unprotected":
+		if ka.s&fieldBit__DecodedJWE_Unprotected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Unprotected}
 		}
-		ka.s += fieldBit__DecodedJOSE_Recipients
+		ka.s += fieldBit__DecodedJWE_Unprotected
 		ka.state = maState_expectValue
 		ka.f = 6
 		return nil
-	case "signatures":
-		if ka.s&fieldBit__DecodedJOSE_Signatures != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Signatures}
-		}
-		ka.s += fieldBit__DecodedJOSE_Signatures
-		ka.state = maState_expectValue
-		ka.f = 7
-		return nil
-	case "tag":
-		if ka.s&fieldBit__DecodedJOSE_Tag != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Tag}
-		}
-		ka.s += fieldBit__DecodedJOSE_Tag
-		ka.state = maState_expectValue
-		ka.f = 8
-		return nil
-	case "unprotected":
-		if ka.s&fieldBit__DecodedJOSE_Unprotected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Unprotected}
-		}
-		ka.s += fieldBit__DecodedJOSE_Unprotected
-		ka.state = maState_expectValue
-		ka.f = 9
-		return nil
 	default:
-		return schema.ErrInvalidKey{TypeName: "dagjose.DecodedJOSE", Key: &_String{k}}
+		return schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWE", Key: &_String{k}}
 	}
 }
-func (_DecodedJOSE__KeyAssembler) AssignBytes([]byte) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.AssignBytes(nil)
+func (_DecodedJWE__KeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.AssignBytes(nil)
 }
-func (_DecodedJOSE__KeyAssembler) AssignLink(datamodel.Link) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.KeyAssembler"}.AssignLink(nil)
+func (_DecodedJWE__KeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.KeyAssembler"}.AssignLink(nil)
 }
-func (ka *_DecodedJOSE__KeyAssembler) AssignNode(v datamodel.Node) error {
+func (ka *_DecodedJWE__KeyAssembler) AssignNode(v datamodel.Node) error {
 	if v2, err := v.AsString(); err != nil {
 		return err
 	} else {
 		return ka.AssignString(v2)
 	}
 }
-func (_DecodedJOSE__KeyAssembler) Prototype() datamodel.NodePrototype {
+func (_DecodedJWE__KeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
-func (DecodedJOSE) Type() schema.Type {
+func (DecodedJWE) Type() schema.Type {
 	return nil /*TODO:typelit*/
 }
-func (n DecodedJOSE) Representation() datamodel.Node {
-	return (*_DecodedJOSE__Repr)(n)
+func (n DecodedJWE) Representation() datamodel.Node {
+	return (*_DecodedJWE__Repr)(n)
 }
 
-type _DecodedJOSE__Repr _DecodedJOSE
+type _DecodedJWE__Repr _DecodedJWE
 
 var (
-	fieldName__DecodedJOSE_Aad_serial         = _String{"aad"}
-	fieldName__DecodedJOSE_Ciphertext_serial  = _String{"ciphertext"}
-	fieldName__DecodedJOSE_Iv_serial          = _String{"iv"}
-	fieldName__DecodedJOSE_Link_serial        = _String{"link"}
-	fieldName__DecodedJOSE_Payload_serial     = _String{"payload"}
-	fieldName__DecodedJOSE_Protected_serial   = _String{"protected"}
-	fieldName__DecodedJOSE_Recipients_serial  = _String{"recipients"}
-	fieldName__DecodedJOSE_Signatures_serial  = _String{"signatures"}
-	fieldName__DecodedJOSE_Tag_serial         = _String{"tag"}
-	fieldName__DecodedJOSE_Unprotected_serial = _String{"unprotected"}
+	fieldName__DecodedJWE_Aad_serial         = _String{"aad"}
+	fieldName__DecodedJWE_Ciphertext_serial  = _String{"ciphertext"}
+	fieldName__DecodedJWE_Iv_serial          = _String{"iv"}
+	fieldName__DecodedJWE_Protected_serial   = _String{"protected"}
+	fieldName__DecodedJWE_Recipients_serial  = _String{"recipients"}
+	fieldName__DecodedJWE_Tag_serial         = _String{"tag"}
+	fieldName__DecodedJWE_Unprotected_serial = _String{"unprotected"}
 )
-var _ datamodel.Node = &_DecodedJOSE__Repr{}
+var _ datamodel.Node = &_DecodedJWE__Repr{}
 
-func (_DecodedJOSE__Repr) Kind() datamodel.Kind {
+func (_DecodedJWE__Repr) Kind() datamodel.Kind {
 	return datamodel.Kind_Map
 }
-func (n *_DecodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) {
+func (n *_DecodedJWE__Repr) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
 	case "aad":
 		if n.aad.m == schema.Maybe_Absent {
@@ -2202,16 +2052,6 @@ func (n *_DecodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) 
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 		}
 		return n.iv.v.Representation(), nil
-	case "link":
-		if n.link.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.link.v.Representation(), nil
-	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.payload.v.Representation(), nil
 	case "protected":
 		if n.protected.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -2222,11 +2062,6 @@ func (n *_DecodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) 
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 		}
 		return n.recipients.v.Representation(), nil
-	case "signatures":
-		if n.signatures.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.signatures.v.Representation(), nil
 	case "tag":
 		if n.tag.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -2241,52 +2076,37 @@ func (n *_DecodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) 
 		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
 	}
 }
-func (n *_DecodedJOSE__Repr) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+func (n *_DecodedJWE__Repr) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
 	ks, err := key.AsString()
 	if err != nil {
 		return nil, err
 	}
 	return n.LookupByString(ks)
 }
-func (_DecodedJOSE__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.LookupByIndex(0)
+func (_DecodedJWE__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.LookupByIndex(0)
 }
-func (n _DecodedJOSE__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+func (n _DecodedJWE__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
 	return n.LookupByString(seg.String())
 }
-func (n *_DecodedJOSE__Repr) MapIterator() datamodel.MapIterator {
-	end := 10
+func (n *_DecodedJWE__Repr) MapIterator() datamodel.MapIterator {
+	end := 7
 	if n.unprotected.m == schema.Maybe_Absent {
-		end = 9
-	} else {
-		goto done
-	}
-	if n.tag.m == schema.Maybe_Absent {
-		end = 8
-	} else {
-		goto done
-	}
-	if n.signatures.m == schema.Maybe_Absent {
-		end = 7
-	} else {
-		goto done
-	}
-	if n.recipients.m == schema.Maybe_Absent {
 		end = 6
 	} else {
 		goto done
 	}
-	if n.protected.m == schema.Maybe_Absent {
+	if n.tag.m == schema.Maybe_Absent {
 		end = 5
 	} else {
 		goto done
 	}
-	if n.payload.m == schema.Maybe_Absent {
+	if n.recipients.m == schema.Maybe_Absent {
 		end = 4
 	} else {
 		goto done
 	}
-	if n.link.m == schema.Maybe_Absent {
+	if n.protected.m == schema.Maybe_Absent {
 		end = 3
 	} else {
 		goto done
@@ -2307,86 +2127,65 @@ func (n *_DecodedJOSE__Repr) MapIterator() datamodel.MapIterator {
 		goto done
 	}
 done:
-	return &_DecodedJOSE__ReprMapItr{n, 0, end}
+	return &_DecodedJWE__ReprMapItr{n, 0, end}
 }
 
-type _DecodedJOSE__ReprMapItr struct {
-	n   *_DecodedJOSE__Repr
+type _DecodedJWE__ReprMapItr struct {
+	n   *_DecodedJWE__Repr
 	idx int
 	end int
 }
 
-func (itr *_DecodedJOSE__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+func (itr *_DecodedJWE__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 10 {
+	if itr.idx >= 7 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
-		k = &fieldName__DecodedJOSE_Aad_serial
+		k = &fieldName__DecodedJWE_Aad_serial
 		if itr.n.aad.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.aad.v.Representation()
 	case 1:
-		k = &fieldName__DecodedJOSE_Ciphertext_serial
+		k = &fieldName__DecodedJWE_Ciphertext_serial
 		if itr.n.ciphertext.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.ciphertext.v.Representation()
 	case 2:
-		k = &fieldName__DecodedJOSE_Iv_serial
+		k = &fieldName__DecodedJWE_Iv_serial
 		if itr.n.iv.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.iv.v.Representation()
 	case 3:
-		k = &fieldName__DecodedJOSE_Link_serial
-		if itr.n.link.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.link.v.Representation()
-	case 4:
-		k = &fieldName__DecodedJOSE_Payload_serial
-		if itr.n.payload.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.payload.v.Representation()
-	case 5:
-		k = &fieldName__DecodedJOSE_Protected_serial
+		k = &fieldName__DecodedJWE_Protected_serial
 		if itr.n.protected.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.protected.v.Representation()
-	case 6:
-		k = &fieldName__DecodedJOSE_Recipients_serial
+	case 4:
+		k = &fieldName__DecodedJWE_Recipients_serial
 		if itr.n.recipients.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.recipients.v.Representation()
-	case 7:
-		k = &fieldName__DecodedJOSE_Signatures_serial
-		if itr.n.signatures.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.signatures.v.Representation()
-	case 8:
-		k = &fieldName__DecodedJOSE_Tag_serial
+	case 5:
+		k = &fieldName__DecodedJWE_Tag_serial
 		if itr.n.tag.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.tag.v.Representation()
-	case 9:
-		k = &fieldName__DecodedJOSE_Unprotected_serial
+	case 6:
+		k = &fieldName__DecodedJWE_Unprotected_serial
 		if itr.n.unprotected.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
@@ -2398,14 +2197,14 @@ advance:
 	itr.idx++
 	return
 }
-func (itr *_DecodedJOSE__ReprMapItr) Done() bool {
+func (itr *_DecodedJWE__ReprMapItr) Done() bool {
 	return itr.idx >= itr.end
 }
-func (_DecodedJOSE__Repr) ListIterator() datamodel.ListIterator {
+func (_DecodedJWE__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
-func (rn *_DecodedJOSE__Repr) Length() int64 {
-	l := 10
+func (rn *_DecodedJWE__Repr) Length() int64 {
+	l := 7
 	if rn.aad.m == schema.Maybe_Absent {
 		l--
 	}
@@ -2415,19 +2214,10 @@ func (rn *_DecodedJOSE__Repr) Length() int64 {
 	if rn.iv.m == schema.Maybe_Absent {
 		l--
 	}
-	if rn.link.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.payload.m == schema.Maybe_Absent {
-		l--
-	}
 	if rn.protected.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.recipients.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.signatures.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.tag.m == schema.Maybe_Absent {
@@ -2438,60 +2228,60 @@ func (rn *_DecodedJOSE__Repr) Length() int64 {
 	}
 	return int64(l)
 }
-func (_DecodedJOSE__Repr) IsAbsent() bool {
+func (_DecodedJWE__Repr) IsAbsent() bool {
 	return false
 }
-func (_DecodedJOSE__Repr) IsNull() bool {
+func (_DecodedJWE__Repr) IsNull() bool {
 	return false
 }
-func (_DecodedJOSE__Repr) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.AsBool()
+func (_DecodedJWE__Repr) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.AsBool()
 }
-func (_DecodedJOSE__Repr) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.AsInt()
+func (_DecodedJWE__Repr) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.AsInt()
 }
-func (_DecodedJOSE__Repr) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.AsFloat()
+func (_DecodedJWE__Repr) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.AsFloat()
 }
-func (_DecodedJOSE__Repr) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.AsString()
+func (_DecodedJWE__Repr) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.AsString()
 }
-func (_DecodedJOSE__Repr) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.AsBytes()
+func (_DecodedJWE__Repr) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.AsBytes()
 }
-func (_DecodedJOSE__Repr) AsLink() (datamodel.Link, error) {
-	return mixins.Map{TypeName: "dagjose.DecodedJOSE.Repr"}.AsLink()
+func (_DecodedJWE__Repr) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWE.Repr"}.AsLink()
 }
-func (_DecodedJOSE__Repr) Prototype() datamodel.NodePrototype {
-	return _DecodedJOSE__ReprPrototype{}
+func (_DecodedJWE__Repr) Prototype() datamodel.NodePrototype {
+	return _DecodedJWE__ReprPrototype{}
 }
 
-type _DecodedJOSE__ReprPrototype struct{}
+type _DecodedJWE__ReprPrototype struct{}
 
-func (_DecodedJOSE__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
-	var nb _DecodedJOSE__ReprBuilder
+func (_DecodedJWE__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _DecodedJWE__ReprBuilder
 	nb.Reset()
 	return &nb
 }
 
-type _DecodedJOSE__ReprBuilder struct {
-	_DecodedJOSE__ReprAssembler
+type _DecodedJWE__ReprBuilder struct {
+	_DecodedJWE__ReprAssembler
 }
 
-func (nb *_DecodedJOSE__ReprBuilder) Build() datamodel.Node {
+func (nb *_DecodedJWE__ReprBuilder) Build() datamodel.Node {
 	if *nb.m != schema.Maybe_Value {
 		panic("invalid state: cannot call Build on an assembler that's not finished")
 	}
 	return nb.w
 }
-func (nb *_DecodedJOSE__ReprBuilder) Reset() {
-	var w _DecodedJOSE
+func (nb *_DecodedJWE__ReprBuilder) Reset() {
+	var w _DecodedJWE
 	var m schema.Maybe
-	*nb = _DecodedJOSE__ReprBuilder{_DecodedJOSE__ReprAssembler{w: &w, m: &m}}
+	*nb = _DecodedJWE__ReprBuilder{_DecodedJWE__ReprAssembler{w: &w, m: &m}}
 }
 
-type _DecodedJOSE__ReprAssembler struct {
-	w     *_DecodedJOSE
+type _DecodedJWE__ReprAssembler struct {
+	w     *_DecodedJWE
 	m     *schema.Maybe
 	state maState
 	s     int
@@ -2501,30 +2291,24 @@ type _DecodedJOSE__ReprAssembler struct {
 	ca_aad         _Base64Url__ReprAssembler
 	ca_ciphertext  _Base64Url__ReprAssembler
 	ca_iv          _Base64Url__ReprAssembler
-	ca_link        _Link__ReprAssembler
-	ca_payload     _Base64Url__ReprAssembler
 	ca_protected   _Base64Url__ReprAssembler
 	ca_recipients  _DecodedRecipients__ReprAssembler
-	ca_signatures  _DecodedSignatures__ReprAssembler
 	ca_tag         _Base64Url__ReprAssembler
 	ca_unprotected _Any__ReprAssembler
 }
 
-func (na *_DecodedJOSE__ReprAssembler) reset() {
+func (na *_DecodedJWE__ReprAssembler) reset() {
 	na.state = maState_initial
 	na.s = 0
 	na.ca_aad.reset()
 	na.ca_ciphertext.reset()
 	na.ca_iv.reset()
-	na.ca_link.reset()
-	na.ca_payload.reset()
 	na.ca_protected.reset()
 	na.ca_recipients.reset()
-	na.ca_signatures.reset()
 	na.ca_tag.reset()
 	na.ca_unprotected.reset()
 }
-func (na *_DecodedJOSE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+func (na *_DecodedJWE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
 	switch *na.m {
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
@@ -2533,20 +2317,20 @@ func (na *_DecodedJOSE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, 
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_DecodedJOSE{}
+		na.w = &_DecodedJWE{}
 	}
 	return na, nil
 }
-func (_DecodedJOSE__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.BeginList(0)
+func (_DecodedJWE__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.BeginList(0)
 }
-func (na *_DecodedJOSE__ReprAssembler) AssignNull() error {
+func (na *_DecodedJWE__ReprAssembler) AssignNull() error {
 	switch *na.m {
 	case allowNull:
 		*na.m = schema.Maybe_Null
 		return nil
 	case schema.Maybe_Absent:
-		return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr.Repr"}.AssignNull()
+		return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr.Repr"}.AssignNull()
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
 	case midvalue:
@@ -2554,29 +2338,29 @@ func (na *_DecodedJOSE__ReprAssembler) AssignNull() error {
 	}
 	panic("unreachable")
 }
-func (_DecodedJOSE__ReprAssembler) AssignBool(bool) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.AssignBool(false)
+func (_DecodedJWE__ReprAssembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.AssignBool(false)
 }
-func (_DecodedJOSE__ReprAssembler) AssignInt(int64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.AssignInt(0)
+func (_DecodedJWE__ReprAssembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.AssignInt(0)
 }
-func (_DecodedJOSE__ReprAssembler) AssignFloat(float64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.AssignFloat(0)
+func (_DecodedJWE__ReprAssembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.AssignFloat(0)
 }
-func (_DecodedJOSE__ReprAssembler) AssignString(string) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.AssignString("")
+func (_DecodedJWE__ReprAssembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.AssignString("")
 }
-func (_DecodedJOSE__ReprAssembler) AssignBytes([]byte) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.AssignBytes(nil)
+func (_DecodedJWE__ReprAssembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.AssignBytes(nil)
 }
-func (_DecodedJOSE__ReprAssembler) AssignLink(datamodel.Link) error {
-	return mixins.MapAssembler{TypeName: "dagjose.DecodedJOSE.Repr"}.AssignLink(nil)
+func (_DecodedJWE__ReprAssembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWE.Repr"}.AssignLink(nil)
 }
-func (na *_DecodedJOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
+func (na *_DecodedJWE__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_DecodedJOSE); ok {
+	if v2, ok := v.(*_DecodedJWE); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -2593,7 +2377,7 @@ func (na *_DecodedJOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
 		return nil
 	}
 	if v.Kind() != datamodel.Kind_Map {
-		return datamodel.ErrWrongKind{TypeName: "dagjose.DecodedJOSE.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+		return datamodel.ErrWrongKind{TypeName: "dagjose.DecodedJWE.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
 	}
 	itr := v.MapIterator()
 	for !itr.Done() {
@@ -2610,10 +2394,10 @@ func (na *_DecodedJOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
 	}
 	return na.Finish()
 }
-func (_DecodedJOSE__ReprAssembler) Prototype() datamodel.NodePrototype {
-	return _DecodedJOSE__ReprPrototype{}
+func (_DecodedJWE__ReprAssembler) Prototype() datamodel.NodePrototype {
+	return _DecodedJWE__ReprPrototype{}
 }
-func (ma *_DecodedJOSE__ReprAssembler) valueFinishTidy() bool {
+func (ma *_DecodedJWE__ReprAssembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
 		switch ma.w.aad.m {
@@ -2640,22 +2424,6 @@ func (ma *_DecodedJOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 3:
-		switch ma.w.link.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 4:
-		switch ma.w.payload.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 5:
 		switch ma.w.protected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -2663,7 +2431,7 @@ func (ma *_DecodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 6:
+	case 4:
 		switch ma.w.recipients.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -2671,15 +2439,7 @@ func (ma *_DecodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 7:
-		switch ma.w.signatures.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 8:
+	case 5:
 		switch ma.w.tag.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -2687,7 +2447,7 @@ func (ma *_DecodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 9:
+	case 6:
 		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.w.unprotected.v = ma.ca_unprotected.w
@@ -2700,7 +2460,7 @@ func (ma *_DecodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		panic("unreachable")
 	}
 }
-func (ma *_DecodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+func (ma *_DecodedJWE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -2717,10 +2477,10 @@ func (ma *_DecodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAs
 	}
 	switch k {
 	case "aad":
-		if ma.s&fieldBit__DecodedJOSE_Aad != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Aad_serial}
+		if ma.s&fieldBit__DecodedJWE_Aad != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Aad_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Aad
+		ma.s += fieldBit__DecodedJWE_Aad
 		ma.state = maState_midValue
 		ma.f = 0
 		ma.ca_aad.w = &ma.w.aad.v
@@ -2728,10 +2488,10 @@ func (ma *_DecodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAs
 
 		return &ma.ca_aad, nil
 	case "ciphertext":
-		if ma.s&fieldBit__DecodedJOSE_Ciphertext != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Ciphertext_serial}
+		if ma.s&fieldBit__DecodedJWE_Ciphertext != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Ciphertext_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Ciphertext
+		ma.s += fieldBit__DecodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
 		ma.ca_ciphertext.w = &ma.w.ciphertext.v
@@ -2739,98 +2499,65 @@ func (ma *_DecodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAs
 
 		return &ma.ca_ciphertext, nil
 	case "iv":
-		if ma.s&fieldBit__DecodedJOSE_Iv != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Iv_serial}
+		if ma.s&fieldBit__DecodedJWE_Iv != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Iv_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Iv
+		ma.s += fieldBit__DecodedJWE_Iv
 		ma.state = maState_midValue
 		ma.f = 2
 		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 
 		return &ma.ca_iv, nil
-	case "link":
-		if ma.s&fieldBit__DecodedJOSE_Link != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Link_serial}
+	case "protected":
+		if ma.s&fieldBit__DecodedJWE_Protected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Protected_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Link
+		ma.s += fieldBit__DecodedJWE_Protected
 		ma.state = maState_midValue
 		ma.f = 3
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-
-		return &ma.ca_link, nil
-	case "payload":
-		if ma.s&fieldBit__DecodedJOSE_Payload != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Payload_serial}
-		}
-		ma.s += fieldBit__DecodedJOSE_Payload
-		ma.state = maState_midValue
-		ma.f = 4
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
-		return &ma.ca_payload, nil
-	case "protected":
-		if ma.s&fieldBit__DecodedJOSE_Protected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Protected_serial}
-		}
-		ma.s += fieldBit__DecodedJOSE_Protected
-		ma.state = maState_midValue
-		ma.f = 5
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected, nil
 	case "recipients":
-		if ma.s&fieldBit__DecodedJOSE_Recipients != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Recipients_serial}
+		if ma.s&fieldBit__DecodedJWE_Recipients != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Recipients_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Recipients
+		ma.s += fieldBit__DecodedJWE_Recipients
 		ma.state = maState_midValue
-		ma.f = 6
+		ma.f = 4
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients, nil
-	case "signatures":
-		if ma.s&fieldBit__DecodedJOSE_Signatures != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Signatures_serial}
-		}
-		ma.s += fieldBit__DecodedJOSE_Signatures
-		ma.state = maState_midValue
-		ma.f = 7
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-
-		return &ma.ca_signatures, nil
 	case "tag":
-		if ma.s&fieldBit__DecodedJOSE_Tag != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Tag_serial}
+		if ma.s&fieldBit__DecodedJWE_Tag != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Tag_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Tag
+		ma.s += fieldBit__DecodedJWE_Tag
 		ma.state = maState_midValue
-		ma.f = 8
+		ma.f = 5
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag, nil
 	case "unprotected":
-		if ma.s&fieldBit__DecodedJOSE_Unprotected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Unprotected_serial}
+		if ma.s&fieldBit__DecodedJWE_Unprotected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Unprotected_serial}
 		}
-		ma.s += fieldBit__DecodedJOSE_Unprotected
+		ma.s += fieldBit__DecodedJWE_Unprotected
 		ma.state = maState_midValue
-		ma.f = 9
+		ma.f = 6
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
 		return &ma.ca_unprotected, nil
 	default:
 	}
-	return nil, schema.ErrInvalidKey{TypeName: "dagjose.DecodedJOSE.Repr", Key: &_String{k}}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWE.Repr", Key: &_String{k}}
 }
-func (ma *_DecodedJOSE__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
+func (ma *_DecodedJWE__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -2846,9 +2573,9 @@ func (ma *_DecodedJOSE__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
 		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
 	}
 	ma.state = maState_midKey
-	return (*_DecodedJOSE__ReprKeyAssembler)(ma)
+	return (*_DecodedJWE__ReprKeyAssembler)(ma)
 }
-func (ma *_DecodedJOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
+func (ma *_DecodedJWE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		panic("invalid state: AssembleValue cannot be called when no key is primed")
@@ -2879,36 +2606,21 @@ func (ma *_DecodedJOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_iv
 	case 3:
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-
-		return &ma.ca_link
-	case 4:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
-		return &ma.ca_payload
-	case 5:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected
-	case 6:
+	case 4:
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients
-	case 7:
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-
-		return &ma.ca_signatures
-	case 8:
+	case 5:
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag
-	case 9:
+	case 6:
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
@@ -2917,7 +2629,7 @@ func (ma *_DecodedJOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 		panic("unreachable")
 	}
 }
-func (ma *_DecodedJOSE__ReprAssembler) Finish() error {
+func (ma *_DecodedJWE__ReprAssembler) Finish() error {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -2932,7 +2644,7 @@ func (ma *_DecodedJOSE__ReprAssembler) Finish() error {
 	case maState_finished:
 		panic("invalid state: Finish cannot be called on an assembler that's already finished")
 	}
-	if ma.s&fieldBits__DecodedJOSE_sufficient != fieldBits__DecodedJOSE_sufficient {
+	if ma.s&fieldBits__DecodedJWE_sufficient != fieldBits__DecodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
 		return err
 	}
@@ -2940,135 +2652,1174 @@ func (ma *_DecodedJOSE__ReprAssembler) Finish() error {
 	*ma.m = schema.Maybe_Value
 	return nil
 }
-func (ma *_DecodedJOSE__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
+func (ma *_DecodedJWE__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
-func (ma *_DecodedJOSE__ReprAssembler) ValuePrototype(k string) datamodel.NodePrototype {
+func (ma *_DecodedJWE__ReprAssembler) ValuePrototype(k string) datamodel.NodePrototype {
 	panic("todo structbuilder mapassembler repr valueprototype")
 }
 
-type _DecodedJOSE__ReprKeyAssembler _DecodedJOSE__ReprAssembler
+type _DecodedJWE__ReprKeyAssembler _DecodedJWE__ReprAssembler
 
-func (_DecodedJOSE__ReprKeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.BeginMap(0)
+func (_DecodedJWE__ReprKeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.BeginMap(0)
 }
-func (_DecodedJOSE__ReprKeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.BeginList(0)
+func (_DecodedJWE__ReprKeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.BeginList(0)
 }
-func (na *_DecodedJOSE__ReprKeyAssembler) AssignNull() error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.AssignNull()
+func (na *_DecodedJWE__ReprKeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.AssignNull()
 }
-func (_DecodedJOSE__ReprKeyAssembler) AssignBool(bool) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.AssignBool(false)
+func (_DecodedJWE__ReprKeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.AssignBool(false)
 }
-func (_DecodedJOSE__ReprKeyAssembler) AssignInt(int64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.AssignInt(0)
+func (_DecodedJWE__ReprKeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.AssignInt(0)
 }
-func (_DecodedJOSE__ReprKeyAssembler) AssignFloat(float64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.AssignFloat(0)
+func (_DecodedJWE__ReprKeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.AssignFloat(0)
 }
-func (ka *_DecodedJOSE__ReprKeyAssembler) AssignString(k string) error {
+func (ka *_DecodedJWE__ReprKeyAssembler) AssignString(k string) error {
 	if ka.state != maState_midKey {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
 	case "aad":
-		if ka.s&fieldBit__DecodedJOSE_Aad != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Aad_serial}
+		if ka.s&fieldBit__DecodedJWE_Aad != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Aad_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Aad
+		ka.s += fieldBit__DecodedJWE_Aad
 		ka.state = maState_expectValue
 		ka.f = 0
 		return nil
 	case "ciphertext":
-		if ka.s&fieldBit__DecodedJOSE_Ciphertext != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Ciphertext_serial}
+		if ka.s&fieldBit__DecodedJWE_Ciphertext != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Ciphertext_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Ciphertext
+		ka.s += fieldBit__DecodedJWE_Ciphertext
 		ka.state = maState_expectValue
 		ka.f = 1
 		return nil
 	case "iv":
-		if ka.s&fieldBit__DecodedJOSE_Iv != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Iv_serial}
+		if ka.s&fieldBit__DecodedJWE_Iv != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Iv_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Iv
+		ka.s += fieldBit__DecodedJWE_Iv
 		ka.state = maState_expectValue
 		ka.f = 2
 		return nil
-	case "link":
-		if ka.s&fieldBit__DecodedJOSE_Link != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Link_serial}
+	case "protected":
+		if ka.s&fieldBit__DecodedJWE_Protected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Protected_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Link
+		ka.s += fieldBit__DecodedJWE_Protected
 		ka.state = maState_expectValue
 		ka.f = 3
 		return nil
-	case "payload":
-		if ka.s&fieldBit__DecodedJOSE_Payload != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Payload_serial}
+	case "recipients":
+		if ka.s&fieldBit__DecodedJWE_Recipients != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Recipients_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Payload
+		ka.s += fieldBit__DecodedJWE_Recipients
 		ka.state = maState_expectValue
 		ka.f = 4
 		return nil
-	case "protected":
-		if ka.s&fieldBit__DecodedJOSE_Protected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Protected_serial}
+	case "tag":
+		if ka.s&fieldBit__DecodedJWE_Tag != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Tag_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Protected
+		ka.s += fieldBit__DecodedJWE_Tag
 		ka.state = maState_expectValue
 		ka.f = 5
 		return nil
-	case "recipients":
-		if ka.s&fieldBit__DecodedJOSE_Recipients != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Recipients_serial}
+	case "unprotected":
+		if ka.s&fieldBit__DecodedJWE_Unprotected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWE_Unprotected_serial}
 		}
-		ka.s += fieldBit__DecodedJOSE_Recipients
+		ka.s += fieldBit__DecodedJWE_Unprotected
 		ka.state = maState_expectValue
 		ka.f = 6
 		return nil
-	case "signatures":
-		if ka.s&fieldBit__DecodedJOSE_Signatures != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Signatures_serial}
-		}
-		ka.s += fieldBit__DecodedJOSE_Signatures
-		ka.state = maState_expectValue
-		ka.f = 7
-		return nil
-	case "tag":
-		if ka.s&fieldBit__DecodedJOSE_Tag != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Tag_serial}
-		}
-		ka.s += fieldBit__DecodedJOSE_Tag
-		ka.state = maState_expectValue
-		ka.f = 8
-		return nil
-	case "unprotected":
-		if ka.s&fieldBit__DecodedJOSE_Unprotected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJOSE_Unprotected_serial}
-		}
-		ka.s += fieldBit__DecodedJOSE_Unprotected
-		ka.state = maState_expectValue
-		ka.f = 9
-		return nil
 	}
-	return schema.ErrInvalidKey{TypeName: "dagjose.DecodedJOSE.Repr", Key: &_String{k}}
+	return schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWE.Repr", Key: &_String{k}}
 }
-func (_DecodedJOSE__ReprKeyAssembler) AssignBytes([]byte) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.AssignBytes(nil)
+func (_DecodedJWE__ReprKeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.AssignBytes(nil)
 }
-func (_DecodedJOSE__ReprKeyAssembler) AssignLink(datamodel.Link) error {
-	return mixins.StringAssembler{TypeName: "dagjose.DecodedJOSE.Repr.KeyAssembler"}.AssignLink(nil)
+func (_DecodedJWE__ReprKeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWE.Repr.KeyAssembler"}.AssignLink(nil)
 }
-func (ka *_DecodedJOSE__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
+func (ka *_DecodedJWE__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
 	if v2, err := v.AsString(); err != nil {
 		return err
 	} else {
 		return ka.AssignString(v2)
 	}
 }
-func (_DecodedJOSE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
+func (_DecodedJWE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+
+func (n _DecodedJWS) FieldLink() MaybeLink {
+	return &n.link
+}
+func (n _DecodedJWS) FieldPayload() MaybeBase64Url {
+	return &n.payload
+}
+func (n _DecodedJWS) FieldSignatures() MaybeDecodedSignatures {
+	return &n.signatures
+}
+
+type _DecodedJWS__Maybe struct {
+	m schema.Maybe
+	v DecodedJWS
+}
+type MaybeDecodedJWS = *_DecodedJWS__Maybe
+
+func (m MaybeDecodedJWS) IsNull() bool {
+	return m.m == schema.Maybe_Null
+}
+func (m MaybeDecodedJWS) IsAbsent() bool {
+	return m.m == schema.Maybe_Absent
+}
+func (m MaybeDecodedJWS) Exists() bool {
+	return m.m == schema.Maybe_Value
+}
+func (m MaybeDecodedJWS) AsNode() datamodel.Node {
+	switch m.m {
+	case schema.Maybe_Absent:
+		return datamodel.Absent
+	case schema.Maybe_Null:
+		return datamodel.Null
+	case schema.Maybe_Value:
+		return m.v
+	default:
+		panic("unreachable")
+	}
+}
+func (m MaybeDecodedJWS) Must() DecodedJWS {
+	if !m.Exists() {
+		panic("unbox of a maybe rejected")
+	}
+	return m.v
+}
+
+var (
+	fieldName__DecodedJWS_Link       = _String{"link"}
+	fieldName__DecodedJWS_Payload    = _String{"payload"}
+	fieldName__DecodedJWS_Signatures = _String{"signatures"}
+)
+var _ datamodel.Node = (DecodedJWS)(&_DecodedJWS{})
+var _ schema.TypedNode = (DecodedJWS)(&_DecodedJWS{})
+
+func (DecodedJWS) Kind() datamodel.Kind {
+	return datamodel.Kind_Map
+}
+func (n DecodedJWS) LookupByString(key string) (datamodel.Node, error) {
+	switch key {
+	case "link":
+		if n.link.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.link.v, nil
+	case "payload":
+		if n.payload.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.payload.v, nil
+	case "signatures":
+		if n.signatures.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.signatures.v, nil
+	default:
+		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
+	}
+}
+func (n DecodedJWS) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+	ks, err := key.AsString()
+	if err != nil {
+		return nil, err
+	}
+	return n.LookupByString(ks)
+}
+func (DecodedJWS) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.LookupByIndex(0)
+}
+func (n DecodedJWS) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return n.LookupByString(seg.String())
+}
+func (n DecodedJWS) MapIterator() datamodel.MapIterator {
+	return &_DecodedJWS__MapItr{n, 0}
+}
+
+type _DecodedJWS__MapItr struct {
+	n   DecodedJWS
+	idx int
+}
+
+func (itr *_DecodedJWS__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+	if itr.idx >= 3 {
+		return nil, nil, datamodel.ErrIteratorOverread{}
+	}
+	switch itr.idx {
+	case 0:
+		k = &fieldName__DecodedJWS_Link
+		if itr.n.link.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.link.v
+	case 1:
+		k = &fieldName__DecodedJWS_Payload
+		if itr.n.payload.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.payload.v
+	case 2:
+		k = &fieldName__DecodedJWS_Signatures
+		if itr.n.signatures.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.signatures.v
+	default:
+		panic("unreachable")
+	}
+	itr.idx++
+	return
+}
+func (itr *_DecodedJWS__MapItr) Done() bool {
+	return itr.idx >= 3
+}
+
+func (DecodedJWS) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (DecodedJWS) Length() int64 {
+	return 3
+}
+func (DecodedJWS) IsAbsent() bool {
+	return false
+}
+func (DecodedJWS) IsNull() bool {
+	return false
+}
+func (DecodedJWS) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.AsBool()
+}
+func (DecodedJWS) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.AsInt()
+}
+func (DecodedJWS) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.AsFloat()
+}
+func (DecodedJWS) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.AsString()
+}
+func (DecodedJWS) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.AsBytes()
+}
+func (DecodedJWS) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS"}.AsLink()
+}
+func (DecodedJWS) Prototype() datamodel.NodePrototype {
+	return _DecodedJWS__Prototype{}
+}
+
+type _DecodedJWS__Prototype struct{}
+
+func (_DecodedJWS__Prototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _DecodedJWS__Builder
+	nb.Reset()
+	return &nb
+}
+
+type _DecodedJWS__Builder struct {
+	_DecodedJWS__Assembler
+}
+
+func (nb *_DecodedJWS__Builder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_DecodedJWS__Builder) Reset() {
+	var w _DecodedJWS
+	var m schema.Maybe
+	*nb = _DecodedJWS__Builder{_DecodedJWS__Assembler{w: &w, m: &m}}
+}
+
+type _DecodedJWS__Assembler struct {
+	w     *_DecodedJWS
+	m     *schema.Maybe
+	state maState
+	s     int
+	f     int
+
+	cm            schema.Maybe
+	ca_link       _Link__Assembler
+	ca_payload    _Base64Url__Assembler
+	ca_signatures _DecodedSignatures__Assembler
+}
+
+func (na *_DecodedJWS__Assembler) reset() {
+	na.state = maState_initial
+	na.s = 0
+	na.ca_link.reset()
+	na.ca_payload.reset()
+	na.ca_signatures.reset()
+}
+
+var (
+	fieldBit__DecodedJWS_Link        = 1 << 0
+	fieldBit__DecodedJWS_Payload     = 1 << 1
+	fieldBit__DecodedJWS_Signatures  = 1 << 2
+	fieldBits__DecodedJWS_sufficient = 0
+)
+
+func (na *_DecodedJWS__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: it makes no sense to 'begin' twice on the same assembler!")
+	}
+	*na.m = midvalue
+	if na.w == nil {
+		na.w = &_DecodedJWS{}
+	}
+	return na, nil
+}
+func (_DecodedJWS__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.BeginList(0)
+}
+func (na *_DecodedJWS__Assembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+	}
+	panic("unreachable")
+}
+func (_DecodedJWS__Assembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignBool(false)
+}
+func (_DecodedJWS__Assembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignInt(0)
+}
+func (_DecodedJWS__Assembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignFloat(0)
+}
+func (_DecodedJWS__Assembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignString("")
+}
+func (_DecodedJWS__Assembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignBytes(nil)
+}
+func (_DecodedJWS__Assembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS"}.AssignLink(nil)
+}
+func (na *_DecodedJWS__Assembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_DecodedJWS); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		case midvalue:
+			panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+		}
+		if na.w == nil {
+			na.w = v2
+			*na.m = schema.Maybe_Value
+			return nil
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v.Kind() != datamodel.Kind_Map {
+		return datamodel.ErrWrongKind{TypeName: "dagjose.DecodedJWS", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+	}
+	itr := v.MapIterator()
+	for !itr.Done() {
+		k, v, err := itr.Next()
+		if err != nil {
+			return err
+		}
+		if err := na.AssembleKey().AssignNode(k); err != nil {
+			return err
+		}
+		if err := na.AssembleValue().AssignNode(v); err != nil {
+			return err
+		}
+	}
+	return na.Finish()
+}
+func (_DecodedJWS__Assembler) Prototype() datamodel.NodePrototype {
+	return _DecodedJWS__Prototype{}
+}
+func (ma *_DecodedJWS__Assembler) valueFinishTidy() bool {
+	switch ma.f {
+	case 0:
+		switch ma.w.link.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 1:
+		switch ma.w.payload.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 2:
+		switch ma.w.signatures.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_DecodedJWS__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleEntry cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleEntry cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleEntry cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
+	}
+	switch k {
+	case "link":
+		if ma.s&fieldBit__DecodedJWS_Link != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Link}
+		}
+		ma.s += fieldBit__DecodedJWS_Link
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+		return &ma.ca_link, nil
+	case "payload":
+		if ma.s&fieldBit__DecodedJWS_Payload != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Payload}
+		}
+		ma.s += fieldBit__DecodedJWS_Payload
+		ma.state = maState_midValue
+		ma.f = 1
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+		return &ma.ca_payload, nil
+	case "signatures":
+		if ma.s&fieldBit__DecodedJWS_Signatures != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Signatures}
+		}
+		ma.s += fieldBit__DecodedJWS_Signatures
+		ma.state = maState_midValue
+		ma.f = 2
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+		return &ma.ca_signatures, nil
+	}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWS", Key: &_String{k}}
+}
+func (ma *_DecodedJWS__Assembler) AssembleKey() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleKey cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleKey cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleKey cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midKey
+	return (*_DecodedJWS__KeyAssembler)(ma)
+}
+func (ma *_DecodedJWS__Assembler) AssembleValue() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		panic("invalid state: AssembleValue cannot be called when no key is primed")
+	case maState_midKey:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		// carry on
+	case maState_midValue:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling another value")
+	case maState_finished:
+		panic("invalid state: AssembleValue cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midValue
+	switch ma.f {
+	case 0:
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+		return &ma.ca_link
+	case 1:
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+		return &ma.ca_payload
+	case 2:
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+		return &ma.ca_signatures
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_DecodedJWS__Assembler) Finish() error {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: Finish cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		panic("invalid state: Finish cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: Finish cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: Finish cannot be called on an assembler that's already finished")
+	}
+	if ma.s&fieldBits__DecodedJWS_sufficient != fieldBits__DecodedJWS_sufficient {
+		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		return err
+	}
+	ma.state = maState_finished
+	*ma.m = schema.Maybe_Value
+	return nil
+}
+func (ma *_DecodedJWS__Assembler) KeyPrototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (ma *_DecodedJWS__Assembler) ValuePrototype(k string) datamodel.NodePrototype {
+	panic("todo structbuilder mapassembler valueprototype")
+}
+
+type _DecodedJWS__KeyAssembler _DecodedJWS__Assembler
+
+func (_DecodedJWS__KeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.BeginMap(0)
+}
+func (_DecodedJWS__KeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.BeginList(0)
+}
+func (na *_DecodedJWS__KeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.AssignNull()
+}
+func (_DecodedJWS__KeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.AssignBool(false)
+}
+func (_DecodedJWS__KeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.AssignInt(0)
+}
+func (_DecodedJWS__KeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.AssignFloat(0)
+}
+func (ka *_DecodedJWS__KeyAssembler) AssignString(k string) error {
+	if ka.state != maState_midKey {
+		panic("misuse: KeyAssembler held beyond its valid lifetime")
+	}
+	switch k {
+	case "link":
+		if ka.s&fieldBit__DecodedJWS_Link != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Link}
+		}
+		ka.s += fieldBit__DecodedJWS_Link
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
+	case "payload":
+		if ka.s&fieldBit__DecodedJWS_Payload != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Payload}
+		}
+		ka.s += fieldBit__DecodedJWS_Payload
+		ka.state = maState_expectValue
+		ka.f = 1
+		return nil
+	case "signatures":
+		if ka.s&fieldBit__DecodedJWS_Signatures != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Signatures}
+		}
+		ka.s += fieldBit__DecodedJWS_Signatures
+		ka.state = maState_expectValue
+		ka.f = 2
+		return nil
+	default:
+		return schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWS", Key: &_String{k}}
+	}
+}
+func (_DecodedJWS__KeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.AssignBytes(nil)
+}
+func (_DecodedJWS__KeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.KeyAssembler"}.AssignLink(nil)
+}
+func (ka *_DecodedJWS__KeyAssembler) AssignNode(v datamodel.Node) error {
+	if v2, err := v.AsString(); err != nil {
+		return err
+	} else {
+		return ka.AssignString(v2)
+	}
+}
+func (_DecodedJWS__KeyAssembler) Prototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (DecodedJWS) Type() schema.Type {
+	return nil /*TODO:typelit*/
+}
+func (n DecodedJWS) Representation() datamodel.Node {
+	return (*_DecodedJWS__Repr)(n)
+}
+
+type _DecodedJWS__Repr _DecodedJWS
+
+var (
+	fieldName__DecodedJWS_Link_serial       = _String{"link"}
+	fieldName__DecodedJWS_Payload_serial    = _String{"payload"}
+	fieldName__DecodedJWS_Signatures_serial = _String{"signatures"}
+)
+var _ datamodel.Node = &_DecodedJWS__Repr{}
+
+func (_DecodedJWS__Repr) Kind() datamodel.Kind {
+	return datamodel.Kind_Map
+}
+func (n *_DecodedJWS__Repr) LookupByString(key string) (datamodel.Node, error) {
+	switch key {
+	case "link":
+		if n.link.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.link.v.Representation(), nil
+	case "payload":
+		if n.payload.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.payload.v.Representation(), nil
+	case "signatures":
+		if n.signatures.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.signatures.v.Representation(), nil
+	default:
+		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
+	}
+}
+func (n *_DecodedJWS__Repr) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+	ks, err := key.AsString()
+	if err != nil {
+		return nil, err
+	}
+	return n.LookupByString(ks)
+}
+func (_DecodedJWS__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.LookupByIndex(0)
+}
+func (n _DecodedJWS__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return n.LookupByString(seg.String())
+}
+func (n *_DecodedJWS__Repr) MapIterator() datamodel.MapIterator {
+	end := 3
+	if n.signatures.m == schema.Maybe_Absent {
+		end = 2
+	} else {
+		goto done
+	}
+	if n.payload.m == schema.Maybe_Absent {
+		end = 1
+	} else {
+		goto done
+	}
+	if n.link.m == schema.Maybe_Absent {
+		end = 0
+	} else {
+		goto done
+	}
+done:
+	return &_DecodedJWS__ReprMapItr{n, 0, end}
+}
+
+type _DecodedJWS__ReprMapItr struct {
+	n   *_DecodedJWS__Repr
+	idx int
+	end int
+}
+
+func (itr *_DecodedJWS__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+advance:
+	if itr.idx >= 3 {
+		return nil, nil, datamodel.ErrIteratorOverread{}
+	}
+	switch itr.idx {
+	case 0:
+		k = &fieldName__DecodedJWS_Link_serial
+		if itr.n.link.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.link.v.Representation()
+	case 1:
+		k = &fieldName__DecodedJWS_Payload_serial
+		if itr.n.payload.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.payload.v.Representation()
+	case 2:
+		k = &fieldName__DecodedJWS_Signatures_serial
+		if itr.n.signatures.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.signatures.v.Representation()
+	default:
+		panic("unreachable")
+	}
+	itr.idx++
+	return
+}
+func (itr *_DecodedJWS__ReprMapItr) Done() bool {
+	return itr.idx >= itr.end
+}
+func (_DecodedJWS__Repr) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (rn *_DecodedJWS__Repr) Length() int64 {
+	l := 3
+	if rn.link.m == schema.Maybe_Absent {
+		l--
+	}
+	if rn.payload.m == schema.Maybe_Absent {
+		l--
+	}
+	if rn.signatures.m == schema.Maybe_Absent {
+		l--
+	}
+	return int64(l)
+}
+func (_DecodedJWS__Repr) IsAbsent() bool {
+	return false
+}
+func (_DecodedJWS__Repr) IsNull() bool {
+	return false
+}
+func (_DecodedJWS__Repr) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.AsBool()
+}
+func (_DecodedJWS__Repr) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.AsInt()
+}
+func (_DecodedJWS__Repr) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.AsFloat()
+}
+func (_DecodedJWS__Repr) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.AsString()
+}
+func (_DecodedJWS__Repr) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.AsBytes()
+}
+func (_DecodedJWS__Repr) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.DecodedJWS.Repr"}.AsLink()
+}
+func (_DecodedJWS__Repr) Prototype() datamodel.NodePrototype {
+	return _DecodedJWS__ReprPrototype{}
+}
+
+type _DecodedJWS__ReprPrototype struct{}
+
+func (_DecodedJWS__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _DecodedJWS__ReprBuilder
+	nb.Reset()
+	return &nb
+}
+
+type _DecodedJWS__ReprBuilder struct {
+	_DecodedJWS__ReprAssembler
+}
+
+func (nb *_DecodedJWS__ReprBuilder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_DecodedJWS__ReprBuilder) Reset() {
+	var w _DecodedJWS
+	var m schema.Maybe
+	*nb = _DecodedJWS__ReprBuilder{_DecodedJWS__ReprAssembler{w: &w, m: &m}}
+}
+
+type _DecodedJWS__ReprAssembler struct {
+	w     *_DecodedJWS
+	m     *schema.Maybe
+	state maState
+	s     int
+	f     int
+
+	cm            schema.Maybe
+	ca_link       _Link__ReprAssembler
+	ca_payload    _Base64Url__ReprAssembler
+	ca_signatures _DecodedSignatures__ReprAssembler
+}
+
+func (na *_DecodedJWS__ReprAssembler) reset() {
+	na.state = maState_initial
+	na.s = 0
+	na.ca_link.reset()
+	na.ca_payload.reset()
+	na.ca_signatures.reset()
+}
+func (na *_DecodedJWS__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: it makes no sense to 'begin' twice on the same assembler!")
+	}
+	*na.m = midvalue
+	if na.w == nil {
+		na.w = &_DecodedJWS{}
+	}
+	return na, nil
+}
+func (_DecodedJWS__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.BeginList(0)
+}
+func (na *_DecodedJWS__ReprAssembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr.Repr"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+	}
+	panic("unreachable")
+}
+func (_DecodedJWS__ReprAssembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.AssignBool(false)
+}
+func (_DecodedJWS__ReprAssembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.AssignInt(0)
+}
+func (_DecodedJWS__ReprAssembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.AssignFloat(0)
+}
+func (_DecodedJWS__ReprAssembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.AssignString("")
+}
+func (_DecodedJWS__ReprAssembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.AssignBytes(nil)
+}
+func (_DecodedJWS__ReprAssembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.DecodedJWS.Repr"}.AssignLink(nil)
+}
+func (na *_DecodedJWS__ReprAssembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_DecodedJWS); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		case midvalue:
+			panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+		}
+		if na.w == nil {
+			na.w = v2
+			*na.m = schema.Maybe_Value
+			return nil
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v.Kind() != datamodel.Kind_Map {
+		return datamodel.ErrWrongKind{TypeName: "dagjose.DecodedJWS.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+	}
+	itr := v.MapIterator()
+	for !itr.Done() {
+		k, v, err := itr.Next()
+		if err != nil {
+			return err
+		}
+		if err := na.AssembleKey().AssignNode(k); err != nil {
+			return err
+		}
+		if err := na.AssembleValue().AssignNode(v); err != nil {
+			return err
+		}
+	}
+	return na.Finish()
+}
+func (_DecodedJWS__ReprAssembler) Prototype() datamodel.NodePrototype {
+	return _DecodedJWS__ReprPrototype{}
+}
+func (ma *_DecodedJWS__ReprAssembler) valueFinishTidy() bool {
+	switch ma.f {
+	case 0:
+		switch ma.w.link.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 1:
+		switch ma.w.payload.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 2:
+		switch ma.w.signatures.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_DecodedJWS__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleEntry cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleEntry cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleEntry cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
+	}
+	switch k {
+	case "link":
+		if ma.s&fieldBit__DecodedJWS_Link != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Link_serial}
+		}
+		ma.s += fieldBit__DecodedJWS_Link
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+
+		return &ma.ca_link, nil
+	case "payload":
+		if ma.s&fieldBit__DecodedJWS_Payload != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Payload_serial}
+		}
+		ma.s += fieldBit__DecodedJWS_Payload
+		ma.state = maState_midValue
+		ma.f = 1
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+
+		return &ma.ca_payload, nil
+	case "signatures":
+		if ma.s&fieldBit__DecodedJWS_Signatures != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Signatures_serial}
+		}
+		ma.s += fieldBit__DecodedJWS_Signatures
+		ma.state = maState_midValue
+		ma.f = 2
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+
+		return &ma.ca_signatures, nil
+	default:
+	}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWS.Repr", Key: &_String{k}}
+}
+func (ma *_DecodedJWS__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleKey cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleKey cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleKey cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midKey
+	return (*_DecodedJWS__ReprKeyAssembler)(ma)
+}
+func (ma *_DecodedJWS__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		panic("invalid state: AssembleValue cannot be called when no key is primed")
+	case maState_midKey:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		// carry on
+	case maState_midValue:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling another value")
+	case maState_finished:
+		panic("invalid state: AssembleValue cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midValue
+	switch ma.f {
+	case 0:
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+
+		return &ma.ca_link
+	case 1:
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+
+		return &ma.ca_payload
+	case 2:
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+
+		return &ma.ca_signatures
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_DecodedJWS__ReprAssembler) Finish() error {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: Finish cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		panic("invalid state: Finish cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: Finish cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: Finish cannot be called on an assembler that's already finished")
+	}
+	if ma.s&fieldBits__DecodedJWS_sufficient != fieldBits__DecodedJWS_sufficient {
+		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		return err
+	}
+	ma.state = maState_finished
+	*ma.m = schema.Maybe_Value
+	return nil
+}
+func (ma *_DecodedJWS__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (ma *_DecodedJWS__ReprAssembler) ValuePrototype(k string) datamodel.NodePrototype {
+	panic("todo structbuilder mapassembler repr valueprototype")
+}
+
+type _DecodedJWS__ReprKeyAssembler _DecodedJWS__ReprAssembler
+
+func (_DecodedJWS__ReprKeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.BeginMap(0)
+}
+func (_DecodedJWS__ReprKeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.BeginList(0)
+}
+func (na *_DecodedJWS__ReprKeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.AssignNull()
+}
+func (_DecodedJWS__ReprKeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.AssignBool(false)
+}
+func (_DecodedJWS__ReprKeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.AssignInt(0)
+}
+func (_DecodedJWS__ReprKeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.AssignFloat(0)
+}
+func (ka *_DecodedJWS__ReprKeyAssembler) AssignString(k string) error {
+	if ka.state != maState_midKey {
+		panic("misuse: KeyAssembler held beyond its valid lifetime")
+	}
+	switch k {
+	case "link":
+		if ka.s&fieldBit__DecodedJWS_Link != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Link_serial}
+		}
+		ka.s += fieldBit__DecodedJWS_Link
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
+	case "payload":
+		if ka.s&fieldBit__DecodedJWS_Payload != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Payload_serial}
+		}
+		ka.s += fieldBit__DecodedJWS_Payload
+		ka.state = maState_expectValue
+		ka.f = 1
+		return nil
+	case "signatures":
+		if ka.s&fieldBit__DecodedJWS_Signatures != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__DecodedJWS_Signatures_serial}
+		}
+		ka.s += fieldBit__DecodedJWS_Signatures
+		ka.state = maState_expectValue
+		ka.f = 2
+		return nil
+	}
+	return schema.ErrInvalidKey{TypeName: "dagjose.DecodedJWS.Repr", Key: &_String{k}}
+}
+func (_DecodedJWS__ReprKeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.AssignBytes(nil)
+}
+func (_DecodedJWS__ReprKeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.DecodedJWS.Repr.KeyAssembler"}.AssignLink(nil)
+}
+func (ka *_DecodedJWS__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
+	if v2, err := v.AsString(); err != nil {
+		return err
+	} else {
+		return ka.AssignString(v2)
+	}
+}
+func (_DecodedJWS__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
 
@@ -6252,53 +7003,44 @@ func (la *_DecodedSignatures__ReprAssembler) ValuePrototype(_ int64) datamodel.N
 	return _DecodedSignature__ReprPrototype{}
 }
 
-func (n _EncodedJOSE) FieldAad() MaybeRaw {
+func (n _EncodedJWE) FieldAad() MaybeRaw {
 	return &n.aad
 }
-func (n _EncodedJOSE) FieldCiphertext() MaybeRaw {
+func (n _EncodedJWE) FieldCiphertext() MaybeRaw {
 	return &n.ciphertext
 }
-func (n _EncodedJOSE) FieldIv() MaybeRaw {
+func (n _EncodedJWE) FieldIv() MaybeRaw {
 	return &n.iv
 }
-func (n _EncodedJOSE) FieldLink() MaybeLink {
-	return &n.link
-}
-func (n _EncodedJOSE) FieldPayload() MaybeRaw {
-	return &n.payload
-}
-func (n _EncodedJOSE) FieldProtected() MaybeRaw {
+func (n _EncodedJWE) FieldProtected() MaybeRaw {
 	return &n.protected
 }
-func (n _EncodedJOSE) FieldRecipients() MaybeEncodedRecipients {
+func (n _EncodedJWE) FieldRecipients() MaybeEncodedRecipients {
 	return &n.recipients
 }
-func (n _EncodedJOSE) FieldSignatures() MaybeEncodedSignatures {
-	return &n.signatures
-}
-func (n _EncodedJOSE) FieldTag() MaybeRaw {
+func (n _EncodedJWE) FieldTag() MaybeRaw {
 	return &n.tag
 }
-func (n _EncodedJOSE) FieldUnprotected() MaybeAny {
+func (n _EncodedJWE) FieldUnprotected() MaybeAny {
 	return &n.unprotected
 }
 
-type _EncodedJOSE__Maybe struct {
+type _EncodedJWE__Maybe struct {
 	m schema.Maybe
-	v EncodedJOSE
+	v EncodedJWE
 }
-type MaybeEncodedJOSE = *_EncodedJOSE__Maybe
+type MaybeEncodedJWE = *_EncodedJWE__Maybe
 
-func (m MaybeEncodedJOSE) IsNull() bool {
+func (m MaybeEncodedJWE) IsNull() bool {
 	return m.m == schema.Maybe_Null
 }
-func (m MaybeEncodedJOSE) IsAbsent() bool {
+func (m MaybeEncodedJWE) IsAbsent() bool {
 	return m.m == schema.Maybe_Absent
 }
-func (m MaybeEncodedJOSE) Exists() bool {
+func (m MaybeEncodedJWE) Exists() bool {
 	return m.m == schema.Maybe_Value
 }
-func (m MaybeEncodedJOSE) AsNode() datamodel.Node {
+func (m MaybeEncodedJWE) AsNode() datamodel.Node {
 	switch m.m {
 	case schema.Maybe_Absent:
 		return datamodel.Absent
@@ -6310,7 +7052,7 @@ func (m MaybeEncodedJOSE) AsNode() datamodel.Node {
 		panic("unreachable")
 	}
 }
-func (m MaybeEncodedJOSE) Must() EncodedJOSE {
+func (m MaybeEncodedJWE) Must() EncodedJWE {
 	if !m.Exists() {
 		panic("unbox of a maybe rejected")
 	}
@@ -6318,24 +7060,21 @@ func (m MaybeEncodedJOSE) Must() EncodedJOSE {
 }
 
 var (
-	fieldName__EncodedJOSE_Aad         = _String{"aad"}
-	fieldName__EncodedJOSE_Ciphertext  = _String{"ciphertext"}
-	fieldName__EncodedJOSE_Iv          = _String{"iv"}
-	fieldName__EncodedJOSE_Link        = _String{"link"}
-	fieldName__EncodedJOSE_Payload     = _String{"payload"}
-	fieldName__EncodedJOSE_Protected   = _String{"protected"}
-	fieldName__EncodedJOSE_Recipients  = _String{"recipients"}
-	fieldName__EncodedJOSE_Signatures  = _String{"signatures"}
-	fieldName__EncodedJOSE_Tag         = _String{"tag"}
-	fieldName__EncodedJOSE_Unprotected = _String{"unprotected"}
+	fieldName__EncodedJWE_Aad         = _String{"aad"}
+	fieldName__EncodedJWE_Ciphertext  = _String{"ciphertext"}
+	fieldName__EncodedJWE_Iv          = _String{"iv"}
+	fieldName__EncodedJWE_Protected   = _String{"protected"}
+	fieldName__EncodedJWE_Recipients  = _String{"recipients"}
+	fieldName__EncodedJWE_Tag         = _String{"tag"}
+	fieldName__EncodedJWE_Unprotected = _String{"unprotected"}
 )
-var _ datamodel.Node = (EncodedJOSE)(&_EncodedJOSE{})
-var _ schema.TypedNode = (EncodedJOSE)(&_EncodedJOSE{})
+var _ datamodel.Node = (EncodedJWE)(&_EncodedJWE{})
+var _ schema.TypedNode = (EncodedJWE)(&_EncodedJWE{})
 
-func (EncodedJOSE) Kind() datamodel.Kind {
+func (EncodedJWE) Kind() datamodel.Kind {
 	return datamodel.Kind_Map
 }
-func (n EncodedJOSE) LookupByString(key string) (datamodel.Node, error) {
+func (n EncodedJWE) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
 	case "aad":
 		if n.aad.m == schema.Maybe_Absent {
@@ -6352,16 +7091,6 @@ func (n EncodedJOSE) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, nil
 		}
 		return &n.iv.v, nil
-	case "link":
-		if n.link.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.link.v, nil
-	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.payload.v, nil
 	case "protected":
 		if n.protected.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -6372,11 +7101,6 @@ func (n EncodedJOSE) LookupByString(key string) (datamodel.Node, error) {
 			return datamodel.Absent, nil
 		}
 		return &n.recipients.v, nil
-	case "signatures":
-		if n.signatures.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.signatures.v, nil
 	case "tag":
 		if n.tag.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -6391,98 +7115,77 @@ func (n EncodedJOSE) LookupByString(key string) (datamodel.Node, error) {
 		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
 	}
 }
-func (n EncodedJOSE) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+func (n EncodedJWE) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
 	ks, err := key.AsString()
 	if err != nil {
 		return nil, err
 	}
 	return n.LookupByString(ks)
 }
-func (EncodedJOSE) LookupByIndex(idx int64) (datamodel.Node, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.LookupByIndex(0)
+func (EncodedJWE) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.LookupByIndex(0)
 }
-func (n EncodedJOSE) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+func (n EncodedJWE) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
 	return n.LookupByString(seg.String())
 }
-func (n EncodedJOSE) MapIterator() datamodel.MapIterator {
-	return &_EncodedJOSE__MapItr{n, 0}
+func (n EncodedJWE) MapIterator() datamodel.MapIterator {
+	return &_EncodedJWE__MapItr{n, 0}
 }
 
-type _EncodedJOSE__MapItr struct {
-	n   EncodedJOSE
+type _EncodedJWE__MapItr struct {
+	n   EncodedJWE
 	idx int
 }
 
-func (itr *_EncodedJOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 10 {
+func (itr *_EncodedJWE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+	if itr.idx >= 7 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
-		k = &fieldName__EncodedJOSE_Aad
+		k = &fieldName__EncodedJWE_Aad
 		if itr.n.aad.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.aad.v
 	case 1:
-		k = &fieldName__EncodedJOSE_Ciphertext
+		k = &fieldName__EncodedJWE_Ciphertext
 		if itr.n.ciphertext.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.ciphertext.v
 	case 2:
-		k = &fieldName__EncodedJOSE_Iv
+		k = &fieldName__EncodedJWE_Iv
 		if itr.n.iv.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.iv.v
 	case 3:
-		k = &fieldName__EncodedJOSE_Link
-		if itr.n.link.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.link.v
-	case 4:
-		k = &fieldName__EncodedJOSE_Payload
-		if itr.n.payload.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.payload.v
-	case 5:
-		k = &fieldName__EncodedJOSE_Protected
+		k = &fieldName__EncodedJWE_Protected
 		if itr.n.protected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.protected.v
-	case 6:
-		k = &fieldName__EncodedJOSE_Recipients
+	case 4:
+		k = &fieldName__EncodedJWE_Recipients
 		if itr.n.recipients.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.recipients.v
-	case 7:
-		k = &fieldName__EncodedJOSE_Signatures
-		if itr.n.signatures.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.signatures.v
-	case 8:
-		k = &fieldName__EncodedJOSE_Tag
+	case 5:
+		k = &fieldName__EncodedJWE_Tag
 		if itr.n.tag.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
 		}
 		v = &itr.n.tag.v
-	case 9:
-		k = &fieldName__EncodedJOSE_Unprotected
+	case 6:
+		k = &fieldName__EncodedJWE_Unprotected
 		if itr.n.unprotected.m == schema.Maybe_Absent {
 			v = datamodel.Absent
 			break
@@ -6494,70 +7197,70 @@ func (itr *_EncodedJOSE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ e
 	itr.idx++
 	return
 }
-func (itr *_EncodedJOSE__MapItr) Done() bool {
-	return itr.idx >= 10
+func (itr *_EncodedJWE__MapItr) Done() bool {
+	return itr.idx >= 7
 }
 
-func (EncodedJOSE) ListIterator() datamodel.ListIterator {
+func (EncodedJWE) ListIterator() datamodel.ListIterator {
 	return nil
 }
-func (EncodedJOSE) Length() int64 {
-	return 10
+func (EncodedJWE) Length() int64 {
+	return 7
 }
-func (EncodedJOSE) IsAbsent() bool {
+func (EncodedJWE) IsAbsent() bool {
 	return false
 }
-func (EncodedJOSE) IsNull() bool {
+func (EncodedJWE) IsNull() bool {
 	return false
 }
-func (EncodedJOSE) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.AsBool()
+func (EncodedJWE) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.AsBool()
 }
-func (EncodedJOSE) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.AsInt()
+func (EncodedJWE) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.AsInt()
 }
-func (EncodedJOSE) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.AsFloat()
+func (EncodedJWE) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.AsFloat()
 }
-func (EncodedJOSE) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.AsString()
+func (EncodedJWE) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.AsString()
 }
-func (EncodedJOSE) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.AsBytes()
+func (EncodedJWE) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.AsBytes()
 }
-func (EncodedJOSE) AsLink() (datamodel.Link, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE"}.AsLink()
+func (EncodedJWE) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE"}.AsLink()
 }
-func (EncodedJOSE) Prototype() datamodel.NodePrototype {
-	return _EncodedJOSE__Prototype{}
+func (EncodedJWE) Prototype() datamodel.NodePrototype {
+	return _EncodedJWE__Prototype{}
 }
 
-type _EncodedJOSE__Prototype struct{}
+type _EncodedJWE__Prototype struct{}
 
-func (_EncodedJOSE__Prototype) NewBuilder() datamodel.NodeBuilder {
-	var nb _EncodedJOSE__Builder
+func (_EncodedJWE__Prototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _EncodedJWE__Builder
 	nb.Reset()
 	return &nb
 }
 
-type _EncodedJOSE__Builder struct {
-	_EncodedJOSE__Assembler
+type _EncodedJWE__Builder struct {
+	_EncodedJWE__Assembler
 }
 
-func (nb *_EncodedJOSE__Builder) Build() datamodel.Node {
+func (nb *_EncodedJWE__Builder) Build() datamodel.Node {
 	if *nb.m != schema.Maybe_Value {
 		panic("invalid state: cannot call Build on an assembler that's not finished")
 	}
 	return nb.w
 }
-func (nb *_EncodedJOSE__Builder) Reset() {
-	var w _EncodedJOSE
+func (nb *_EncodedJWE__Builder) Reset() {
+	var w _EncodedJWE
 	var m schema.Maybe
-	*nb = _EncodedJOSE__Builder{_EncodedJOSE__Assembler{w: &w, m: &m}}
+	*nb = _EncodedJWE__Builder{_EncodedJWE__Assembler{w: &w, m: &m}}
 }
 
-type _EncodedJOSE__Assembler struct {
-	w     *_EncodedJOSE
+type _EncodedJWE__Assembler struct {
+	w     *_EncodedJWE
 	m     *schema.Maybe
 	state maState
 	s     int
@@ -6567,45 +7270,36 @@ type _EncodedJOSE__Assembler struct {
 	ca_aad         _Raw__Assembler
 	ca_ciphertext  _Raw__Assembler
 	ca_iv          _Raw__Assembler
-	ca_link        _Link__Assembler
-	ca_payload     _Raw__Assembler
 	ca_protected   _Raw__Assembler
 	ca_recipients  _EncodedRecipients__Assembler
-	ca_signatures  _EncodedSignatures__Assembler
 	ca_tag         _Raw__Assembler
 	ca_unprotected _Any__Assembler
 }
 
-func (na *_EncodedJOSE__Assembler) reset() {
+func (na *_EncodedJWE__Assembler) reset() {
 	na.state = maState_initial
 	na.s = 0
 	na.ca_aad.reset()
 	na.ca_ciphertext.reset()
 	na.ca_iv.reset()
-	na.ca_link.reset()
-	na.ca_payload.reset()
 	na.ca_protected.reset()
 	na.ca_recipients.reset()
-	na.ca_signatures.reset()
 	na.ca_tag.reset()
 	na.ca_unprotected.reset()
 }
 
 var (
-	fieldBit__EncodedJOSE_Aad         = 1 << 0
-	fieldBit__EncodedJOSE_Ciphertext  = 1 << 1
-	fieldBit__EncodedJOSE_Iv          = 1 << 2
-	fieldBit__EncodedJOSE_Link        = 1 << 3
-	fieldBit__EncodedJOSE_Payload     = 1 << 4
-	fieldBit__EncodedJOSE_Protected   = 1 << 5
-	fieldBit__EncodedJOSE_Recipients  = 1 << 6
-	fieldBit__EncodedJOSE_Signatures  = 1 << 7
-	fieldBit__EncodedJOSE_Tag         = 1 << 8
-	fieldBit__EncodedJOSE_Unprotected = 1 << 9
-	fieldBits__EncodedJOSE_sufficient = 0
+	fieldBit__EncodedJWE_Aad         = 1 << 0
+	fieldBit__EncodedJWE_Ciphertext  = 1 << 1
+	fieldBit__EncodedJWE_Iv          = 1 << 2
+	fieldBit__EncodedJWE_Protected   = 1 << 3
+	fieldBit__EncodedJWE_Recipients  = 1 << 4
+	fieldBit__EncodedJWE_Tag         = 1 << 5
+	fieldBit__EncodedJWE_Unprotected = 1 << 6
+	fieldBits__EncodedJWE_sufficient = 0
 )
 
-func (na *_EncodedJOSE__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+func (na *_EncodedJWE__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
 	switch *na.m {
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
@@ -6614,20 +7308,20 @@ func (na *_EncodedJOSE__Assembler) BeginMap(int64) (datamodel.MapAssembler, erro
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_EncodedJOSE{}
+		na.w = &_EncodedJWE{}
 	}
 	return na, nil
 }
-func (_EncodedJOSE__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.BeginList(0)
+func (_EncodedJWE__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.BeginList(0)
 }
-func (na *_EncodedJOSE__Assembler) AssignNull() error {
+func (na *_EncodedJWE__Assembler) AssignNull() error {
 	switch *na.m {
 	case allowNull:
 		*na.m = schema.Maybe_Null
 		return nil
 	case schema.Maybe_Absent:
-		return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignNull()
+		return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignNull()
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
 	case midvalue:
@@ -6635,29 +7329,29 @@ func (na *_EncodedJOSE__Assembler) AssignNull() error {
 	}
 	panic("unreachable")
 }
-func (_EncodedJOSE__Assembler) AssignBool(bool) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignBool(false)
+func (_EncodedJWE__Assembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignBool(false)
 }
-func (_EncodedJOSE__Assembler) AssignInt(int64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignInt(0)
+func (_EncodedJWE__Assembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignInt(0)
 }
-func (_EncodedJOSE__Assembler) AssignFloat(float64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignFloat(0)
+func (_EncodedJWE__Assembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignFloat(0)
 }
-func (_EncodedJOSE__Assembler) AssignString(string) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignString("")
+func (_EncodedJWE__Assembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignString("")
 }
-func (_EncodedJOSE__Assembler) AssignBytes([]byte) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignBytes(nil)
+func (_EncodedJWE__Assembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignBytes(nil)
 }
-func (_EncodedJOSE__Assembler) AssignLink(datamodel.Link) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE"}.AssignLink(nil)
+func (_EncodedJWE__Assembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE"}.AssignLink(nil)
 }
-func (na *_EncodedJOSE__Assembler) AssignNode(v datamodel.Node) error {
+func (na *_EncodedJWE__Assembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_EncodedJOSE); ok {
+	if v2, ok := v.(*_EncodedJWE); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -6674,7 +7368,7 @@ func (na *_EncodedJOSE__Assembler) AssignNode(v datamodel.Node) error {
 		return nil
 	}
 	if v.Kind() != datamodel.Kind_Map {
-		return datamodel.ErrWrongKind{TypeName: "dagjose.EncodedJOSE", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+		return datamodel.ErrWrongKind{TypeName: "dagjose.EncodedJWE", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
 	}
 	itr := v.MapIterator()
 	for !itr.Done() {
@@ -6691,10 +7385,10 @@ func (na *_EncodedJOSE__Assembler) AssignNode(v datamodel.Node) error {
 	}
 	return na.Finish()
 }
-func (_EncodedJOSE__Assembler) Prototype() datamodel.NodePrototype {
-	return _EncodedJOSE__Prototype{}
+func (_EncodedJWE__Assembler) Prototype() datamodel.NodePrototype {
+	return _EncodedJWE__Prototype{}
 }
-func (ma *_EncodedJOSE__Assembler) valueFinishTidy() bool {
+func (ma *_EncodedJWE__Assembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
 		switch ma.w.aad.m {
@@ -6721,22 +7415,6 @@ func (ma *_EncodedJOSE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 3:
-		switch ma.w.link.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 4:
-		switch ma.w.payload.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 5:
 		switch ma.w.protected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -6744,7 +7422,7 @@ func (ma *_EncodedJOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 6:
+	case 4:
 		switch ma.w.recipients.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -6752,15 +7430,7 @@ func (ma *_EncodedJOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 7:
-		switch ma.w.signatures.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 8:
+	case 5:
 		switch ma.w.tag.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -6768,7 +7438,7 @@ func (ma *_EncodedJOSE__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 9:
+	case 6:
 		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.w.unprotected.v = ma.ca_unprotected.w
@@ -6781,7 +7451,7 @@ func (ma *_EncodedJOSE__Assembler) valueFinishTidy() bool {
 		panic("unreachable")
 	}
 }
-func (ma *_EncodedJOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+func (ma *_EncodedJWE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -6798,109 +7468,79 @@ func (ma *_EncodedJOSE__Assembler) AssembleEntry(k string) (datamodel.NodeAssemb
 	}
 	switch k {
 	case "aad":
-		if ma.s&fieldBit__EncodedJOSE_Aad != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Aad}
+		if ma.s&fieldBit__EncodedJWE_Aad != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Aad}
 		}
-		ma.s += fieldBit__EncodedJOSE_Aad
+		ma.s += fieldBit__EncodedJWE_Aad
 		ma.state = maState_midValue
 		ma.f = 0
 		ma.ca_aad.w = &ma.w.aad.v
 		ma.ca_aad.m = &ma.w.aad.m
 		return &ma.ca_aad, nil
 	case "ciphertext":
-		if ma.s&fieldBit__EncodedJOSE_Ciphertext != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Ciphertext}
+		if ma.s&fieldBit__EncodedJWE_Ciphertext != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Ciphertext}
 		}
-		ma.s += fieldBit__EncodedJOSE_Ciphertext
+		ma.s += fieldBit__EncodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
 		ma.ca_ciphertext.w = &ma.w.ciphertext.v
 		ma.ca_ciphertext.m = &ma.w.ciphertext.m
 		return &ma.ca_ciphertext, nil
 	case "iv":
-		if ma.s&fieldBit__EncodedJOSE_Iv != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Iv}
+		if ma.s&fieldBit__EncodedJWE_Iv != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Iv}
 		}
-		ma.s += fieldBit__EncodedJOSE_Iv
+		ma.s += fieldBit__EncodedJWE_Iv
 		ma.state = maState_midValue
 		ma.f = 2
 		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 		return &ma.ca_iv, nil
-	case "link":
-		if ma.s&fieldBit__EncodedJOSE_Link != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Link}
+	case "protected":
+		if ma.s&fieldBit__EncodedJWE_Protected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Protected}
 		}
-		ma.s += fieldBit__EncodedJOSE_Link
+		ma.s += fieldBit__EncodedJWE_Protected
 		ma.state = maState_midValue
 		ma.f = 3
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-		return &ma.ca_link, nil
-	case "payload":
-		if ma.s&fieldBit__EncodedJOSE_Payload != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Payload}
-		}
-		ma.s += fieldBit__EncodedJOSE_Payload
-		ma.state = maState_midValue
-		ma.f = 4
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-		return &ma.ca_payload, nil
-	case "protected":
-		if ma.s&fieldBit__EncodedJOSE_Protected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Protected}
-		}
-		ma.s += fieldBit__EncodedJOSE_Protected
-		ma.state = maState_midValue
-		ma.f = 5
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected, nil
 	case "recipients":
-		if ma.s&fieldBit__EncodedJOSE_Recipients != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Recipients}
+		if ma.s&fieldBit__EncodedJWE_Recipients != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Recipients}
 		}
-		ma.s += fieldBit__EncodedJOSE_Recipients
+		ma.s += fieldBit__EncodedJWE_Recipients
 		ma.state = maState_midValue
-		ma.f = 6
+		ma.f = 4
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 		return &ma.ca_recipients, nil
-	case "signatures":
-		if ma.s&fieldBit__EncodedJOSE_Signatures != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Signatures}
-		}
-		ma.s += fieldBit__EncodedJOSE_Signatures
-		ma.state = maState_midValue
-		ma.f = 7
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-		return &ma.ca_signatures, nil
 	case "tag":
-		if ma.s&fieldBit__EncodedJOSE_Tag != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Tag}
+		if ma.s&fieldBit__EncodedJWE_Tag != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Tag}
 		}
-		ma.s += fieldBit__EncodedJOSE_Tag
+		ma.s += fieldBit__EncodedJWE_Tag
 		ma.state = maState_midValue
-		ma.f = 8
+		ma.f = 5
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag, nil
 	case "unprotected":
-		if ma.s&fieldBit__EncodedJOSE_Unprotected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Unprotected}
+		if ma.s&fieldBit__EncodedJWE_Unprotected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Unprotected}
 		}
-		ma.s += fieldBit__EncodedJOSE_Unprotected
+		ma.s += fieldBit__EncodedJWE_Unprotected
 		ma.state = maState_midValue
-		ma.f = 9
+		ma.f = 6
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 		return &ma.ca_unprotected, nil
 	}
-	return nil, schema.ErrInvalidKey{TypeName: "dagjose.EncodedJOSE", Key: &_String{k}}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWE", Key: &_String{k}}
 }
-func (ma *_EncodedJOSE__Assembler) AssembleKey() datamodel.NodeAssembler {
+func (ma *_EncodedJWE__Assembler) AssembleKey() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -6916,9 +7556,9 @@ func (ma *_EncodedJOSE__Assembler) AssembleKey() datamodel.NodeAssembler {
 		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
 	}
 	ma.state = maState_midKey
-	return (*_EncodedJOSE__KeyAssembler)(ma)
+	return (*_EncodedJWE__KeyAssembler)(ma)
 }
-func (ma *_EncodedJOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
+func (ma *_EncodedJWE__Assembler) AssembleValue() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		panic("invalid state: AssembleValue cannot be called when no key is primed")
@@ -6946,30 +7586,18 @@ func (ma *_EncodedJOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_iv.m = &ma.w.iv.m
 		return &ma.ca_iv
 	case 3:
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-		return &ma.ca_link
-	case 4:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-		return &ma.ca_payload
-	case 5:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 		return &ma.ca_protected
-	case 6:
+	case 4:
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 		return &ma.ca_recipients
-	case 7:
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-		return &ma.ca_signatures
-	case 8:
+	case 5:
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 		return &ma.ca_tag
-	case 9:
+	case 6:
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 		return &ma.ca_unprotected
@@ -6977,7 +7605,7 @@ func (ma *_EncodedJOSE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		panic("unreachable")
 	}
 }
-func (ma *_EncodedJOSE__Assembler) Finish() error {
+func (ma *_EncodedJWE__Assembler) Finish() error {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -6992,7 +7620,7 @@ func (ma *_EncodedJOSE__Assembler) Finish() error {
 	case maState_finished:
 		panic("invalid state: Finish cannot be called on an assembler that's already finished")
 	}
-	if ma.s&fieldBits__EncodedJOSE_sufficient != fieldBits__EncodedJOSE_sufficient {
+	if ma.s&fieldBits__EncodedJWE_sufficient != fieldBits__EncodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
 		return err
 	}
@@ -7000,165 +7628,138 @@ func (ma *_EncodedJOSE__Assembler) Finish() error {
 	*ma.m = schema.Maybe_Value
 	return nil
 }
-func (ma *_EncodedJOSE__Assembler) KeyPrototype() datamodel.NodePrototype {
+func (ma *_EncodedJWE__Assembler) KeyPrototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
-func (ma *_EncodedJOSE__Assembler) ValuePrototype(k string) datamodel.NodePrototype {
+func (ma *_EncodedJWE__Assembler) ValuePrototype(k string) datamodel.NodePrototype {
 	panic("todo structbuilder mapassembler valueprototype")
 }
 
-type _EncodedJOSE__KeyAssembler _EncodedJOSE__Assembler
+type _EncodedJWE__KeyAssembler _EncodedJWE__Assembler
 
-func (_EncodedJOSE__KeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.BeginMap(0)
+func (_EncodedJWE__KeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.BeginMap(0)
 }
-func (_EncodedJOSE__KeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.BeginList(0)
+func (_EncodedJWE__KeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.BeginList(0)
 }
-func (na *_EncodedJOSE__KeyAssembler) AssignNull() error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.AssignNull()
+func (na *_EncodedJWE__KeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.AssignNull()
 }
-func (_EncodedJOSE__KeyAssembler) AssignBool(bool) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.AssignBool(false)
+func (_EncodedJWE__KeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.AssignBool(false)
 }
-func (_EncodedJOSE__KeyAssembler) AssignInt(int64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.AssignInt(0)
+func (_EncodedJWE__KeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.AssignInt(0)
 }
-func (_EncodedJOSE__KeyAssembler) AssignFloat(float64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.AssignFloat(0)
+func (_EncodedJWE__KeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.AssignFloat(0)
 }
-func (ka *_EncodedJOSE__KeyAssembler) AssignString(k string) error {
+func (ka *_EncodedJWE__KeyAssembler) AssignString(k string) error {
 	if ka.state != maState_midKey {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
 	case "aad":
-		if ka.s&fieldBit__EncodedJOSE_Aad != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Aad}
+		if ka.s&fieldBit__EncodedJWE_Aad != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Aad}
 		}
-		ka.s += fieldBit__EncodedJOSE_Aad
+		ka.s += fieldBit__EncodedJWE_Aad
 		ka.state = maState_expectValue
 		ka.f = 0
 		return nil
 	case "ciphertext":
-		if ka.s&fieldBit__EncodedJOSE_Ciphertext != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Ciphertext}
+		if ka.s&fieldBit__EncodedJWE_Ciphertext != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Ciphertext}
 		}
-		ka.s += fieldBit__EncodedJOSE_Ciphertext
+		ka.s += fieldBit__EncodedJWE_Ciphertext
 		ka.state = maState_expectValue
 		ka.f = 1
 		return nil
 	case "iv":
-		if ka.s&fieldBit__EncodedJOSE_Iv != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Iv}
+		if ka.s&fieldBit__EncodedJWE_Iv != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Iv}
 		}
-		ka.s += fieldBit__EncodedJOSE_Iv
+		ka.s += fieldBit__EncodedJWE_Iv
 		ka.state = maState_expectValue
 		ka.f = 2
 		return nil
-	case "link":
-		if ka.s&fieldBit__EncodedJOSE_Link != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Link}
+	case "protected":
+		if ka.s&fieldBit__EncodedJWE_Protected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Protected}
 		}
-		ka.s += fieldBit__EncodedJOSE_Link
+		ka.s += fieldBit__EncodedJWE_Protected
 		ka.state = maState_expectValue
 		ka.f = 3
 		return nil
-	case "payload":
-		if ka.s&fieldBit__EncodedJOSE_Payload != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Payload}
+	case "recipients":
+		if ka.s&fieldBit__EncodedJWE_Recipients != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Recipients}
 		}
-		ka.s += fieldBit__EncodedJOSE_Payload
+		ka.s += fieldBit__EncodedJWE_Recipients
 		ka.state = maState_expectValue
 		ka.f = 4
 		return nil
-	case "protected":
-		if ka.s&fieldBit__EncodedJOSE_Protected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Protected}
+	case "tag":
+		if ka.s&fieldBit__EncodedJWE_Tag != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Tag}
 		}
-		ka.s += fieldBit__EncodedJOSE_Protected
+		ka.s += fieldBit__EncodedJWE_Tag
 		ka.state = maState_expectValue
 		ka.f = 5
 		return nil
-	case "recipients":
-		if ka.s&fieldBit__EncodedJOSE_Recipients != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Recipients}
+	case "unprotected":
+		if ka.s&fieldBit__EncodedJWE_Unprotected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Unprotected}
 		}
-		ka.s += fieldBit__EncodedJOSE_Recipients
+		ka.s += fieldBit__EncodedJWE_Unprotected
 		ka.state = maState_expectValue
 		ka.f = 6
 		return nil
-	case "signatures":
-		if ka.s&fieldBit__EncodedJOSE_Signatures != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Signatures}
-		}
-		ka.s += fieldBit__EncodedJOSE_Signatures
-		ka.state = maState_expectValue
-		ka.f = 7
-		return nil
-	case "tag":
-		if ka.s&fieldBit__EncodedJOSE_Tag != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Tag}
-		}
-		ka.s += fieldBit__EncodedJOSE_Tag
-		ka.state = maState_expectValue
-		ka.f = 8
-		return nil
-	case "unprotected":
-		if ka.s&fieldBit__EncodedJOSE_Unprotected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Unprotected}
-		}
-		ka.s += fieldBit__EncodedJOSE_Unprotected
-		ka.state = maState_expectValue
-		ka.f = 9
-		return nil
 	default:
-		return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJOSE", Key: &_String{k}}
+		return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWE", Key: &_String{k}}
 	}
 }
-func (_EncodedJOSE__KeyAssembler) AssignBytes([]byte) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.AssignBytes(nil)
+func (_EncodedJWE__KeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.AssignBytes(nil)
 }
-func (_EncodedJOSE__KeyAssembler) AssignLink(datamodel.Link) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.KeyAssembler"}.AssignLink(nil)
+func (_EncodedJWE__KeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.KeyAssembler"}.AssignLink(nil)
 }
-func (ka *_EncodedJOSE__KeyAssembler) AssignNode(v datamodel.Node) error {
+func (ka *_EncodedJWE__KeyAssembler) AssignNode(v datamodel.Node) error {
 	if v2, err := v.AsString(); err != nil {
 		return err
 	} else {
 		return ka.AssignString(v2)
 	}
 }
-func (_EncodedJOSE__KeyAssembler) Prototype() datamodel.NodePrototype {
+func (_EncodedJWE__KeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
-func (EncodedJOSE) Type() schema.Type {
+func (EncodedJWE) Type() schema.Type {
 	return nil /*TODO:typelit*/
 }
-func (n EncodedJOSE) Representation() datamodel.Node {
-	return (*_EncodedJOSE__Repr)(n)
+func (n EncodedJWE) Representation() datamodel.Node {
+	return (*_EncodedJWE__Repr)(n)
 }
 
-type _EncodedJOSE__Repr _EncodedJOSE
+type _EncodedJWE__Repr _EncodedJWE
 
 var (
-	fieldName__EncodedJOSE_Aad_serial         = _String{"aad"}
-	fieldName__EncodedJOSE_Ciphertext_serial  = _String{"ciphertext"}
-	fieldName__EncodedJOSE_Iv_serial          = _String{"iv"}
-	fieldName__EncodedJOSE_Link_serial        = _String{"link"}
-	fieldName__EncodedJOSE_Payload_serial     = _String{"payload"}
-	fieldName__EncodedJOSE_Protected_serial   = _String{"protected"}
-	fieldName__EncodedJOSE_Recipients_serial  = _String{"recipients"}
-	fieldName__EncodedJOSE_Signatures_serial  = _String{"signatures"}
-	fieldName__EncodedJOSE_Tag_serial         = _String{"tag"}
-	fieldName__EncodedJOSE_Unprotected_serial = _String{"unprotected"}
+	fieldName__EncodedJWE_Aad_serial         = _String{"aad"}
+	fieldName__EncodedJWE_Ciphertext_serial  = _String{"ciphertext"}
+	fieldName__EncodedJWE_Iv_serial          = _String{"iv"}
+	fieldName__EncodedJWE_Protected_serial   = _String{"protected"}
+	fieldName__EncodedJWE_Recipients_serial  = _String{"recipients"}
+	fieldName__EncodedJWE_Tag_serial         = _String{"tag"}
+	fieldName__EncodedJWE_Unprotected_serial = _String{"unprotected"}
 )
-var _ datamodel.Node = &_EncodedJOSE__Repr{}
+var _ datamodel.Node = &_EncodedJWE__Repr{}
 
-func (_EncodedJOSE__Repr) Kind() datamodel.Kind {
+func (_EncodedJWE__Repr) Kind() datamodel.Kind {
 	return datamodel.Kind_Map
 }
-func (n *_EncodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) {
+func (n *_EncodedJWE__Repr) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
 	case "aad":
 		if n.aad.m == schema.Maybe_Absent {
@@ -7175,16 +7776,6 @@ func (n *_EncodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) 
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 		}
 		return n.iv.v.Representation(), nil
-	case "link":
-		if n.link.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.link.v.Representation(), nil
-	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.payload.v.Representation(), nil
 	case "protected":
 		if n.protected.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -7195,11 +7786,6 @@ func (n *_EncodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) 
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
 		}
 		return n.recipients.v.Representation(), nil
-	case "signatures":
-		if n.signatures.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.signatures.v.Representation(), nil
 	case "tag":
 		if n.tag.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -7214,52 +7800,37 @@ func (n *_EncodedJOSE__Repr) LookupByString(key string) (datamodel.Node, error) 
 		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
 	}
 }
-func (n *_EncodedJOSE__Repr) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+func (n *_EncodedJWE__Repr) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
 	ks, err := key.AsString()
 	if err != nil {
 		return nil, err
 	}
 	return n.LookupByString(ks)
 }
-func (_EncodedJOSE__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.LookupByIndex(0)
+func (_EncodedJWE__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.LookupByIndex(0)
 }
-func (n _EncodedJOSE__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+func (n _EncodedJWE__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
 	return n.LookupByString(seg.String())
 }
-func (n *_EncodedJOSE__Repr) MapIterator() datamodel.MapIterator {
-	end := 10
+func (n *_EncodedJWE__Repr) MapIterator() datamodel.MapIterator {
+	end := 7
 	if n.unprotected.m == schema.Maybe_Absent {
-		end = 9
-	} else {
-		goto done
-	}
-	if n.tag.m == schema.Maybe_Absent {
-		end = 8
-	} else {
-		goto done
-	}
-	if n.signatures.m == schema.Maybe_Absent {
-		end = 7
-	} else {
-		goto done
-	}
-	if n.recipients.m == schema.Maybe_Absent {
 		end = 6
 	} else {
 		goto done
 	}
-	if n.protected.m == schema.Maybe_Absent {
+	if n.tag.m == schema.Maybe_Absent {
 		end = 5
 	} else {
 		goto done
 	}
-	if n.payload.m == schema.Maybe_Absent {
+	if n.recipients.m == schema.Maybe_Absent {
 		end = 4
 	} else {
 		goto done
 	}
-	if n.link.m == schema.Maybe_Absent {
+	if n.protected.m == schema.Maybe_Absent {
 		end = 3
 	} else {
 		goto done
@@ -7280,86 +7851,65 @@ func (n *_EncodedJOSE__Repr) MapIterator() datamodel.MapIterator {
 		goto done
 	}
 done:
-	return &_EncodedJOSE__ReprMapItr{n, 0, end}
+	return &_EncodedJWE__ReprMapItr{n, 0, end}
 }
 
-type _EncodedJOSE__ReprMapItr struct {
-	n   *_EncodedJOSE__Repr
+type _EncodedJWE__ReprMapItr struct {
+	n   *_EncodedJWE__Repr
 	idx int
 	end int
 }
 
-func (itr *_EncodedJOSE__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+func (itr *_EncodedJWE__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 10 {
+	if itr.idx >= 7 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
-		k = &fieldName__EncodedJOSE_Aad_serial
+		k = &fieldName__EncodedJWE_Aad_serial
 		if itr.n.aad.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.aad.v.Representation()
 	case 1:
-		k = &fieldName__EncodedJOSE_Ciphertext_serial
+		k = &fieldName__EncodedJWE_Ciphertext_serial
 		if itr.n.ciphertext.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.ciphertext.v.Representation()
 	case 2:
-		k = &fieldName__EncodedJOSE_Iv_serial
+		k = &fieldName__EncodedJWE_Iv_serial
 		if itr.n.iv.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.iv.v.Representation()
 	case 3:
-		k = &fieldName__EncodedJOSE_Link_serial
-		if itr.n.link.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.link.v.Representation()
-	case 4:
-		k = &fieldName__EncodedJOSE_Payload_serial
-		if itr.n.payload.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.payload.v.Representation()
-	case 5:
-		k = &fieldName__EncodedJOSE_Protected_serial
+		k = &fieldName__EncodedJWE_Protected_serial
 		if itr.n.protected.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.protected.v.Representation()
-	case 6:
-		k = &fieldName__EncodedJOSE_Recipients_serial
+	case 4:
+		k = &fieldName__EncodedJWE_Recipients_serial
 		if itr.n.recipients.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.recipients.v.Representation()
-	case 7:
-		k = &fieldName__EncodedJOSE_Signatures_serial
-		if itr.n.signatures.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.signatures.v.Representation()
-	case 8:
-		k = &fieldName__EncodedJOSE_Tag_serial
+	case 5:
+		k = &fieldName__EncodedJWE_Tag_serial
 		if itr.n.tag.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
 		}
 		v = itr.n.tag.v.Representation()
-	case 9:
-		k = &fieldName__EncodedJOSE_Unprotected_serial
+	case 6:
+		k = &fieldName__EncodedJWE_Unprotected_serial
 		if itr.n.unprotected.m == schema.Maybe_Absent {
 			itr.idx++
 			goto advance
@@ -7371,14 +7921,14 @@ advance:
 	itr.idx++
 	return
 }
-func (itr *_EncodedJOSE__ReprMapItr) Done() bool {
+func (itr *_EncodedJWE__ReprMapItr) Done() bool {
 	return itr.idx >= itr.end
 }
-func (_EncodedJOSE__Repr) ListIterator() datamodel.ListIterator {
+func (_EncodedJWE__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
-func (rn *_EncodedJOSE__Repr) Length() int64 {
-	l := 10
+func (rn *_EncodedJWE__Repr) Length() int64 {
+	l := 7
 	if rn.aad.m == schema.Maybe_Absent {
 		l--
 	}
@@ -7388,19 +7938,10 @@ func (rn *_EncodedJOSE__Repr) Length() int64 {
 	if rn.iv.m == schema.Maybe_Absent {
 		l--
 	}
-	if rn.link.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.payload.m == schema.Maybe_Absent {
-		l--
-	}
 	if rn.protected.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.recipients.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.signatures.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.tag.m == schema.Maybe_Absent {
@@ -7411,60 +7952,60 @@ func (rn *_EncodedJOSE__Repr) Length() int64 {
 	}
 	return int64(l)
 }
-func (_EncodedJOSE__Repr) IsAbsent() bool {
+func (_EncodedJWE__Repr) IsAbsent() bool {
 	return false
 }
-func (_EncodedJOSE__Repr) IsNull() bool {
+func (_EncodedJWE__Repr) IsNull() bool {
 	return false
 }
-func (_EncodedJOSE__Repr) AsBool() (bool, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.AsBool()
+func (_EncodedJWE__Repr) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.AsBool()
 }
-func (_EncodedJOSE__Repr) AsInt() (int64, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.AsInt()
+func (_EncodedJWE__Repr) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.AsInt()
 }
-func (_EncodedJOSE__Repr) AsFloat() (float64, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.AsFloat()
+func (_EncodedJWE__Repr) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.AsFloat()
 }
-func (_EncodedJOSE__Repr) AsString() (string, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.AsString()
+func (_EncodedJWE__Repr) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.AsString()
 }
-func (_EncodedJOSE__Repr) AsBytes() ([]byte, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.AsBytes()
+func (_EncodedJWE__Repr) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.AsBytes()
 }
-func (_EncodedJOSE__Repr) AsLink() (datamodel.Link, error) {
-	return mixins.Map{TypeName: "dagjose.EncodedJOSE.Repr"}.AsLink()
+func (_EncodedJWE__Repr) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWE.Repr"}.AsLink()
 }
-func (_EncodedJOSE__Repr) Prototype() datamodel.NodePrototype {
-	return _EncodedJOSE__ReprPrototype{}
+func (_EncodedJWE__Repr) Prototype() datamodel.NodePrototype {
+	return _EncodedJWE__ReprPrototype{}
 }
 
-type _EncodedJOSE__ReprPrototype struct{}
+type _EncodedJWE__ReprPrototype struct{}
 
-func (_EncodedJOSE__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
-	var nb _EncodedJOSE__ReprBuilder
+func (_EncodedJWE__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _EncodedJWE__ReprBuilder
 	nb.Reset()
 	return &nb
 }
 
-type _EncodedJOSE__ReprBuilder struct {
-	_EncodedJOSE__ReprAssembler
+type _EncodedJWE__ReprBuilder struct {
+	_EncodedJWE__ReprAssembler
 }
 
-func (nb *_EncodedJOSE__ReprBuilder) Build() datamodel.Node {
+func (nb *_EncodedJWE__ReprBuilder) Build() datamodel.Node {
 	if *nb.m != schema.Maybe_Value {
 		panic("invalid state: cannot call Build on an assembler that's not finished")
 	}
 	return nb.w
 }
-func (nb *_EncodedJOSE__ReprBuilder) Reset() {
-	var w _EncodedJOSE
+func (nb *_EncodedJWE__ReprBuilder) Reset() {
+	var w _EncodedJWE
 	var m schema.Maybe
-	*nb = _EncodedJOSE__ReprBuilder{_EncodedJOSE__ReprAssembler{w: &w, m: &m}}
+	*nb = _EncodedJWE__ReprBuilder{_EncodedJWE__ReprAssembler{w: &w, m: &m}}
 }
 
-type _EncodedJOSE__ReprAssembler struct {
-	w     *_EncodedJOSE
+type _EncodedJWE__ReprAssembler struct {
+	w     *_EncodedJWE
 	m     *schema.Maybe
 	state maState
 	s     int
@@ -7474,30 +8015,24 @@ type _EncodedJOSE__ReprAssembler struct {
 	ca_aad         _Raw__ReprAssembler
 	ca_ciphertext  _Raw__ReprAssembler
 	ca_iv          _Raw__ReprAssembler
-	ca_link        _Link__ReprAssembler
-	ca_payload     _Raw__ReprAssembler
 	ca_protected   _Raw__ReprAssembler
 	ca_recipients  _EncodedRecipients__ReprAssembler
-	ca_signatures  _EncodedSignatures__ReprAssembler
 	ca_tag         _Raw__ReprAssembler
 	ca_unprotected _Any__ReprAssembler
 }
 
-func (na *_EncodedJOSE__ReprAssembler) reset() {
+func (na *_EncodedJWE__ReprAssembler) reset() {
 	na.state = maState_initial
 	na.s = 0
 	na.ca_aad.reset()
 	na.ca_ciphertext.reset()
 	na.ca_iv.reset()
-	na.ca_link.reset()
-	na.ca_payload.reset()
 	na.ca_protected.reset()
 	na.ca_recipients.reset()
-	na.ca_signatures.reset()
 	na.ca_tag.reset()
 	na.ca_unprotected.reset()
 }
-func (na *_EncodedJOSE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+func (na *_EncodedJWE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
 	switch *na.m {
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
@@ -7506,20 +8041,20 @@ func (na *_EncodedJOSE__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, 
 	}
 	*na.m = midvalue
 	if na.w == nil {
-		na.w = &_EncodedJOSE{}
+		na.w = &_EncodedJWE{}
 	}
 	return na, nil
 }
-func (_EncodedJOSE__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.BeginList(0)
+func (_EncodedJWE__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.BeginList(0)
 }
-func (na *_EncodedJOSE__ReprAssembler) AssignNull() error {
+func (na *_EncodedJWE__ReprAssembler) AssignNull() error {
 	switch *na.m {
 	case allowNull:
 		*na.m = schema.Maybe_Null
 		return nil
 	case schema.Maybe_Absent:
-		return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr.Repr"}.AssignNull()
+		return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr.Repr"}.AssignNull()
 	case schema.Maybe_Value, schema.Maybe_Null:
 		panic("invalid state: cannot assign into assembler that's already finished")
 	case midvalue:
@@ -7527,29 +8062,29 @@ func (na *_EncodedJOSE__ReprAssembler) AssignNull() error {
 	}
 	panic("unreachable")
 }
-func (_EncodedJOSE__ReprAssembler) AssignBool(bool) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.AssignBool(false)
+func (_EncodedJWE__ReprAssembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.AssignBool(false)
 }
-func (_EncodedJOSE__ReprAssembler) AssignInt(int64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.AssignInt(0)
+func (_EncodedJWE__ReprAssembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.AssignInt(0)
 }
-func (_EncodedJOSE__ReprAssembler) AssignFloat(float64) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.AssignFloat(0)
+func (_EncodedJWE__ReprAssembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.AssignFloat(0)
 }
-func (_EncodedJOSE__ReprAssembler) AssignString(string) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.AssignString("")
+func (_EncodedJWE__ReprAssembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.AssignString("")
 }
-func (_EncodedJOSE__ReprAssembler) AssignBytes([]byte) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.AssignBytes(nil)
+func (_EncodedJWE__ReprAssembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.AssignBytes(nil)
 }
-func (_EncodedJOSE__ReprAssembler) AssignLink(datamodel.Link) error {
-	return mixins.MapAssembler{TypeName: "dagjose.EncodedJOSE.Repr"}.AssignLink(nil)
+func (_EncodedJWE__ReprAssembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWE.Repr"}.AssignLink(nil)
 }
-func (na *_EncodedJOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
+func (na *_EncodedJWE__ReprAssembler) AssignNode(v datamodel.Node) error {
 	if v.IsNull() {
 		return na.AssignNull()
 	}
-	if v2, ok := v.(*_EncodedJOSE); ok {
+	if v2, ok := v.(*_EncodedJWE); ok {
 		switch *na.m {
 		case schema.Maybe_Value, schema.Maybe_Null:
 			panic("invalid state: cannot assign into assembler that's already finished")
@@ -7566,7 +8101,7 @@ func (na *_EncodedJOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
 		return nil
 	}
 	if v.Kind() != datamodel.Kind_Map {
-		return datamodel.ErrWrongKind{TypeName: "dagjose.EncodedJOSE.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+		return datamodel.ErrWrongKind{TypeName: "dagjose.EncodedJWE.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
 	}
 	itr := v.MapIterator()
 	for !itr.Done() {
@@ -7583,10 +8118,10 @@ func (na *_EncodedJOSE__ReprAssembler) AssignNode(v datamodel.Node) error {
 	}
 	return na.Finish()
 }
-func (_EncodedJOSE__ReprAssembler) Prototype() datamodel.NodePrototype {
-	return _EncodedJOSE__ReprPrototype{}
+func (_EncodedJWE__ReprAssembler) Prototype() datamodel.NodePrototype {
+	return _EncodedJWE__ReprPrototype{}
 }
-func (ma *_EncodedJOSE__ReprAssembler) valueFinishTidy() bool {
+func (ma *_EncodedJWE__ReprAssembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
 		switch ma.w.aad.m {
@@ -7613,22 +8148,6 @@ func (ma *_EncodedJOSE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 3:
-		switch ma.w.link.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 4:
-		switch ma.w.payload.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 5:
 		switch ma.w.protected.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -7636,7 +8155,7 @@ func (ma *_EncodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 6:
+	case 4:
 		switch ma.w.recipients.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -7644,15 +8163,7 @@ func (ma *_EncodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 7:
-		switch ma.w.signatures.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 8:
+	case 5:
 		switch ma.w.tag.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -7660,7 +8171,7 @@ func (ma *_EncodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 9:
+	case 6:
 		switch ma.w.unprotected.m {
 		case schema.Maybe_Value:
 			ma.w.unprotected.v = ma.ca_unprotected.w
@@ -7673,7 +8184,7 @@ func (ma *_EncodedJOSE__ReprAssembler) valueFinishTidy() bool {
 		panic("unreachable")
 	}
 }
-func (ma *_EncodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+func (ma *_EncodedJWE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -7690,10 +8201,10 @@ func (ma *_EncodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAs
 	}
 	switch k {
 	case "aad":
-		if ma.s&fieldBit__EncodedJOSE_Aad != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Aad_serial}
+		if ma.s&fieldBit__EncodedJWE_Aad != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Aad_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Aad
+		ma.s += fieldBit__EncodedJWE_Aad
 		ma.state = maState_midValue
 		ma.f = 0
 		ma.ca_aad.w = &ma.w.aad.v
@@ -7701,10 +8212,10 @@ func (ma *_EncodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAs
 
 		return &ma.ca_aad, nil
 	case "ciphertext":
-		if ma.s&fieldBit__EncodedJOSE_Ciphertext != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Ciphertext_serial}
+		if ma.s&fieldBit__EncodedJWE_Ciphertext != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Ciphertext_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Ciphertext
+		ma.s += fieldBit__EncodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
 		ma.ca_ciphertext.w = &ma.w.ciphertext.v
@@ -7712,98 +8223,65 @@ func (ma *_EncodedJOSE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAs
 
 		return &ma.ca_ciphertext, nil
 	case "iv":
-		if ma.s&fieldBit__EncodedJOSE_Iv != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Iv_serial}
+		if ma.s&fieldBit__EncodedJWE_Iv != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Iv_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Iv
+		ma.s += fieldBit__EncodedJWE_Iv
 		ma.state = maState_midValue
 		ma.f = 2
 		ma.ca_iv.w = &ma.w.iv.v
 		ma.ca_iv.m = &ma.w.iv.m
 
 		return &ma.ca_iv, nil
-	case "link":
-		if ma.s&fieldBit__EncodedJOSE_Link != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Link_serial}
+	case "protected":
+		if ma.s&fieldBit__EncodedJWE_Protected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Protected_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Link
+		ma.s += fieldBit__EncodedJWE_Protected
 		ma.state = maState_midValue
 		ma.f = 3
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-
-		return &ma.ca_link, nil
-	case "payload":
-		if ma.s&fieldBit__EncodedJOSE_Payload != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Payload_serial}
-		}
-		ma.s += fieldBit__EncodedJOSE_Payload
-		ma.state = maState_midValue
-		ma.f = 4
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
-		return &ma.ca_payload, nil
-	case "protected":
-		if ma.s&fieldBit__EncodedJOSE_Protected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Protected_serial}
-		}
-		ma.s += fieldBit__EncodedJOSE_Protected
-		ma.state = maState_midValue
-		ma.f = 5
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected, nil
 	case "recipients":
-		if ma.s&fieldBit__EncodedJOSE_Recipients != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Recipients_serial}
+		if ma.s&fieldBit__EncodedJWE_Recipients != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Recipients_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Recipients
+		ma.s += fieldBit__EncodedJWE_Recipients
 		ma.state = maState_midValue
-		ma.f = 6
+		ma.f = 4
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients, nil
-	case "signatures":
-		if ma.s&fieldBit__EncodedJOSE_Signatures != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Signatures_serial}
-		}
-		ma.s += fieldBit__EncodedJOSE_Signatures
-		ma.state = maState_midValue
-		ma.f = 7
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-
-		return &ma.ca_signatures, nil
 	case "tag":
-		if ma.s&fieldBit__EncodedJOSE_Tag != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Tag_serial}
+		if ma.s&fieldBit__EncodedJWE_Tag != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Tag_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Tag
+		ma.s += fieldBit__EncodedJWE_Tag
 		ma.state = maState_midValue
-		ma.f = 8
+		ma.f = 5
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag, nil
 	case "unprotected":
-		if ma.s&fieldBit__EncodedJOSE_Unprotected != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Unprotected_serial}
+		if ma.s&fieldBit__EncodedJWE_Unprotected != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Unprotected_serial}
 		}
-		ma.s += fieldBit__EncodedJOSE_Unprotected
+		ma.s += fieldBit__EncodedJWE_Unprotected
 		ma.state = maState_midValue
-		ma.f = 9
+		ma.f = 6
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
 		return &ma.ca_unprotected, nil
 	default:
 	}
-	return nil, schema.ErrInvalidKey{TypeName: "dagjose.EncodedJOSE.Repr", Key: &_String{k}}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWE.Repr", Key: &_String{k}}
 }
-func (ma *_EncodedJOSE__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
+func (ma *_EncodedJWE__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -7819,9 +8297,9 @@ func (ma *_EncodedJOSE__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
 		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
 	}
 	ma.state = maState_midKey
-	return (*_EncodedJOSE__ReprKeyAssembler)(ma)
+	return (*_EncodedJWE__ReprKeyAssembler)(ma)
 }
-func (ma *_EncodedJOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
+func (ma *_EncodedJWE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	switch ma.state {
 	case maState_initial:
 		panic("invalid state: AssembleValue cannot be called when no key is primed")
@@ -7852,36 +8330,21 @@ func (ma *_EncodedJOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_iv
 	case 3:
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-
-		return &ma.ca_link
-	case 4:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
-		return &ma.ca_payload
-	case 5:
 		ma.ca_protected.w = &ma.w.protected.v
 		ma.ca_protected.m = &ma.w.protected.m
 
 		return &ma.ca_protected
-	case 6:
+	case 4:
 		ma.ca_recipients.w = &ma.w.recipients.v
 		ma.ca_recipients.m = &ma.w.recipients.m
 
 		return &ma.ca_recipients
-	case 7:
-		ma.ca_signatures.w = &ma.w.signatures.v
-		ma.ca_signatures.m = &ma.w.signatures.m
-
-		return &ma.ca_signatures
-	case 8:
+	case 5:
 		ma.ca_tag.w = &ma.w.tag.v
 		ma.ca_tag.m = &ma.w.tag.m
 
 		return &ma.ca_tag
-	case 9:
+	case 6:
 		ma.ca_unprotected.w = ma.w.unprotected.v
 		ma.ca_unprotected.m = &ma.w.unprotected.m
 
@@ -7890,7 +8353,7 @@ func (ma *_EncodedJOSE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 		panic("unreachable")
 	}
 }
-func (ma *_EncodedJOSE__ReprAssembler) Finish() error {
+func (ma *_EncodedJWE__ReprAssembler) Finish() error {
 	switch ma.state {
 	case maState_initial:
 		// carry on
@@ -7905,7 +8368,7 @@ func (ma *_EncodedJOSE__ReprAssembler) Finish() error {
 	case maState_finished:
 		panic("invalid state: Finish cannot be called on an assembler that's already finished")
 	}
-	if ma.s&fieldBits__EncodedJOSE_sufficient != fieldBits__EncodedJOSE_sufficient {
+	if ma.s&fieldBits__EncodedJWE_sufficient != fieldBits__EncodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
 		return err
 	}
@@ -7913,135 +8376,1174 @@ func (ma *_EncodedJOSE__ReprAssembler) Finish() error {
 	*ma.m = schema.Maybe_Value
 	return nil
 }
-func (ma *_EncodedJOSE__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
+func (ma *_EncodedJWE__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
-func (ma *_EncodedJOSE__ReprAssembler) ValuePrototype(k string) datamodel.NodePrototype {
+func (ma *_EncodedJWE__ReprAssembler) ValuePrototype(k string) datamodel.NodePrototype {
 	panic("todo structbuilder mapassembler repr valueprototype")
 }
 
-type _EncodedJOSE__ReprKeyAssembler _EncodedJOSE__ReprAssembler
+type _EncodedJWE__ReprKeyAssembler _EncodedJWE__ReprAssembler
 
-func (_EncodedJOSE__ReprKeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.BeginMap(0)
+func (_EncodedJWE__ReprKeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.BeginMap(0)
 }
-func (_EncodedJOSE__ReprKeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.BeginList(0)
+func (_EncodedJWE__ReprKeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.BeginList(0)
 }
-func (na *_EncodedJOSE__ReprKeyAssembler) AssignNull() error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.AssignNull()
+func (na *_EncodedJWE__ReprKeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.AssignNull()
 }
-func (_EncodedJOSE__ReprKeyAssembler) AssignBool(bool) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.AssignBool(false)
+func (_EncodedJWE__ReprKeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.AssignBool(false)
 }
-func (_EncodedJOSE__ReprKeyAssembler) AssignInt(int64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.AssignInt(0)
+func (_EncodedJWE__ReprKeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.AssignInt(0)
 }
-func (_EncodedJOSE__ReprKeyAssembler) AssignFloat(float64) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.AssignFloat(0)
+func (_EncodedJWE__ReprKeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.AssignFloat(0)
 }
-func (ka *_EncodedJOSE__ReprKeyAssembler) AssignString(k string) error {
+func (ka *_EncodedJWE__ReprKeyAssembler) AssignString(k string) error {
 	if ka.state != maState_midKey {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
 	case "aad":
-		if ka.s&fieldBit__EncodedJOSE_Aad != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Aad_serial}
+		if ka.s&fieldBit__EncodedJWE_Aad != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Aad_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Aad
+		ka.s += fieldBit__EncodedJWE_Aad
 		ka.state = maState_expectValue
 		ka.f = 0
 		return nil
 	case "ciphertext":
-		if ka.s&fieldBit__EncodedJOSE_Ciphertext != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Ciphertext_serial}
+		if ka.s&fieldBit__EncodedJWE_Ciphertext != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Ciphertext_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Ciphertext
+		ka.s += fieldBit__EncodedJWE_Ciphertext
 		ka.state = maState_expectValue
 		ka.f = 1
 		return nil
 	case "iv":
-		if ka.s&fieldBit__EncodedJOSE_Iv != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Iv_serial}
+		if ka.s&fieldBit__EncodedJWE_Iv != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Iv_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Iv
+		ka.s += fieldBit__EncodedJWE_Iv
 		ka.state = maState_expectValue
 		ka.f = 2
 		return nil
-	case "link":
-		if ka.s&fieldBit__EncodedJOSE_Link != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Link_serial}
+	case "protected":
+		if ka.s&fieldBit__EncodedJWE_Protected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Protected_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Link
+		ka.s += fieldBit__EncodedJWE_Protected
 		ka.state = maState_expectValue
 		ka.f = 3
 		return nil
-	case "payload":
-		if ka.s&fieldBit__EncodedJOSE_Payload != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Payload_serial}
+	case "recipients":
+		if ka.s&fieldBit__EncodedJWE_Recipients != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Recipients_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Payload
+		ka.s += fieldBit__EncodedJWE_Recipients
 		ka.state = maState_expectValue
 		ka.f = 4
 		return nil
-	case "protected":
-		if ka.s&fieldBit__EncodedJOSE_Protected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Protected_serial}
+	case "tag":
+		if ka.s&fieldBit__EncodedJWE_Tag != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Tag_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Protected
+		ka.s += fieldBit__EncodedJWE_Tag
 		ka.state = maState_expectValue
 		ka.f = 5
 		return nil
-	case "recipients":
-		if ka.s&fieldBit__EncodedJOSE_Recipients != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Recipients_serial}
+	case "unprotected":
+		if ka.s&fieldBit__EncodedJWE_Unprotected != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWE_Unprotected_serial}
 		}
-		ka.s += fieldBit__EncodedJOSE_Recipients
+		ka.s += fieldBit__EncodedJWE_Unprotected
 		ka.state = maState_expectValue
 		ka.f = 6
 		return nil
-	case "signatures":
-		if ka.s&fieldBit__EncodedJOSE_Signatures != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Signatures_serial}
-		}
-		ka.s += fieldBit__EncodedJOSE_Signatures
-		ka.state = maState_expectValue
-		ka.f = 7
-		return nil
-	case "tag":
-		if ka.s&fieldBit__EncodedJOSE_Tag != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Tag_serial}
-		}
-		ka.s += fieldBit__EncodedJOSE_Tag
-		ka.state = maState_expectValue
-		ka.f = 8
-		return nil
-	case "unprotected":
-		if ka.s&fieldBit__EncodedJOSE_Unprotected != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJOSE_Unprotected_serial}
-		}
-		ka.s += fieldBit__EncodedJOSE_Unprotected
-		ka.state = maState_expectValue
-		ka.f = 9
-		return nil
 	}
-	return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJOSE.Repr", Key: &_String{k}}
+	return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWE.Repr", Key: &_String{k}}
 }
-func (_EncodedJOSE__ReprKeyAssembler) AssignBytes([]byte) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.AssignBytes(nil)
+func (_EncodedJWE__ReprKeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.AssignBytes(nil)
 }
-func (_EncodedJOSE__ReprKeyAssembler) AssignLink(datamodel.Link) error {
-	return mixins.StringAssembler{TypeName: "dagjose.EncodedJOSE.Repr.KeyAssembler"}.AssignLink(nil)
+func (_EncodedJWE__ReprKeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWE.Repr.KeyAssembler"}.AssignLink(nil)
 }
-func (ka *_EncodedJOSE__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
+func (ka *_EncodedJWE__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
 	if v2, err := v.AsString(); err != nil {
 		return err
 	} else {
 		return ka.AssignString(v2)
 	}
 }
-func (_EncodedJOSE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
+func (_EncodedJWE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+
+func (n _EncodedJWS) FieldLink() MaybeLink {
+	return &n.link
+}
+func (n _EncodedJWS) FieldPayload() MaybeRaw {
+	return &n.payload
+}
+func (n _EncodedJWS) FieldSignatures() MaybeEncodedSignatures {
+	return &n.signatures
+}
+
+type _EncodedJWS__Maybe struct {
+	m schema.Maybe
+	v EncodedJWS
+}
+type MaybeEncodedJWS = *_EncodedJWS__Maybe
+
+func (m MaybeEncodedJWS) IsNull() bool {
+	return m.m == schema.Maybe_Null
+}
+func (m MaybeEncodedJWS) IsAbsent() bool {
+	return m.m == schema.Maybe_Absent
+}
+func (m MaybeEncodedJWS) Exists() bool {
+	return m.m == schema.Maybe_Value
+}
+func (m MaybeEncodedJWS) AsNode() datamodel.Node {
+	switch m.m {
+	case schema.Maybe_Absent:
+		return datamodel.Absent
+	case schema.Maybe_Null:
+		return datamodel.Null
+	case schema.Maybe_Value:
+		return m.v
+	default:
+		panic("unreachable")
+	}
+}
+func (m MaybeEncodedJWS) Must() EncodedJWS {
+	if !m.Exists() {
+		panic("unbox of a maybe rejected")
+	}
+	return m.v
+}
+
+var (
+	fieldName__EncodedJWS_Link       = _String{"link"}
+	fieldName__EncodedJWS_Payload    = _String{"payload"}
+	fieldName__EncodedJWS_Signatures = _String{"signatures"}
+)
+var _ datamodel.Node = (EncodedJWS)(&_EncodedJWS{})
+var _ schema.TypedNode = (EncodedJWS)(&_EncodedJWS{})
+
+func (EncodedJWS) Kind() datamodel.Kind {
+	return datamodel.Kind_Map
+}
+func (n EncodedJWS) LookupByString(key string) (datamodel.Node, error) {
+	switch key {
+	case "link":
+		if n.link.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.link.v, nil
+	case "payload":
+		if n.payload.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.payload.v, nil
+	case "signatures":
+		if n.signatures.m == schema.Maybe_Absent {
+			return datamodel.Absent, nil
+		}
+		return &n.signatures.v, nil
+	default:
+		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
+	}
+}
+func (n EncodedJWS) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+	ks, err := key.AsString()
+	if err != nil {
+		return nil, err
+	}
+	return n.LookupByString(ks)
+}
+func (EncodedJWS) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.LookupByIndex(0)
+}
+func (n EncodedJWS) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return n.LookupByString(seg.String())
+}
+func (n EncodedJWS) MapIterator() datamodel.MapIterator {
+	return &_EncodedJWS__MapItr{n, 0}
+}
+
+type _EncodedJWS__MapItr struct {
+	n   EncodedJWS
+	idx int
+}
+
+func (itr *_EncodedJWS__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+	if itr.idx >= 3 {
+		return nil, nil, datamodel.ErrIteratorOverread{}
+	}
+	switch itr.idx {
+	case 0:
+		k = &fieldName__EncodedJWS_Link
+		if itr.n.link.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.link.v
+	case 1:
+		k = &fieldName__EncodedJWS_Payload
+		if itr.n.payload.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.payload.v
+	case 2:
+		k = &fieldName__EncodedJWS_Signatures
+		if itr.n.signatures.m == schema.Maybe_Absent {
+			v = datamodel.Absent
+			break
+		}
+		v = &itr.n.signatures.v
+	default:
+		panic("unreachable")
+	}
+	itr.idx++
+	return
+}
+func (itr *_EncodedJWS__MapItr) Done() bool {
+	return itr.idx >= 3
+}
+
+func (EncodedJWS) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (EncodedJWS) Length() int64 {
+	return 3
+}
+func (EncodedJWS) IsAbsent() bool {
+	return false
+}
+func (EncodedJWS) IsNull() bool {
+	return false
+}
+func (EncodedJWS) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.AsBool()
+}
+func (EncodedJWS) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.AsInt()
+}
+func (EncodedJWS) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.AsFloat()
+}
+func (EncodedJWS) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.AsString()
+}
+func (EncodedJWS) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.AsBytes()
+}
+func (EncodedJWS) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS"}.AsLink()
+}
+func (EncodedJWS) Prototype() datamodel.NodePrototype {
+	return _EncodedJWS__Prototype{}
+}
+
+type _EncodedJWS__Prototype struct{}
+
+func (_EncodedJWS__Prototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _EncodedJWS__Builder
+	nb.Reset()
+	return &nb
+}
+
+type _EncodedJWS__Builder struct {
+	_EncodedJWS__Assembler
+}
+
+func (nb *_EncodedJWS__Builder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_EncodedJWS__Builder) Reset() {
+	var w _EncodedJWS
+	var m schema.Maybe
+	*nb = _EncodedJWS__Builder{_EncodedJWS__Assembler{w: &w, m: &m}}
+}
+
+type _EncodedJWS__Assembler struct {
+	w     *_EncodedJWS
+	m     *schema.Maybe
+	state maState
+	s     int
+	f     int
+
+	cm            schema.Maybe
+	ca_link       _Link__Assembler
+	ca_payload    _Raw__Assembler
+	ca_signatures _EncodedSignatures__Assembler
+}
+
+func (na *_EncodedJWS__Assembler) reset() {
+	na.state = maState_initial
+	na.s = 0
+	na.ca_link.reset()
+	na.ca_payload.reset()
+	na.ca_signatures.reset()
+}
+
+var (
+	fieldBit__EncodedJWS_Link        = 1 << 0
+	fieldBit__EncodedJWS_Payload     = 1 << 1
+	fieldBit__EncodedJWS_Signatures  = 1 << 2
+	fieldBits__EncodedJWS_sufficient = 0
+)
+
+func (na *_EncodedJWS__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: it makes no sense to 'begin' twice on the same assembler!")
+	}
+	*na.m = midvalue
+	if na.w == nil {
+		na.w = &_EncodedJWS{}
+	}
+	return na, nil
+}
+func (_EncodedJWS__Assembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.BeginList(0)
+}
+func (na *_EncodedJWS__Assembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+	}
+	panic("unreachable")
+}
+func (_EncodedJWS__Assembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignBool(false)
+}
+func (_EncodedJWS__Assembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignInt(0)
+}
+func (_EncodedJWS__Assembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignFloat(0)
+}
+func (_EncodedJWS__Assembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignString("")
+}
+func (_EncodedJWS__Assembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignBytes(nil)
+}
+func (_EncodedJWS__Assembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS"}.AssignLink(nil)
+}
+func (na *_EncodedJWS__Assembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_EncodedJWS); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		case midvalue:
+			panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+		}
+		if na.w == nil {
+			na.w = v2
+			*na.m = schema.Maybe_Value
+			return nil
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v.Kind() != datamodel.Kind_Map {
+		return datamodel.ErrWrongKind{TypeName: "dagjose.EncodedJWS", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+	}
+	itr := v.MapIterator()
+	for !itr.Done() {
+		k, v, err := itr.Next()
+		if err != nil {
+			return err
+		}
+		if err := na.AssembleKey().AssignNode(k); err != nil {
+			return err
+		}
+		if err := na.AssembleValue().AssignNode(v); err != nil {
+			return err
+		}
+	}
+	return na.Finish()
+}
+func (_EncodedJWS__Assembler) Prototype() datamodel.NodePrototype {
+	return _EncodedJWS__Prototype{}
+}
+func (ma *_EncodedJWS__Assembler) valueFinishTidy() bool {
+	switch ma.f {
+	case 0:
+		switch ma.w.link.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 1:
+		switch ma.w.payload.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 2:
+		switch ma.w.signatures.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_EncodedJWS__Assembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleEntry cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleEntry cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleEntry cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
+	}
+	switch k {
+	case "link":
+		if ma.s&fieldBit__EncodedJWS_Link != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link}
+		}
+		ma.s += fieldBit__EncodedJWS_Link
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+		return &ma.ca_link, nil
+	case "payload":
+		if ma.s&fieldBit__EncodedJWS_Payload != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload}
+		}
+		ma.s += fieldBit__EncodedJWS_Payload
+		ma.state = maState_midValue
+		ma.f = 1
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+		return &ma.ca_payload, nil
+	case "signatures":
+		if ma.s&fieldBit__EncodedJWS_Signatures != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Signatures}
+		}
+		ma.s += fieldBit__EncodedJWS_Signatures
+		ma.state = maState_midValue
+		ma.f = 2
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+		return &ma.ca_signatures, nil
+	}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWS", Key: &_String{k}}
+}
+func (ma *_EncodedJWS__Assembler) AssembleKey() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleKey cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleKey cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleKey cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midKey
+	return (*_EncodedJWS__KeyAssembler)(ma)
+}
+func (ma *_EncodedJWS__Assembler) AssembleValue() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		panic("invalid state: AssembleValue cannot be called when no key is primed")
+	case maState_midKey:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		// carry on
+	case maState_midValue:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling another value")
+	case maState_finished:
+		panic("invalid state: AssembleValue cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midValue
+	switch ma.f {
+	case 0:
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+		return &ma.ca_link
+	case 1:
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+		return &ma.ca_payload
+	case 2:
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+		return &ma.ca_signatures
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_EncodedJWS__Assembler) Finish() error {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: Finish cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		panic("invalid state: Finish cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: Finish cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: Finish cannot be called on an assembler that's already finished")
+	}
+	if ma.s&fieldBits__EncodedJWS_sufficient != fieldBits__EncodedJWS_sufficient {
+		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		return err
+	}
+	ma.state = maState_finished
+	*ma.m = schema.Maybe_Value
+	return nil
+}
+func (ma *_EncodedJWS__Assembler) KeyPrototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (ma *_EncodedJWS__Assembler) ValuePrototype(k string) datamodel.NodePrototype {
+	panic("todo structbuilder mapassembler valueprototype")
+}
+
+type _EncodedJWS__KeyAssembler _EncodedJWS__Assembler
+
+func (_EncodedJWS__KeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.BeginMap(0)
+}
+func (_EncodedJWS__KeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.BeginList(0)
+}
+func (na *_EncodedJWS__KeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.AssignNull()
+}
+func (_EncodedJWS__KeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.AssignBool(false)
+}
+func (_EncodedJWS__KeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.AssignInt(0)
+}
+func (_EncodedJWS__KeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.AssignFloat(0)
+}
+func (ka *_EncodedJWS__KeyAssembler) AssignString(k string) error {
+	if ka.state != maState_midKey {
+		panic("misuse: KeyAssembler held beyond its valid lifetime")
+	}
+	switch k {
+	case "link":
+		if ka.s&fieldBit__EncodedJWS_Link != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link}
+		}
+		ka.s += fieldBit__EncodedJWS_Link
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
+	case "payload":
+		if ka.s&fieldBit__EncodedJWS_Payload != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload}
+		}
+		ka.s += fieldBit__EncodedJWS_Payload
+		ka.state = maState_expectValue
+		ka.f = 1
+		return nil
+	case "signatures":
+		if ka.s&fieldBit__EncodedJWS_Signatures != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Signatures}
+		}
+		ka.s += fieldBit__EncodedJWS_Signatures
+		ka.state = maState_expectValue
+		ka.f = 2
+		return nil
+	default:
+		return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWS", Key: &_String{k}}
+	}
+}
+func (_EncodedJWS__KeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.AssignBytes(nil)
+}
+func (_EncodedJWS__KeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.KeyAssembler"}.AssignLink(nil)
+}
+func (ka *_EncodedJWS__KeyAssembler) AssignNode(v datamodel.Node) error {
+	if v2, err := v.AsString(); err != nil {
+		return err
+	} else {
+		return ka.AssignString(v2)
+	}
+}
+func (_EncodedJWS__KeyAssembler) Prototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (EncodedJWS) Type() schema.Type {
+	return nil /*TODO:typelit*/
+}
+func (n EncodedJWS) Representation() datamodel.Node {
+	return (*_EncodedJWS__Repr)(n)
+}
+
+type _EncodedJWS__Repr _EncodedJWS
+
+var (
+	fieldName__EncodedJWS_Link_serial       = _String{"link"}
+	fieldName__EncodedJWS_Payload_serial    = _String{"payload"}
+	fieldName__EncodedJWS_Signatures_serial = _String{"signatures"}
+)
+var _ datamodel.Node = &_EncodedJWS__Repr{}
+
+func (_EncodedJWS__Repr) Kind() datamodel.Kind {
+	return datamodel.Kind_Map
+}
+func (n *_EncodedJWS__Repr) LookupByString(key string) (datamodel.Node, error) {
+	switch key {
+	case "link":
+		if n.link.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.link.v.Representation(), nil
+	case "payload":
+		if n.payload.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.payload.v.Representation(), nil
+	case "signatures":
+		if n.signatures.m == schema.Maybe_Absent {
+			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
+		}
+		return n.signatures.v.Representation(), nil
+	default:
+		return nil, schema.ErrNoSuchField{Type: nil /*TODO*/, Field: datamodel.PathSegmentOfString(key)}
+	}
+}
+func (n *_EncodedJWS__Repr) LookupByNode(key datamodel.Node) (datamodel.Node, error) {
+	ks, err := key.AsString()
+	if err != nil {
+		return nil, err
+	}
+	return n.LookupByString(ks)
+}
+func (_EncodedJWS__Repr) LookupByIndex(idx int64) (datamodel.Node, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.LookupByIndex(0)
+}
+func (n _EncodedJWS__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel.Node, error) {
+	return n.LookupByString(seg.String())
+}
+func (n *_EncodedJWS__Repr) MapIterator() datamodel.MapIterator {
+	end := 3
+	if n.signatures.m == schema.Maybe_Absent {
+		end = 2
+	} else {
+		goto done
+	}
+	if n.payload.m == schema.Maybe_Absent {
+		end = 1
+	} else {
+		goto done
+	}
+	if n.link.m == schema.Maybe_Absent {
+		end = 0
+	} else {
+		goto done
+	}
+done:
+	return &_EncodedJWS__ReprMapItr{n, 0, end}
+}
+
+type _EncodedJWS__ReprMapItr struct {
+	n   *_EncodedJWS__Repr
+	idx int
+	end int
+}
+
+func (itr *_EncodedJWS__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
+advance:
+	if itr.idx >= 3 {
+		return nil, nil, datamodel.ErrIteratorOverread{}
+	}
+	switch itr.idx {
+	case 0:
+		k = &fieldName__EncodedJWS_Link_serial
+		if itr.n.link.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.link.v.Representation()
+	case 1:
+		k = &fieldName__EncodedJWS_Payload_serial
+		if itr.n.payload.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.payload.v.Representation()
+	case 2:
+		k = &fieldName__EncodedJWS_Signatures_serial
+		if itr.n.signatures.m == schema.Maybe_Absent {
+			itr.idx++
+			goto advance
+		}
+		v = itr.n.signatures.v.Representation()
+	default:
+		panic("unreachable")
+	}
+	itr.idx++
+	return
+}
+func (itr *_EncodedJWS__ReprMapItr) Done() bool {
+	return itr.idx >= itr.end
+}
+func (_EncodedJWS__Repr) ListIterator() datamodel.ListIterator {
+	return nil
+}
+func (rn *_EncodedJWS__Repr) Length() int64 {
+	l := 3
+	if rn.link.m == schema.Maybe_Absent {
+		l--
+	}
+	if rn.payload.m == schema.Maybe_Absent {
+		l--
+	}
+	if rn.signatures.m == schema.Maybe_Absent {
+		l--
+	}
+	return int64(l)
+}
+func (_EncodedJWS__Repr) IsAbsent() bool {
+	return false
+}
+func (_EncodedJWS__Repr) IsNull() bool {
+	return false
+}
+func (_EncodedJWS__Repr) AsBool() (bool, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.AsBool()
+}
+func (_EncodedJWS__Repr) AsInt() (int64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.AsInt()
+}
+func (_EncodedJWS__Repr) AsFloat() (float64, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.AsFloat()
+}
+func (_EncodedJWS__Repr) AsString() (string, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.AsString()
+}
+func (_EncodedJWS__Repr) AsBytes() ([]byte, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.AsBytes()
+}
+func (_EncodedJWS__Repr) AsLink() (datamodel.Link, error) {
+	return mixins.Map{TypeName: "dagjose.EncodedJWS.Repr"}.AsLink()
+}
+func (_EncodedJWS__Repr) Prototype() datamodel.NodePrototype {
+	return _EncodedJWS__ReprPrototype{}
+}
+
+type _EncodedJWS__ReprPrototype struct{}
+
+func (_EncodedJWS__ReprPrototype) NewBuilder() datamodel.NodeBuilder {
+	var nb _EncodedJWS__ReprBuilder
+	nb.Reset()
+	return &nb
+}
+
+type _EncodedJWS__ReprBuilder struct {
+	_EncodedJWS__ReprAssembler
+}
+
+func (nb *_EncodedJWS__ReprBuilder) Build() datamodel.Node {
+	if *nb.m != schema.Maybe_Value {
+		panic("invalid state: cannot call Build on an assembler that's not finished")
+	}
+	return nb.w
+}
+func (nb *_EncodedJWS__ReprBuilder) Reset() {
+	var w _EncodedJWS
+	var m schema.Maybe
+	*nb = _EncodedJWS__ReprBuilder{_EncodedJWS__ReprAssembler{w: &w, m: &m}}
+}
+
+type _EncodedJWS__ReprAssembler struct {
+	w     *_EncodedJWS
+	m     *schema.Maybe
+	state maState
+	s     int
+	f     int
+
+	cm            schema.Maybe
+	ca_link       _Link__ReprAssembler
+	ca_payload    _Raw__ReprAssembler
+	ca_signatures _EncodedSignatures__ReprAssembler
+}
+
+func (na *_EncodedJWS__ReprAssembler) reset() {
+	na.state = maState_initial
+	na.s = 0
+	na.ca_link.reset()
+	na.ca_payload.reset()
+	na.ca_signatures.reset()
+}
+func (na *_EncodedJWS__ReprAssembler) BeginMap(int64) (datamodel.MapAssembler, error) {
+	switch *na.m {
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: it makes no sense to 'begin' twice on the same assembler!")
+	}
+	*na.m = midvalue
+	if na.w == nil {
+		na.w = &_EncodedJWS{}
+	}
+	return na, nil
+}
+func (_EncodedJWS__ReprAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.BeginList(0)
+}
+func (na *_EncodedJWS__ReprAssembler) AssignNull() error {
+	switch *na.m {
+	case allowNull:
+		*na.m = schema.Maybe_Null
+		return nil
+	case schema.Maybe_Absent:
+		return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr.Repr"}.AssignNull()
+	case schema.Maybe_Value, schema.Maybe_Null:
+		panic("invalid state: cannot assign into assembler that's already finished")
+	case midvalue:
+		panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+	}
+	panic("unreachable")
+}
+func (_EncodedJWS__ReprAssembler) AssignBool(bool) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.AssignBool(false)
+}
+func (_EncodedJWS__ReprAssembler) AssignInt(int64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.AssignInt(0)
+}
+func (_EncodedJWS__ReprAssembler) AssignFloat(float64) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.AssignFloat(0)
+}
+func (_EncodedJWS__ReprAssembler) AssignString(string) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.AssignString("")
+}
+func (_EncodedJWS__ReprAssembler) AssignBytes([]byte) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.AssignBytes(nil)
+}
+func (_EncodedJWS__ReprAssembler) AssignLink(datamodel.Link) error {
+	return mixins.MapAssembler{TypeName: "dagjose.EncodedJWS.Repr"}.AssignLink(nil)
+}
+func (na *_EncodedJWS__ReprAssembler) AssignNode(v datamodel.Node) error {
+	if v.IsNull() {
+		return na.AssignNull()
+	}
+	if v2, ok := v.(*_EncodedJWS); ok {
+		switch *na.m {
+		case schema.Maybe_Value, schema.Maybe_Null:
+			panic("invalid state: cannot assign into assembler that's already finished")
+		case midvalue:
+			panic("invalid state: cannot assign null into an assembler that's already begun working on recursive structures!")
+		}
+		if na.w == nil {
+			na.w = v2
+			*na.m = schema.Maybe_Value
+			return nil
+		}
+		*na.w = *v2
+		*na.m = schema.Maybe_Value
+		return nil
+	}
+	if v.Kind() != datamodel.Kind_Map {
+		return datamodel.ErrWrongKind{TypeName: "dagjose.EncodedJWS.Repr", MethodName: "AssignNode", AppropriateKind: datamodel.KindSet_JustMap, ActualKind: v.Kind()}
+	}
+	itr := v.MapIterator()
+	for !itr.Done() {
+		k, v, err := itr.Next()
+		if err != nil {
+			return err
+		}
+		if err := na.AssembleKey().AssignNode(k); err != nil {
+			return err
+		}
+		if err := na.AssembleValue().AssignNode(v); err != nil {
+			return err
+		}
+	}
+	return na.Finish()
+}
+func (_EncodedJWS__ReprAssembler) Prototype() datamodel.NodePrototype {
+	return _EncodedJWS__ReprPrototype{}
+}
+func (ma *_EncodedJWS__ReprAssembler) valueFinishTidy() bool {
+	switch ma.f {
+	case 0:
+		switch ma.w.link.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 1:
+		switch ma.w.payload.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	case 2:
+		switch ma.w.signatures.m {
+		case schema.Maybe_Value:
+			ma.state = maState_initial
+			return true
+		default:
+			return false
+		}
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_EncodedJWS__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAssembler, error) {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleEntry cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleEntry cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleEntry cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
+	}
+	switch k {
+	case "link":
+		if ma.s&fieldBit__EncodedJWS_Link != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link_serial}
+		}
+		ma.s += fieldBit__EncodedJWS_Link
+		ma.state = maState_midValue
+		ma.f = 0
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+
+		return &ma.ca_link, nil
+	case "payload":
+		if ma.s&fieldBit__EncodedJWS_Payload != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload_serial}
+		}
+		ma.s += fieldBit__EncodedJWS_Payload
+		ma.state = maState_midValue
+		ma.f = 1
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+
+		return &ma.ca_payload, nil
+	case "signatures":
+		if ma.s&fieldBit__EncodedJWS_Signatures != 0 {
+			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Signatures_serial}
+		}
+		ma.s += fieldBit__EncodedJWS_Signatures
+		ma.state = maState_midValue
+		ma.f = 2
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+
+		return &ma.ca_signatures, nil
+	default:
+	}
+	return nil, schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWS.Repr", Key: &_String{k}}
+}
+func (ma *_EncodedJWS__ReprAssembler) AssembleKey() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: AssembleKey cannot be called when in the middle of assembling another key")
+	case maState_expectValue:
+		panic("invalid state: AssembleKey cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: AssembleKey cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: AssembleKey cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midKey
+	return (*_EncodedJWS__ReprKeyAssembler)(ma)
+}
+func (ma *_EncodedJWS__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
+	switch ma.state {
+	case maState_initial:
+		panic("invalid state: AssembleValue cannot be called when no key is primed")
+	case maState_midKey:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		// carry on
+	case maState_midValue:
+		panic("invalid state: AssembleValue cannot be called when in the middle of assembling another value")
+	case maState_finished:
+		panic("invalid state: AssembleValue cannot be called on an assembler that's already finished")
+	}
+	ma.state = maState_midValue
+	switch ma.f {
+	case 0:
+		ma.ca_link.w = &ma.w.link.v
+		ma.ca_link.m = &ma.w.link.m
+
+		return &ma.ca_link
+	case 1:
+		ma.ca_payload.w = &ma.w.payload.v
+		ma.ca_payload.m = &ma.w.payload.m
+
+		return &ma.ca_payload
+	case 2:
+		ma.ca_signatures.w = &ma.w.signatures.v
+		ma.ca_signatures.m = &ma.w.signatures.m
+
+		return &ma.ca_signatures
+	default:
+		panic("unreachable")
+	}
+}
+func (ma *_EncodedJWS__ReprAssembler) Finish() error {
+	switch ma.state {
+	case maState_initial:
+		// carry on
+	case maState_midKey:
+		panic("invalid state: Finish cannot be called when in the middle of assembling a key")
+	case maState_expectValue:
+		panic("invalid state: Finish cannot be called when expecting start of value assembly")
+	case maState_midValue:
+		if !ma.valueFinishTidy() {
+			panic("invalid state: Finish cannot be called when in the middle of assembling a value")
+		} // if tidy success: carry on
+	case maState_finished:
+		panic("invalid state: Finish cannot be called on an assembler that's already finished")
+	}
+	if ma.s&fieldBits__EncodedJWS_sufficient != fieldBits__EncodedJWS_sufficient {
+		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		return err
+	}
+	ma.state = maState_finished
+	*ma.m = schema.Maybe_Value
+	return nil
+}
+func (ma *_EncodedJWS__ReprAssembler) KeyPrototype() datamodel.NodePrototype {
+	return _String__Prototype{}
+}
+func (ma *_EncodedJWS__ReprAssembler) ValuePrototype(k string) datamodel.NodePrototype {
+	panic("todo structbuilder mapassembler repr valueprototype")
+}
+
+type _EncodedJWS__ReprKeyAssembler _EncodedJWS__ReprAssembler
+
+func (_EncodedJWS__ReprKeyAssembler) BeginMap(sizeHint int64) (datamodel.MapAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.BeginMap(0)
+}
+func (_EncodedJWS__ReprKeyAssembler) BeginList(sizeHint int64) (datamodel.ListAssembler, error) {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.BeginList(0)
+}
+func (na *_EncodedJWS__ReprKeyAssembler) AssignNull() error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.AssignNull()
+}
+func (_EncodedJWS__ReprKeyAssembler) AssignBool(bool) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.AssignBool(false)
+}
+func (_EncodedJWS__ReprKeyAssembler) AssignInt(int64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.AssignInt(0)
+}
+func (_EncodedJWS__ReprKeyAssembler) AssignFloat(float64) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.AssignFloat(0)
+}
+func (ka *_EncodedJWS__ReprKeyAssembler) AssignString(k string) error {
+	if ka.state != maState_midKey {
+		panic("misuse: KeyAssembler held beyond its valid lifetime")
+	}
+	switch k {
+	case "link":
+		if ka.s&fieldBit__EncodedJWS_Link != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link_serial}
+		}
+		ka.s += fieldBit__EncodedJWS_Link
+		ka.state = maState_expectValue
+		ka.f = 0
+		return nil
+	case "payload":
+		if ka.s&fieldBit__EncodedJWS_Payload != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload_serial}
+		}
+		ka.s += fieldBit__EncodedJWS_Payload
+		ka.state = maState_expectValue
+		ka.f = 1
+		return nil
+	case "signatures":
+		if ka.s&fieldBit__EncodedJWS_Signatures != 0 {
+			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Signatures_serial}
+		}
+		ka.s += fieldBit__EncodedJWS_Signatures
+		ka.state = maState_expectValue
+		ka.f = 2
+		return nil
+	}
+	return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWS.Repr", Key: &_String{k}}
+}
+func (_EncodedJWS__ReprKeyAssembler) AssignBytes([]byte) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.AssignBytes(nil)
+}
+func (_EncodedJWS__ReprKeyAssembler) AssignLink(datamodel.Link) error {
+	return mixins.StringAssembler{TypeName: "dagjose.EncodedJWS.Repr.KeyAssembler"}.AssignLink(nil)
+}
+func (ka *_EncodedJWS__ReprKeyAssembler) AssignNode(v datamodel.Node) error {
+	if v2, err := v.AsString(); err != nil {
+		return err
+	} else {
+		return ka.AssignString(v2)
+	}
+}
+func (_EncodedJWS__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
 

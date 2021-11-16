@@ -2,31 +2,12 @@ package dagjose
 
 import (
 	"bytes"
-	"errors"
 	ipldJson "github.com/ipld/go-ipld-prime/codec/dagjson"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/node/basicnode"
 	"gopkg.in/square/go-jose.v2/json"
 	"reflect"
 )
-
-func unflattenJOSE(n datamodel.Node) (datamodel.Node, error) {
-	// "flattened" fields are not included in the schema and thus never encoded. That means that this cannot have been
-	// called on a JOSE-related node because we wouldn't have gotten this far without an error have occurred earlier.
-	// We'll assume this is some sort of Map-type node that we can reconstruct to be in a "general" form before any
-	// actual JOSE-related operations are performed on it.
-	if jwe, err := isJWE(n); err != nil {
-		return nil, err
-	} else if jwe {
-		return unflattenJWE(n)
-	} else if jws, err := isJWS(n); err != nil {
-		return nil, err
-	} else if jws {
-		return unflattenJWS(n)
-	} else {
-		return nil, errors.New("invalid JOSE object")
-	}
-}
 
 func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 	if recipients, err := lookupIgnoreAbsent("recipients", n); err != nil {
