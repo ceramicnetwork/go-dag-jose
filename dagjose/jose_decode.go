@@ -19,10 +19,13 @@ type DecodeOptions struct {
 // Decode deserializes data from the given io.Reader and feeds it into the given datamodel.NodeAssembler. Decode fits
 // the codec.Decoder function interface.
 func (cfg DecodeOptions) Decode(na datamodel.NodeAssembler, r io.Reader) error {
+	// Since a JWE might be partially decoded by the time we figure out that this isn't a JWE and is probably a JWS, we
+	// can't pass the same reader to both decode methods. Instead, we read off all input bytes and use them in separate
+	// readers to the JWE/JWS decode methods.
 	if buf, err := io.ReadAll(r); err != nil {
 		return err
-	} else if err := cfg.tryDecodeJWE(na, bytes.NewReader(buf)); err != nil {
-		return cfg.tryDecodeJWS(na, bytes.NewReader(buf))
+	} else if err := cfg.DecodeJWE(na, bytes.NewReader(buf)); err != nil {
+		return cfg.DecodeJWS(na, bytes.NewReader(buf))
 	}
 	return nil
 }
@@ -35,7 +38,7 @@ func Decode(na datamodel.NodeAssembler, r io.Reader) error {
 	}.Decode(na, r)
 }
 
-func (DecodeOptions) tryDecodeJWE(na datamodel.NodeAssembler, r io.Reader) error {
+func (DecodeOptions) DecodeJWE(na datamodel.NodeAssembler, r io.Reader) error {
 	// Check for the fastpath where the passed assembler is already of type `_DecodedJWE__ReprBuilder` or
 	// `_DecodedJWE__ReprAssembler`.
 	copyRequired := false
@@ -63,7 +66,7 @@ func (DecodeOptions) tryDecodeJWE(na datamodel.NodeAssembler, r io.Reader) error
 	return nil
 }
 
-func (cfg DecodeOptions) tryDecodeJWS(na datamodel.NodeAssembler, r io.Reader) error {
+func (cfg DecodeOptions) DecodeJWS(na datamodel.NodeAssembler, r io.Reader) error {
 	// Check for the fastpath where the passed assembler is already of type `_DecodedJWS__ReprBuilder` or
 	// `_DecodedJWS__ReprAssembler`.
 	copyRequired := false
