@@ -64,7 +64,11 @@ func EncodeJWE(n datamodel.Node, w io.Writer) error {
 }
 
 func EncodeJWS(n datamodel.Node, w io.Writer) error {
-	// Check for the fastpath where the passed node is already of type `_EncodedJWES__Repr` or `_EncodedJWS`.
+	// If `link` and `payload` are present, make sure they match.
+	if err := validateLink(n); err != nil {
+		return err
+	} else
+	// Check for the fastpath where the passed node is already of type `_EncodedJWES__Repr` or `_EncodedJWS`
 	if _, castOk := n.(*_EncodedJWS__Repr); !castOk {
 		// This could still be `_EncodedJWS`, so check for that.
 		if _, castOk := n.(*_EncodedJWS); !castOk {
@@ -87,39 +91,25 @@ func EncodeJWS(n datamodel.Node, w io.Writer) error {
 	}.Encode(n, w)
 }
 
-func validateLinkBeforeEncode(n datamodel.Node) (bool, error) {
-	rebuildRequired := false
-	// If `link` and `payload` are present, make sure they match.
+func validateLink(n datamodel.Node) error {
 	if linkNode, err := n.LookupByString("link"); err != nil {
-		// It's ok for `link` to be absent (even if `payload` was present), but if some other error occurred,
-		// return it.
+		// It's ok for `link` to be absent (even if `payload` was present), but if some other error occurred, return it.
 		if _, linkNotFound := err.(datamodel.ErrNotExists); !linkNotFound {
-			return false, err
+			return err
 		}
-	} else {
-		// If `link` was present then `payload` must be present and the two must match. If any error occurs here
-		// (including `payload` being absent) return it.
-		payloadNode, err := n.LookupByString("payload")
-		if err != nil {
-			return false, err
-		}
-		payloadString, err := payloadNode.AsString()
-		if err != nil {
-			return false, err
-		}
-		cidFromPayload, err := cid.Decode(string(multibase.Base64url) + payloadString)
-		if err != nil {
-			return false, err
-		}
-		linkFromNode, err := linkNode.AsLink()
-		if err != nil {
-			return false, err
-		}
-		if linkFromNode.(cidlink.Link).Cid != cidFromPayload {
-			return false, errors.New("cid mismatch")
-		}
-		// The node needs to be rebuilt without `link` before it can be encoded
-		rebuildRequired = true
+	} else
+	// If `link` was present then `payload` must be present and the two must match. If any error occurs here (including
+	// `payload` being absent) return it.
+	if payloadNode, err := n.LookupByString("payload"); err != nil {
+		return err
+	} else if payloadString, err := payloadNode.AsString(); err != nil {
+		return err
+	} else if cidFromPayload, err := cid.Decode(string(multibase.Base64url) + payloadString); err != nil {
+		return err
+	} else if linkFromNode, err := linkNode.AsLink(); err != nil {
+		return err
+	} else if linkFromNode.(cidlink.Link).Cid != cidFromPayload {
+		return errors.New("cid mismatch")
 	}
-	return rebuildRequired, nil
+	return nil
 }
