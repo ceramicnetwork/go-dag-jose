@@ -2,18 +2,35 @@ package dagjose
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
+	"gopkg.in/square/go-jose.v2/json"
+	"reflect"
+
+	"github.com/ipfs/go-cid"
 	ipldJson "github.com/ipld/go-ipld-prime/codec/dagjson"
 	"github.com/ipld/go-ipld-prime/datamodel"
 	"github.com/ipld/go-ipld-prime/node/basicnode"
-	"gopkg.in/square/go-jose.v2/json"
-	"reflect"
+	"github.com/ipld/go-ipld-prime/schema"
+	"github.com/multiformats/go-multibase"
 )
 
 func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 	if recipients, err := lookupIgnoreAbsent("recipients", n); err != nil {
 		return nil, err
 	} else if recipients != nil {
-		// If `recipients` is present, this must be a "general" JWE and no changes are needed.
+		// If `recipients` is present, this must be a "general" JWE and no changes are needed but make sure that
+		// `header` and/or `encrypted_key` are not also present since that would be a violation of the spec.
+		if encryptedKey, err := lookupIgnoreNoSuchField("encrypted_key", n); err != nil {
+			return nil, err
+		} else if encryptedKey != nil {
+			return nil, errors.New("invalid JWE serialization")
+		}
+		if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
+			return nil, err
+		} else if header != nil {
+			return nil, errors.New("invalid JWE serialization")
+		}
 		return n, nil
 	} else
 	// If `recipients` is absent, this must be a "flattened" JWE.
@@ -114,13 +131,33 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 	if signatures, err := lookupIgnoreAbsent("signatures", n); err != nil {
 		return nil, err
 	} else if signatures != nil {
-		// If `signatures` is present, this must be a "general" JWS and no changes are needed.
+		// If `signatures` is present, this must be a "general" JWS and no changes are needed but make sure that
+		// `header`, `protected`, and/or `signature` are not also present since that would be a violation of the spec.
+		if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
+			return nil, err
+		} else if header != nil {
+			return nil, errors.New("invalid JWS serialization")
+		}
+		if protected, err := lookupIgnoreNoSuchField("protected", n); err != nil {
+			return nil, err
+		} else if protected != nil {
+			return nil, errors.New("invalid JWS serialization")
+		}
+		if signature, err := lookupIgnoreNoSuchField("signature", n); err != nil {
+			return nil, err
+		} else if signature != nil {
+			return nil, errors.New("invalid JWS serialization")
+		}
 		return n, nil
 	} else
 	// If `signatures` is absent, this must be a "flattened" JWS.
 	if payload, err := n.LookupByString("payload"); err != nil {
 		// `payload` is mandatory so if any error occurs, return from here
 		return nil, err
+	} else if payloadString, err := payload.AsString(); err != nil {
+		return nil, err
+	} else if _, err := cid.Decode(string(multibase.Base64url) + payloadString); err != nil {
+		return nil, errors.New(fmt.Sprintf("payload is not a valid CID: %v", err))
 	} else if payloadString, err := payload.AsString(); err != nil {
 		return nil, err
 	} else {
@@ -162,7 +199,7 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 }
 
 func isJWS(n datamodel.Node) (bool, error) {
-	if payload, err := lookupIgnoreAbsent("payload", n); err != nil {
+	if payload, err := lookupIgnoreNoSuchField("payload", n); err != nil {
 		return false, err
 	} else {
 		return payload != nil, nil
@@ -170,7 +207,7 @@ func isJWS(n datamodel.Node) (bool, error) {
 }
 
 func isJWE(n datamodel.Node) (bool, error) {
-	if ciphertext, err := lookupIgnoreAbsent("ciphertext", n); err != nil {
+	if ciphertext, err := lookupIgnoreNoSuchField("ciphertext", n); err != nil {
 		return false, err
 	} else {
 		return ciphertext != nil, nil
@@ -234,4 +271,14 @@ func lookupIgnoreAbsent(key string, n datamodel.Node) (datamodel.Node, error) {
 	} else {
 		return value, nil
 	}
+}
+
+func lookupIgnoreNoSuchField(key string, n datamodel.Node) (datamodel.Node, error) {
+	value, err := lookupIgnoreAbsent(key, n)
+	if err != nil {
+		if _, noSuchFieldErr := err.(schema.ErrNoSuchField); !noSuchFieldErr {
+			return nil, err
+		}
+	}
+	return value, nil
 }
