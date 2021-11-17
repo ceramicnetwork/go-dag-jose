@@ -61,7 +61,7 @@ func main() {
 
 	ts.Accumulate(schema.SpawnStruct("DecodedJWE", []schema.StructField{
 		schema.SpawnStructField("aad", "Base64Url", true, false),
-		schema.SpawnStructField("ciphertext", "Base64Url", true, false),
+		schema.SpawnStructField("ciphertext", "Base64Url", false, false),
 		schema.SpawnStructField("iv", "Base64Url", true, false),
 		schema.SpawnStructField("protected", "Base64Url", true, false),
 		schema.SpawnStructField("recipients", "DecodedRecipients", true, false),
@@ -85,7 +85,7 @@ func main() {
 		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
 		// during encode, it is validated against `payload` and then ignored.
 		schema.SpawnStructField("link", "Link", true, false),
-		schema.SpawnStructField("payload", "Base64Url", true, false),
+		schema.SpawnStructField("payload", "Base64Url", false, false),
 		schema.SpawnStructField("signatures", "DecodedSignatures", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 
@@ -106,7 +106,7 @@ func main() {
 
 	ts.Accumulate(schema.SpawnStruct("EncodedJWE", []schema.StructField{
 		schema.SpawnStructField("aad", "Raw", true, false),
-		schema.SpawnStructField("ciphertext", "Raw", true, false),
+		schema.SpawnStructField("ciphertext", "Raw", false, false),
 		schema.SpawnStructField("iv", "Raw", true, false),
 		schema.SpawnStructField("protected", "Raw", true, false),
 		schema.SpawnStructField("recipients", "EncodedRecipients", true, false),
@@ -130,7 +130,7 @@ func main() {
 		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
 		// during encode, it is validated against `payload` and then ignored.
 		schema.SpawnStructField("link", "Link", true, false),
-		schema.SpawnStructField("payload", "Raw", true, false),
+		schema.SpawnStructField("payload", "Raw", false, false),
 		schema.SpawnStructField("signatures", "EncodedSignatures", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))
 

@@ -93,7 +93,7 @@ type _Bytes struct{ x []byte }
 type DecodedJWE = *_DecodedJWE
 type _DecodedJWE struct {
 	aad         _Base64Url__Maybe
-	ciphertext  _Base64Url__Maybe
+	ciphertext  _Base64Url
 	iv          _Base64Url__Maybe
 	protected   _Base64Url__Maybe
 	recipients  _DecodedRecipients__Maybe
@@ -105,7 +105,7 @@ type _DecodedJWE struct {
 type DecodedJWS = *_DecodedJWS
 type _DecodedJWS struct {
 	link       _Link__Maybe
-	payload    _Base64Url__Maybe
+	payload    _Base64Url
 	signatures _DecodedSignatures__Maybe
 }
 
@@ -140,7 +140,7 @@ type _DecodedSignatures struct {
 type EncodedJWE = *_EncodedJWE
 type _EncodedJWE struct {
 	aad         _Raw__Maybe
-	ciphertext  _Raw__Maybe
+	ciphertext  _Raw
 	iv          _Raw__Maybe
 	protected   _Raw__Maybe
 	recipients  _EncodedRecipients__Maybe
@@ -152,7 +152,7 @@ type _EncodedJWE struct {
 type EncodedJWS = *_EncodedJWS
 type _EncodedJWS struct {
 	link       _Link__Maybe
-	payload    _Raw__Maybe
+	payload    _Raw
 	signatures _EncodedSignatures__Maybe
 }
 

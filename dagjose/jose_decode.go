@@ -88,10 +88,9 @@ func (cfg DecodeOptions) DecodeJWS(na datamodel.NodeAssembler, r io.Reader) erro
 	}
 	if cfg.AddLink {
 		// If `payload` is present but `link` is not, add `link` with the corresponding encoded CID.
-		payloadNode := &jwsBuilder.w.payload
 		linkNode := &jwsBuilder.w.link
-		if payloadNode.Exists() && !linkNode.Exists() {
-			if link, err := Type.Base64Url.Link(&payloadNode.v); err != nil {
+		if !linkNode.Exists() {
+			if link, err := Type.Base64Url.Link(&jwsBuilder.w.payload); err != nil {
 				return err
 			} else {
 				linkNode.m = schema.Maybe_Value

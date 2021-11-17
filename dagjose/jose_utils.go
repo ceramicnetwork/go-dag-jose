@@ -64,6 +64,17 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 				jwe["iv"] = ivString
 			}
 		}
+		if link, err := lookupIgnoreAbsent("link", n); err != nil {
+			return nil, err
+		} else if link != nil {
+			if linkString, err := link.AsString(); err != nil {
+				return nil, err
+			} else {
+				jwe["link"] = map[string]string{
+					"/": linkString,
+				}
+			}
+		}
 		if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
 			return nil, err
 		} else if protected != nil {

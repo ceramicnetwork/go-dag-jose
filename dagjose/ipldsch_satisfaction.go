@@ -1282,7 +1282,7 @@ type _Bytes__ReprAssembler = _Bytes__Assembler
 func (n _DecodedJWE) FieldAad() MaybeBase64Url {
 	return &n.aad
 }
-func (n _DecodedJWE) FieldCiphertext() MaybeBase64Url {
+func (n _DecodedJWE) FieldCiphertext() Base64Url {
 	return &n.ciphertext
 }
 func (n _DecodedJWE) FieldIv() MaybeBase64Url {
@@ -1358,10 +1358,7 @@ func (n DecodedJWE) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return &n.aad.v, nil
 	case "ciphertext":
-		if n.ciphertext.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.ciphertext.v, nil
+		return &n.ciphertext, nil
 	case "iv":
 		if n.iv.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -1427,11 +1424,7 @@ func (itr *_DecodedJWE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ er
 		v = &itr.n.aad.v
 	case 1:
 		k = &fieldName__DecodedJWE_Ciphertext
-		if itr.n.ciphertext.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.ciphertext.v
+		v = &itr.n.ciphertext
 	case 2:
 		k = &fieldName__DecodedJWE_Iv
 		if itr.n.iv.m == schema.Maybe_Absent {
@@ -1572,7 +1565,7 @@ var (
 	fieldBit__DecodedJWE_Recipients  = 1 << 4
 	fieldBit__DecodedJWE_Tag         = 1 << 5
 	fieldBit__DecodedJWE_Unprotected = 1 << 6
-	fieldBits__DecodedJWE_sufficient = 0
+	fieldBits__DecodedJWE_sufficient = 0 + 1<<1
 )
 
 func (na *_DecodedJWE__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -1675,8 +1668,10 @@ func (ma *_DecodedJWE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.ciphertext.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.ca_ciphertext.w = nil
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -1760,8 +1755,8 @@ func (ma *_DecodedJWE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembl
 		ma.s += fieldBit__DecodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext, nil
 	case "iv":
 		if ma.s&fieldBit__DecodedJWE_Iv != 0 {
@@ -1854,8 +1849,8 @@ func (ma *_DecodedJWE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_aad.m = &ma.w.aad.m
 		return &ma.ca_aad
 	case 1:
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext
 	case 2:
 		ma.ca_iv.w = &ma.w.iv.v
@@ -1898,6 +1893,9 @@ func (ma *_DecodedJWE__Assembler) Finish() error {
 	}
 	if ma.s&fieldBits__DecodedJWE_sufficient != fieldBits__DecodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__DecodedJWE_Ciphertext == 0 {
+			err.Missing = append(err.Missing, "ciphertext")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -2043,10 +2041,7 @@ func (n *_DecodedJWE__Repr) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return n.aad.v.Representation(), nil
 	case "ciphertext":
-		if n.ciphertext.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.ciphertext.v.Representation(), nil
+		return n.ciphertext.Representation(), nil
 	case "iv":
 		if n.iv.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -2116,16 +2111,6 @@ func (n *_DecodedJWE__Repr) MapIterator() datamodel.MapIterator {
 	} else {
 		goto done
 	}
-	if n.ciphertext.m == schema.Maybe_Absent {
-		end = 1
-	} else {
-		goto done
-	}
-	if n.aad.m == schema.Maybe_Absent {
-		end = 0
-	} else {
-		goto done
-	}
 done:
 	return &_DecodedJWE__ReprMapItr{n, 0, end}
 }
@@ -2151,11 +2136,7 @@ advance:
 		v = itr.n.aad.v.Representation()
 	case 1:
 		k = &fieldName__DecodedJWE_Ciphertext_serial
-		if itr.n.ciphertext.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.ciphertext.v.Representation()
+		v = itr.n.ciphertext.Representation()
 	case 2:
 		k = &fieldName__DecodedJWE_Iv_serial
 		if itr.n.iv.m == schema.Maybe_Absent {
@@ -2206,9 +2187,6 @@ func (_DecodedJWE__Repr) ListIterator() datamodel.ListIterator {
 func (rn *_DecodedJWE__Repr) Length() int64 {
 	l := 7
 	if rn.aad.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.ciphertext.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.iv.m == schema.Maybe_Absent {
@@ -2408,8 +2386,9 @@ func (ma *_DecodedJWE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.ciphertext.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -2494,9 +2473,8 @@ func (ma *_DecodedJWE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAss
 		ma.s += fieldBit__DecodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
-
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext, nil
 	case "iv":
 		if ma.s&fieldBit__DecodedJWE_Iv != 0 {
@@ -2596,9 +2574,8 @@ func (ma *_DecodedJWE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_aad
 	case 1:
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
-
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext
 	case 2:
 		ma.ca_iv.w = &ma.w.iv.v
@@ -2646,6 +2623,9 @@ func (ma *_DecodedJWE__ReprAssembler) Finish() error {
 	}
 	if ma.s&fieldBits__DecodedJWE_sufficient != fieldBits__DecodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__DecodedJWE_Ciphertext == 0 {
+			err.Missing = append(err.Missing, "ciphertext")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -2763,7 +2743,7 @@ func (_DecodedJWE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 func (n _DecodedJWS) FieldLink() MaybeLink {
 	return &n.link
 }
-func (n _DecodedJWS) FieldPayload() MaybeBase64Url {
+func (n _DecodedJWS) FieldPayload() Base64Url {
 	return &n.payload
 }
 func (n _DecodedJWS) FieldSignatures() MaybeDecodedSignatures {
@@ -2823,10 +2803,7 @@ func (n DecodedJWS) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return &n.link.v, nil
 	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.payload.v, nil
+		return &n.payload, nil
 	case "signatures":
 		if n.signatures.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -2872,11 +2849,7 @@ func (itr *_DecodedJWS__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ er
 		v = &itr.n.link.v
 	case 1:
 		k = &fieldName__DecodedJWS_Payload
-		if itr.n.payload.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.payload.v
+		v = &itr.n.payload
 	case 2:
 		k = &fieldName__DecodedJWS_Signatures
 		if itr.n.signatures.m == schema.Maybe_Absent {
@@ -2977,7 +2950,7 @@ var (
 	fieldBit__DecodedJWS_Link        = 1 << 0
 	fieldBit__DecodedJWS_Payload     = 1 << 1
 	fieldBit__DecodedJWS_Signatures  = 1 << 2
-	fieldBits__DecodedJWS_sufficient = 0
+	fieldBits__DecodedJWS_sufficient = 0 + 1<<1
 )
 
 func (na *_DecodedJWS__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -3080,8 +3053,10 @@ func (ma *_DecodedJWS__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.payload.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.ca_payload.w = nil
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -3132,8 +3107,8 @@ func (ma *_DecodedJWS__Assembler) AssembleEntry(k string) (datamodel.NodeAssembl
 		ma.s += fieldBit__DecodedJWS_Payload
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload, nil
 	case "signatures":
 		if ma.s&fieldBit__DecodedJWS_Signatures != 0 {
@@ -3186,8 +3161,8 @@ func (ma *_DecodedJWS__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_link.m = &ma.w.link.m
 		return &ma.ca_link
 	case 1:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload
 	case 2:
 		ma.ca_signatures.w = &ma.w.signatures.v
@@ -3214,6 +3189,9 @@ func (ma *_DecodedJWS__Assembler) Finish() error {
 	}
 	if ma.s&fieldBits__DecodedJWS_sufficient != fieldBits__DecodedJWS_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__DecodedJWS_Payload == 0 {
+			err.Missing = append(err.Missing, "payload")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -3323,10 +3301,7 @@ func (n *_DecodedJWS__Repr) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return n.link.v.Representation(), nil
 	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.payload.v.Representation(), nil
+		return n.payload.Representation(), nil
 	case "signatures":
 		if n.signatures.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -3356,16 +3331,6 @@ func (n *_DecodedJWS__Repr) MapIterator() datamodel.MapIterator {
 	} else {
 		goto done
 	}
-	if n.payload.m == schema.Maybe_Absent {
-		end = 1
-	} else {
-		goto done
-	}
-	if n.link.m == schema.Maybe_Absent {
-		end = 0
-	} else {
-		goto done
-	}
 done:
 	return &_DecodedJWS__ReprMapItr{n, 0, end}
 }
@@ -3391,11 +3356,7 @@ advance:
 		v = itr.n.link.v.Representation()
 	case 1:
 		k = &fieldName__DecodedJWS_Payload_serial
-		if itr.n.payload.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.payload.v.Representation()
+		v = itr.n.payload.Representation()
 	case 2:
 		k = &fieldName__DecodedJWS_Signatures_serial
 		if itr.n.signatures.m == schema.Maybe_Absent {
@@ -3418,9 +3379,6 @@ func (_DecodedJWS__Repr) ListIterator() datamodel.ListIterator {
 func (rn *_DecodedJWS__Repr) Length() int64 {
 	l := 3
 	if rn.link.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.payload.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.signatures.m == schema.Maybe_Absent {
@@ -3600,8 +3558,9 @@ func (ma *_DecodedJWS__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.payload.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -3653,9 +3612,8 @@ func (ma *_DecodedJWS__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAss
 		ma.s += fieldBit__DecodedJWS_Payload
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload, nil
 	case "signatures":
 		if ma.s&fieldBit__DecodedJWS_Signatures != 0 {
@@ -3711,9 +3669,8 @@ func (ma *_DecodedJWS__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_link
 	case 1:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload
 	case 2:
 		ma.ca_signatures.w = &ma.w.signatures.v
@@ -3741,6 +3698,9 @@ func (ma *_DecodedJWS__ReprAssembler) Finish() error {
 	}
 	if ma.s&fieldBits__DecodedJWS_sufficient != fieldBits__DecodedJWS_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__DecodedJWS_Payload == 0 {
+			err.Missing = append(err.Missing, "payload")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -7006,7 +6966,7 @@ func (la *_DecodedSignatures__ReprAssembler) ValuePrototype(_ int64) datamodel.N
 func (n _EncodedJWE) FieldAad() MaybeRaw {
 	return &n.aad
 }
-func (n _EncodedJWE) FieldCiphertext() MaybeRaw {
+func (n _EncodedJWE) FieldCiphertext() Raw {
 	return &n.ciphertext
 }
 func (n _EncodedJWE) FieldIv() MaybeRaw {
@@ -7082,10 +7042,7 @@ func (n EncodedJWE) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return &n.aad.v, nil
 	case "ciphertext":
-		if n.ciphertext.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.ciphertext.v, nil
+		return &n.ciphertext, nil
 	case "iv":
 		if n.iv.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -7151,11 +7108,7 @@ func (itr *_EncodedJWE__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ er
 		v = &itr.n.aad.v
 	case 1:
 		k = &fieldName__EncodedJWE_Ciphertext
-		if itr.n.ciphertext.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.ciphertext.v
+		v = &itr.n.ciphertext
 	case 2:
 		k = &fieldName__EncodedJWE_Iv
 		if itr.n.iv.m == schema.Maybe_Absent {
@@ -7296,7 +7249,7 @@ var (
 	fieldBit__EncodedJWE_Recipients  = 1 << 4
 	fieldBit__EncodedJWE_Tag         = 1 << 5
 	fieldBit__EncodedJWE_Unprotected = 1 << 6
-	fieldBits__EncodedJWE_sufficient = 0
+	fieldBits__EncodedJWE_sufficient = 0 + 1<<1
 )
 
 func (na *_EncodedJWE__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -7399,8 +7352,10 @@ func (ma *_EncodedJWE__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.ciphertext.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.ca_ciphertext.w = nil
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -7484,8 +7439,8 @@ func (ma *_EncodedJWE__Assembler) AssembleEntry(k string) (datamodel.NodeAssembl
 		ma.s += fieldBit__EncodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext, nil
 	case "iv":
 		if ma.s&fieldBit__EncodedJWE_Iv != 0 {
@@ -7578,8 +7533,8 @@ func (ma *_EncodedJWE__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_aad.m = &ma.w.aad.m
 		return &ma.ca_aad
 	case 1:
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext
 	case 2:
 		ma.ca_iv.w = &ma.w.iv.v
@@ -7622,6 +7577,9 @@ func (ma *_EncodedJWE__Assembler) Finish() error {
 	}
 	if ma.s&fieldBits__EncodedJWE_sufficient != fieldBits__EncodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__EncodedJWE_Ciphertext == 0 {
+			err.Missing = append(err.Missing, "ciphertext")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -7767,10 +7725,7 @@ func (n *_EncodedJWE__Repr) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return n.aad.v.Representation(), nil
 	case "ciphertext":
-		if n.ciphertext.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.ciphertext.v.Representation(), nil
+		return n.ciphertext.Representation(), nil
 	case "iv":
 		if n.iv.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -7840,16 +7795,6 @@ func (n *_EncodedJWE__Repr) MapIterator() datamodel.MapIterator {
 	} else {
 		goto done
 	}
-	if n.ciphertext.m == schema.Maybe_Absent {
-		end = 1
-	} else {
-		goto done
-	}
-	if n.aad.m == schema.Maybe_Absent {
-		end = 0
-	} else {
-		goto done
-	}
 done:
 	return &_EncodedJWE__ReprMapItr{n, 0, end}
 }
@@ -7875,11 +7820,7 @@ advance:
 		v = itr.n.aad.v.Representation()
 	case 1:
 		k = &fieldName__EncodedJWE_Ciphertext_serial
-		if itr.n.ciphertext.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.ciphertext.v.Representation()
+		v = itr.n.ciphertext.Representation()
 	case 2:
 		k = &fieldName__EncodedJWE_Iv_serial
 		if itr.n.iv.m == schema.Maybe_Absent {
@@ -7930,9 +7871,6 @@ func (_EncodedJWE__Repr) ListIterator() datamodel.ListIterator {
 func (rn *_EncodedJWE__Repr) Length() int64 {
 	l := 7
 	if rn.aad.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.ciphertext.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.iv.m == schema.Maybe_Absent {
@@ -8132,8 +8070,9 @@ func (ma *_EncodedJWE__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.ciphertext.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -8218,9 +8157,8 @@ func (ma *_EncodedJWE__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAss
 		ma.s += fieldBit__EncodedJWE_Ciphertext
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
-
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext, nil
 	case "iv":
 		if ma.s&fieldBit__EncodedJWE_Iv != 0 {
@@ -8320,9 +8258,8 @@ func (ma *_EncodedJWE__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_aad
 	case 1:
-		ma.ca_ciphertext.w = &ma.w.ciphertext.v
-		ma.ca_ciphertext.m = &ma.w.ciphertext.m
-
+		ma.ca_ciphertext.w = &ma.w.ciphertext
+		ma.ca_ciphertext.m = &ma.cm
 		return &ma.ca_ciphertext
 	case 2:
 		ma.ca_iv.w = &ma.w.iv.v
@@ -8370,6 +8307,9 @@ func (ma *_EncodedJWE__ReprAssembler) Finish() error {
 	}
 	if ma.s&fieldBits__EncodedJWE_sufficient != fieldBits__EncodedJWE_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__EncodedJWE_Ciphertext == 0 {
+			err.Missing = append(err.Missing, "ciphertext")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -8487,7 +8427,7 @@ func (_EncodedJWE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 func (n _EncodedJWS) FieldLink() MaybeLink {
 	return &n.link
 }
-func (n _EncodedJWS) FieldPayload() MaybeRaw {
+func (n _EncodedJWS) FieldPayload() Raw {
 	return &n.payload
 }
 func (n _EncodedJWS) FieldSignatures() MaybeEncodedSignatures {
@@ -8547,10 +8487,7 @@ func (n EncodedJWS) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return &n.link.v, nil
 	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.payload.v, nil
+		return &n.payload, nil
 	case "signatures":
 		if n.signatures.m == schema.Maybe_Absent {
 			return datamodel.Absent, nil
@@ -8596,11 +8533,7 @@ func (itr *_EncodedJWS__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ er
 		v = &itr.n.link.v
 	case 1:
 		k = &fieldName__EncodedJWS_Payload
-		if itr.n.payload.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.payload.v
+		v = &itr.n.payload
 	case 2:
 		k = &fieldName__EncodedJWS_Signatures
 		if itr.n.signatures.m == schema.Maybe_Absent {
@@ -8701,7 +8634,7 @@ var (
 	fieldBit__EncodedJWS_Link        = 1 << 0
 	fieldBit__EncodedJWS_Payload     = 1 << 1
 	fieldBit__EncodedJWS_Signatures  = 1 << 2
-	fieldBits__EncodedJWS_sufficient = 0
+	fieldBits__EncodedJWS_sufficient = 0 + 1<<1
 )
 
 func (na *_EncodedJWS__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -8804,8 +8737,10 @@ func (ma *_EncodedJWS__Assembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.payload.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.ca_payload.w = nil
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -8856,8 +8791,8 @@ func (ma *_EncodedJWS__Assembler) AssembleEntry(k string) (datamodel.NodeAssembl
 		ma.s += fieldBit__EncodedJWS_Payload
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload, nil
 	case "signatures":
 		if ma.s&fieldBit__EncodedJWS_Signatures != 0 {
@@ -8910,8 +8845,8 @@ func (ma *_EncodedJWS__Assembler) AssembleValue() datamodel.NodeAssembler {
 		ma.ca_link.m = &ma.w.link.m
 		return &ma.ca_link
 	case 1:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload
 	case 2:
 		ma.ca_signatures.w = &ma.w.signatures.v
@@ -8938,6 +8873,9 @@ func (ma *_EncodedJWS__Assembler) Finish() error {
 	}
 	if ma.s&fieldBits__EncodedJWS_sufficient != fieldBits__EncodedJWS_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__EncodedJWS_Payload == 0 {
+			err.Missing = append(err.Missing, "payload")
+		}
 		return err
 	}
 	ma.state = maState_finished
@@ -9047,10 +8985,7 @@ func (n *_EncodedJWS__Repr) LookupByString(key string) (datamodel.Node, error) {
 		}
 		return n.link.v.Representation(), nil
 	case "payload":
-		if n.payload.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.payload.v.Representation(), nil
+		return n.payload.Representation(), nil
 	case "signatures":
 		if n.signatures.m == schema.Maybe_Absent {
 			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
@@ -9080,16 +9015,6 @@ func (n *_EncodedJWS__Repr) MapIterator() datamodel.MapIterator {
 	} else {
 		goto done
 	}
-	if n.payload.m == schema.Maybe_Absent {
-		end = 1
-	} else {
-		goto done
-	}
-	if n.link.m == schema.Maybe_Absent {
-		end = 0
-	} else {
-		goto done
-	}
 done:
 	return &_EncodedJWS__ReprMapItr{n, 0, end}
 }
@@ -9115,11 +9040,7 @@ advance:
 		v = itr.n.link.v.Representation()
 	case 1:
 		k = &fieldName__EncodedJWS_Payload_serial
-		if itr.n.payload.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.payload.v.Representation()
+		v = itr.n.payload.Representation()
 	case 2:
 		k = &fieldName__EncodedJWS_Signatures_serial
 		if itr.n.signatures.m == schema.Maybe_Absent {
@@ -9142,9 +9063,6 @@ func (_EncodedJWS__Repr) ListIterator() datamodel.ListIterator {
 func (rn *_EncodedJWS__Repr) Length() int64 {
 	l := 3
 	if rn.link.m == schema.Maybe_Absent {
-		l--
-	}
-	if rn.payload.m == schema.Maybe_Absent {
 		l--
 	}
 	if rn.signatures.m == schema.Maybe_Absent {
@@ -9324,8 +9242,9 @@ func (ma *_EncodedJWS__ReprAssembler) valueFinishTidy() bool {
 			return false
 		}
 	case 1:
-		switch ma.w.payload.m {
+		switch ma.cm {
 		case schema.Maybe_Value:
+			ma.cm = schema.Maybe_Absent
 			ma.state = maState_initial
 			return true
 		default:
@@ -9377,9 +9296,8 @@ func (ma *_EncodedJWS__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAss
 		ma.s += fieldBit__EncodedJWS_Payload
 		ma.state = maState_midValue
 		ma.f = 1
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload, nil
 	case "signatures":
 		if ma.s&fieldBit__EncodedJWS_Signatures != 0 {
@@ -9435,9 +9353,8 @@ func (ma *_EncodedJWS__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 
 		return &ma.ca_link
 	case 1:
-		ma.ca_payload.w = &ma.w.payload.v
-		ma.ca_payload.m = &ma.w.payload.m
-
+		ma.ca_payload.w = &ma.w.payload
+		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload
 	case 2:
 		ma.ca_signatures.w = &ma.w.signatures.v
@@ -9465,6 +9382,9 @@ func (ma *_EncodedJWS__ReprAssembler) Finish() error {
 	}
 	if ma.s&fieldBits__EncodedJWS_sufficient != fieldBits__EncodedJWS_sufficient {
 		err := schema.ErrMissingRequiredField{Missing: make([]string, 0)}
+		if ma.s&fieldBit__EncodedJWS_Payload == 0 {
+			err.Missing = append(err.Missing, "payload")
+		}
 		return err
 	}
 	ma.state = maState_finished
