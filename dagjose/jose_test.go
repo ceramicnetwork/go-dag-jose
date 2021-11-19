@@ -497,6 +497,31 @@ func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
 	})
 }
 
+// A JWS without a signature is not valid
+func TestMissingPayloadErrorParsingJWS(t *testing.T) {
+	jsonStr := "{\"signatures\": []}"
+	jws, err := parseJOSE([]byte(jsonStr))
+	require.NotNil(t, err)
+	require.Nil(t, jws)
+}
+
+// A JWE without ciphertext is not valid
+func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
+	jsonStr := "{\"header\": {}}"
+	jwe, err := parseJOSE([]byte(jsonStr))
+	require.NotNil(t, err)
+	require.Nil(t, jwe)
+}
+
+// Trying to serialize a JWS with more than one signature to a flattened serialization should throw an error
+func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
+	jsonStr := "{\"signature\": \"sig\", \"signatures\": [], \"payload\": \"pay\"}"
+	jws, err := parseJOSE([]byte(jsonStr))
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "invalid JWS serialization")
+	require.Nil(t, jws)
+}
+
 // If the incoming IPLD data contains a payload which is not a valid CID we
 // should raise an error
 func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
