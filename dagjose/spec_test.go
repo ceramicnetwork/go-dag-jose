@@ -39,7 +39,7 @@ func TestSpecFixtures(t *testing.T) {
 		t.Run(dir.Name, func(t *testing.T) {
 			// We always expect the hunk with dag-jose in hex form.
 			// Parse the hex (and strip linebreaks, which should be about every 80 chars, though that's not enforced).
-			fixtureDataHex := dir.Children["data.dag-jose.hex"].Hunk.Body
+			fixtureDataHex := dir.Children["serial.dag-jose.hex"].Hunk.Body
 			fixtureDataHex = bytes.ReplaceAll(fixtureDataHex, []byte{'\n'}, []byte{})
 			fixtureDataBinary := make([]byte, hex.DecodedLen(len(fixtureDataHex)))
 			i, err := hex.Decode(fixtureDataBinary, fixtureDataHex)
@@ -83,7 +83,7 @@ func TestSpecFixtures(t *testing.T) {
 					})
 				}
 
-				if fixtureJson, exists := dir.Children["data.dag-json-pretty"]; exists {
+				if fixtureJson, exists := dir.Children["datamodel.dag-json.pretty"]; exists {
 					t.Run("datamodel-dagjson", func(t *testing.T) {
 						dagjson, err := ipld.Encode(n, dagjson.Encode)
 						if err != nil {
