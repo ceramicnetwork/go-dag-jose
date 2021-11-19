@@ -4,24 +4,23 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/ipld/go-ipld-prime/fluent"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/crypto/ed25519"
+	gojose "gopkg.in/square/go-jose.v2"
 	"io"
+	"pgregory.net/rapid"
 	"testing"
 
 	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/codec/dagjson"
 	"github.com/ipld/go-ipld-prime/datamodel"
+	"github.com/ipld/go-ipld-prime/fluent"
 	"github.com/ipld/go-ipld-prime/linking/cid"
 	"github.com/ipld/go-ipld-prime/multicodec"
 	"github.com/ipld/go-ipld-prime/node/basicnode"
 	"github.com/ipld/go-ipld-prime/schema"
 	"github.com/multiformats/go-multihash"
-	//"github.com/stretchr/testify/require"
-	"golang.org/x/crypto/ed25519"
-	gojose "gopkg.in/square/go-jose.v2"
-	"pgregory.net/rapid"
 )
 
 // This test suite is mostly a set of property based tests for the serialization of JOSE objects to and from IPLD and
@@ -167,18 +166,21 @@ func validJWSGen() *rapid.Generator {
 // Generate a non-empty slice of JWSSignatures. Note that the signatures are not valid, they are just arbitrary byte
 // sequences.
 func signatures(numSignatures int) *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) _EncodedSignatures {
-		return _EncodedSignatures{
-			rapid.SliceOfN(
-				signatureGen(),
-				numSignatures,
-				numSignatures,
-			).Draw(t, "A non-empty slice of signatures").([]_EncodedSignature),
+	return rapid.Custom(func(t *rapid.T) _EncodedSignatures__Maybe {
+		return _EncodedSignatures__Maybe{
+			schema.Maybe_Value,
+			_EncodedSignatures{
+				rapid.SliceOfN(
+					signatureGen(),
+					1,
+					numSignatures,
+				).Draw(t, "A non-empty slice of signatures").([]_EncodedSignature),
+			},
 		}
 	})
 }
 
-// Generate a non empty slice of JWERecipients
+// Generate a slice of JWERecipients
 func recipients(numRecipients int) *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) _EncodedRecipients__Maybe {
 		isNil := rapid.Bool().Draw(t, "").(bool)
@@ -270,11 +272,11 @@ func mapGen() *rapid.Generator {
 		entries := make([]_Map__entry, 0, len(keys))
 		for _, key := range keys {
 			k := _String{key}
-			v := _Any{_Bytes{nonNilSliceOfBytes().Draw(t, "string").([]byte)}}
+			v := _Any{&_Bytes{nonNilSliceOfBytes().Draw(t, "string").([]byte)}}
 			header[k] = &v
 			entries = append(entries, _Map__entry{k, v})
 		}
-		return _Any__Maybe{schema.Maybe_Value, &_Any{_Map{header, entries}}}
+		return _Any__Maybe{schema.Maybe_Value, &_Any{&_Map{header, entries}}}
 	})
 }
 
@@ -302,7 +304,7 @@ func recipientGen() *rapid.Generator {
 // Generate an arbitrary JWE, note that the ciphertext is just random bytes and
 // cannot be decrypted to anything
 func jweGen(numRecipients int) *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) EncodedJWE {
+	return rapid.Custom(func(t *rapid.T) datamodel.Node {
 		aad := sliceOfRawBytes().Draw(t, "aad").(_Raw__Maybe)
 		ciphertext := nonNilSliceOfRawBytes().Draw(t, "ciphertext").(_Raw)
 		iv := sliceOfRawBytes().Draw(t, "iv").(_Raw__Maybe)
@@ -326,7 +328,7 @@ func jwsGen(numSignatures int) *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
 		return (EncodedJWS)(&_EncodedJWS__Repr{
 			payload:    _Raw{cidGen().Draw(t, "a JWS CID").(*cid.Cid).Bytes()},
-			signatures: _EncodedSignatures__Maybe{schema.Maybe_Value, signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures)},
+			signatures: signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures__Maybe),
 		})
 	})
 }

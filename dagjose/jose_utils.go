@@ -31,7 +31,6 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 		} else if header != nil {
 			return nil, errors.New("invalid JWE serialization")
 		}
-		return n, nil
 	} else
 	// If `recipients` is absent, this must be a "flattened" JWE.
 	if ciphertext, err := n.LookupByString("ciphertext"); err != nil {
@@ -54,7 +53,7 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 				jwe["aad"] = aadString
 			}
 		}
-		if encryptedKey, err := lookupIgnoreAbsent("encrypted_key", n); err != nil {
+		if encryptedKey, err := lookupIgnoreNoSuchField("encrypted_key", n); err != nil {
 			return nil, err
 		} else if encryptedKey != nil {
 			if encryptedKeyString, err := encryptedKey.AsString(); err != nil {
@@ -63,7 +62,7 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 				recipients[0]["encrypted_key"] = encryptedKeyString
 			}
 		}
-		if header, err := lookupIgnoreAbsent("header", n); err != nil {
+		if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
 			return nil, err
 		} else if header != nil {
 			if headerMap, err := nodeToMap(header); err != nil {
@@ -79,17 +78,6 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 				return nil, err
 			} else {
 				jwe["iv"] = ivString
-			}
-		}
-		if link, err := lookupIgnoreAbsent("link", n); err != nil {
-			return nil, err
-		} else if link != nil {
-			if linkString, err := link.AsString(); err != nil {
-				return nil, err
-			} else {
-				jwe["link"] = map[string]string{
-					"/": linkString,
-				}
 			}
 		}
 		if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
@@ -123,8 +111,15 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 		if len(recipients[0]) > 0 {
 			jwe["recipients"] = recipients
 		}
-		return mapToNode(jwe)
+		if n, err = mapToNode(jwe); err != nil {
+			return nil, err
+		}
 	}
+	if tn, castOk := n.(schema.TypedNode); castOk {
+		// The "representation" node gives an accurate view of fields that are actually present
+		n = tn.Representation()
+	}
+	return n, nil
 }
 
 func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
@@ -148,7 +143,6 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 		} else if signature != nil {
 			return nil, errors.New("invalid JWS serialization")
 		}
-		return n, nil
 	} else
 	// If `signatures` is absent, this must be a "flattened" JWS.
 	if payload, err := n.LookupByString("payload"); err != nil {
@@ -167,7 +161,7 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 			"payload":    payloadString,
 			"signatures": signatures,
 		}
-		if header, err := lookupIgnoreAbsent("header", n); err != nil {
+		if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
 			return nil, err
 		} else if header != nil {
 			if headerMap, err := nodeToMap(header); err != nil {
@@ -176,7 +170,7 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 				signatures[0]["header"] = headerMap
 			}
 		}
-		if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
+		if protected, err := lookupIgnoreNoSuchField("protected", n); err != nil {
 			return nil, err
 		} else if protected != nil {
 			if protectedString, err := protected.AsString(); err != nil {
@@ -185,7 +179,7 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 				signatures[0]["protected"] = protectedString
 			}
 		}
-		if signature, err := lookupIgnoreAbsent("signature", n); err != nil {
+		if signature, err := lookupIgnoreNoSuchField("signature", n); err != nil {
 			return nil, err
 		} else if signature != nil {
 			if signatureString, err := signature.AsString(); err != nil {
@@ -194,8 +188,15 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 				signatures[0]["signature"] = signatureString
 			}
 		}
-		return mapToNode(jws)
+		if n, err = mapToNode(jws); err != nil {
+			return nil, err
+		}
 	}
+	if tn, castOk := n.(schema.TypedNode); castOk {
+		// The "representation" node gives an accurate view of fields that are actually present
+		n = tn.Representation()
+	}
+	return n, nil
 }
 
 func isJWS(n datamodel.Node) (bool, error) {
@@ -263,14 +264,16 @@ func sanitizeMap(m map[string]interface{}) map[string]interface{} {
 }
 
 func lookupIgnoreAbsent(key string, n datamodel.Node) (datamodel.Node, error) {
-	if value, err := n.LookupByString(key); err != nil {
+	value, err := n.LookupByString(key)
+	if err != nil {
 		if _, notFoundErr := err.(datamodel.ErrNotExists); !notFoundErr {
 			return nil, err
 		}
-		return nil, nil
-	} else {
-		return value, nil
 	}
+	if value == datamodel.Absent {
+		value = nil
+	}
+	return value, nil
 }
 
 func lookupIgnoreNoSuchField(key string, n datamodel.Node) (datamodel.Node, error) {

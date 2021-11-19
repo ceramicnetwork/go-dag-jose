@@ -94,12 +94,9 @@ func EncodeJWS(n datamodel.Node, w io.Writer) error {
 }
 
 func validateLink(n datamodel.Node) error {
-	if linkNode, err := n.LookupByString("link"); err != nil {
-		// It's ok for `link` to be absent (even if `payload` was present), but if some other error occurred, return it.
-		if _, linkNotFound := err.(datamodel.ErrNotExists); !linkNotFound {
-			return err
-		}
-	} else if linkNode != datamodel.Absent {
+	if linkNode, err := lookupIgnoreAbsent("link", n); err != nil {
+		return err
+	} else if linkNode != nil {
 		// If `link` was present then `payload` must be present and the two must match. If any error occurs here
 		// (including `payload` being absent) return it.
 		if payloadNode, err := n.LookupByString("payload"); err != nil {
