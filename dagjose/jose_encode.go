@@ -52,9 +52,10 @@ func EncodeJWE(n datamodel.Node, w io.Writer) error {
 			if err := datamodel.Copy(n, jweBuilder); err != nil {
 				return err
 			}
-			// The "representation" node gives an accurate view of fields that are actually present
-			n = jweBuilder.Build().(schema.TypedNode).Representation()
+			n = jweBuilder.Build()
 		}
+		// The "representation" node gives an accurate view of fields that are actually present
+		n = n.(schema.TypedNode).Representation()
 	}
 	// DAG-CBOR is a superset of DAG-JOSE and can be used to encode valid DAG-JOSE objects.
 	// See: https://specs.ipld.io/block-layer/codecs/dag-jose.html
@@ -80,9 +81,10 @@ func EncodeJWS(n datamodel.Node, w io.Writer) error {
 			// Mark `link` as absent because we do not want to encode it
 			jwsBuilder.w.link.m = schema.Maybe_Absent
 			jwsBuilder.w.link.v.x = nil
-			// The "representation" node gives an accurate view of fields that are actually present
-			n = jwsBuilder.Build().(schema.TypedNode).Representation()
+			n = jwsBuilder.Build()
 		}
+		// The "representation" node gives an accurate view of fields that are actually present
+		n = n.(schema.TypedNode).Representation()
 	}
 	// DAG-CBOR is a superset of DAG-JOSE and can be used to encode valid DAG-JOSE objects.
 	// See: https://specs.ipld.io/block-layer/codecs/dag-jose.html
@@ -97,19 +99,20 @@ func validateLink(n datamodel.Node) error {
 		if _, linkNotFound := err.(datamodel.ErrNotExists); !linkNotFound {
 			return err
 		}
-	} else
-	// If `link` was present then `payload` must be present and the two must match. If any error occurs here (including
-	// `payload` being absent) return it.
-	if payloadNode, err := n.LookupByString("payload"); err != nil {
-		return err
-	} else if payloadString, err := payloadNode.AsString(); err != nil {
-		return err
-	} else if cidFromPayload, err := cid.Decode(string(multibase.Base64url) + payloadString); err != nil {
-		return err
-	} else if linkFromNode, err := linkNode.AsLink(); err != nil {
-		return err
-	} else if linkFromNode.(cidlink.Link).Cid != cidFromPayload {
-		return errors.New("cid mismatch")
+	} else if linkNode != datamodel.Absent {
+		// If `link` was present then `payload` must be present and the two must match. If any error occurs here
+		// (including `payload` being absent) return it.
+		if payloadNode, err := n.LookupByString("payload"); err != nil {
+			return err
+		} else if payloadString, err := payloadNode.AsString(); err != nil {
+			return err
+		} else if cidFromPayload, err := cid.Decode(string(multibase.Base64url) + payloadString); err != nil {
+			return err
+		} else if linkFromNode, err := linkNode.AsLink(); err != nil {
+			return err
+		} else if linkFromNode.(cidlink.Link).Cid != cidFromPayload {
+			return errors.New("cid mismatch")
+		}
 	}
 	return nil
 }

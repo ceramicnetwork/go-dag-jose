@@ -323,10 +323,10 @@ func jweGen(numRecipients int) *rapid.Generator {
 
 // Generate an arbitrary JWS, note that the signatures will not  be valid
 func jwsGen(numSignatures int) *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) EncodedJWS {
+	return rapid.Custom(func(t *rapid.T) datamodel.Node {
 		return (EncodedJWS)(&_EncodedJWS__Repr{
 			payload:    _Raw{cidGen().Draw(t, "a JWS CID").(*cid.Cid).Bytes()},
-			signatures: _EncodedSignatures__Maybe{schema.Maybe_Value, (_EncodedSignatures)(signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures))},
+			signatures: _EncodedSignatures__Maybe{schema.Maybe_Value, signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures)},
 		})
 	})
 }
