@@ -263,7 +263,7 @@ func mapGen() *rapid.Generator {
 			return _Any__Maybe{schema.Maybe_Absent, nil}
 		}
 		keys := rapid.SliceOfDistinct(
-			rapid.String(),
+			rapid.StringN(1, -1, -1),
 			func(k string) string {
 				return k
 			},
@@ -272,7 +272,7 @@ func mapGen() *rapid.Generator {
 		entries := make([]_Map__entry, 0, len(keys))
 		for _, key := range keys {
 			k := _String{key}
-			v := _Any{&_Bytes{nonNilSliceOfBytes().Draw(t, "string").([]byte)}}
+			v := _Any{&_String{string(nonNilSliceOfBytes().Draw(t, "string").([]byte))}}
 			header[k] = &v
 			entries = append(entries, _Map__entry{k, v})
 		}
@@ -452,6 +452,19 @@ func TestRoundTripValidJWS(t *testing.T) {
 			t.Errorf("failed roundtrip: %v", err)
 		} else {
 			compareJOSE(t, validJws, roundTrippedJws)
+		}
+	})
+}
+
+// Check that if we encode and decode an arbitrary JOSE object then the
+// output is equal to the input (up to ipld normalization)
+func TestRoundTripArbitraryJOSE(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(datamodel.Node)
+		if roundTrippedJose, err := roundTripJose(jose); err != nil {
+			t.Errorf("failed roundtrip: %v", err)
+		} else {
+			compareJOSE(t, jose, roundTrippedJose)
 		}
 	})
 }
