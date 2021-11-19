@@ -258,10 +258,6 @@ func nonNilSliceOfEncodedBytes() *rapid.Generator {
 // level of the unprotected header of JOSE objects.
 func mapGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) _Any__Maybe {
-		isNil := rapid.Bool().Draw(t, "whether the map is nil").(bool)
-		if isNil {
-			return _Any__Maybe{schema.Maybe_Absent, nil}
-		}
 		keys := rapid.SliceOfDistinct(
 			rapid.StringN(1, -1, -1),
 			func(k string) string {
@@ -311,7 +307,7 @@ func jweGen(numRecipients int) *rapid.Generator {
 		protected := sliceOfRawBytes().Draw(t, "protected").(_Raw__Maybe)
 		unprotected := mapGen().Draw(t, "unprotected").(_Any__Maybe)
 		tag := sliceOfRawBytes().Draw(t, "JOSE iv").(_Raw__Maybe)
-		return (EncodedJWE)(&_EncodedJWE__Repr{
+		return &_EncodedJWE__Repr{
 			aad,
 			ciphertext,
 			iv,
@@ -319,17 +315,17 @@ func jweGen(numRecipients int) *rapid.Generator {
 			recipients(numRecipients).Draw(t, "JWE recipients").(_EncodedRecipients__Maybe),
 			tag,
 			unprotected,
-		})
+		}
 	})
 }
 
 // Generate an arbitrary JWS, note that the signatures will not  be valid
 func jwsGen(numSignatures int) *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
-		return (EncodedJWS)(&_EncodedJWS__Repr{
+		return &_EncodedJWS__Repr{
 			payload:    _Raw{cidGen().Draw(t, "a JWS CID").(*cid.Cid).Bytes()},
 			signatures: signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures__Maybe),
-		})
+		}
 	})
 }
 
@@ -383,7 +379,6 @@ func compareJOSE(t *rapid.T, encoded datamodel.Node, decoded datamodel.Node) {
 	compareJOSEField(t, "aad", encoded, decoded)
 	compareJOSEField(t, "ciphertext", encoded, decoded)
 	compareJOSEField(t, "iv", encoded, decoded)
-	//compareJOSEField(t, "link", encoded, decoded)
 	compareJOSEField(t, "payload", encoded, decoded)
 	compareJOSEField(t, "protected", encoded, decoded)
 	compareJOSEField(t, "tag", encoded, decoded)
@@ -436,12 +431,27 @@ func compareJOSEMap(t *rapid.T, f1 datamodel.Node, f2 datamodel.Node) {
 }
 
 func compareJOSEBytes(t *rapid.T, f1 datamodel.Node, f2 datamodel.Node) {
-	if f1String, err := f1.AsString(); err != nil {
+	if f1String, err := stringOrBytesAsString(f1); err != nil {
 		t.Errorf("error fetching field: %v", err)
-	} else if f2String, err := f2.AsString(); err != nil {
+	} else if f2String, err := stringOrBytesAsString(f2); err != nil {
 		t.Errorf("error fetching field: %v", err)
 	} else if f1String != f2String {
 		t.Errorf("fields do not match:\n%s\n%s", f1String, f2String)
+	}
+}
+
+func stringOrBytesAsString(n datamodel.Node) (string, error) {
+	if s, err := n.AsString(); err != nil {
+		if e, wrongKind := err.(datamodel.ErrWrongKind); wrongKind && (e.ActualKind == datamodel.Kind_Bytes) {
+			if b, err := n.AsBytes(); err != nil {
+				return "", err
+			} else {
+				return string(b), nil
+			}
+		}
+		return "", err
+	} else {
+		return s, nil
 	}
 }
 
@@ -465,6 +475,24 @@ func TestRoundTripArbitraryJOSE(t *testing.T) {
 			t.Errorf("failed roundtrip: %v", err)
 		} else {
 			compareJOSE(t, jose, roundTrippedJose)
+		}
+	})
+}
+
+// Decoding should always return either a JWS or a JWE if the input is valid
+func TestAlwaysDeserializesToEitherJWSOrJWE(t *testing.T) {
+	rapid.Check(t, func(t *rapid.T) {
+		jose := arbitraryJoseGen().Draw(t, "An arbitrary JOSE object").(datamodel.Node)
+		if roundTrippedJose, err := roundTripJose(jose); err != nil {
+			t.Errorf("failed roundtrip: %v", err)
+		} else if jwe, err := isJWE(roundTrippedJose); err != nil {
+			t.Errorf("JWE check failed: %v", err)
+		} else if !jwe {
+			if jws, err := isJWS(roundTrippedJose); err != nil {
+				t.Errorf("JWS check failed: %v", err)
+			} else {
+				require.True(t, jws)
+			}
 		}
 	})
 }

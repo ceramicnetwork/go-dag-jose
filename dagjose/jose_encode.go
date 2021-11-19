@@ -43,7 +43,7 @@ func Encode(n datamodel.Node, w io.Writer) error {
 }
 
 func EncodeJWE(n datamodel.Node, w io.Writer) error {
-	// Check for the fastpath where the passed node is already of type `_EncodedJWE__Repr` or `_EncodedJWE`.
+	// Check for the fastpath where the passed node is already of type `_EncodedJWE__Repr` or `_EncodedJWE`
 	if _, castOk := n.(*_EncodedJWE__Repr); !castOk {
 		// This could still be `_EncodedJWE`, so check for that.
 		if _, castOk := n.(*_EncodedJWE); !castOk {
