@@ -151,7 +151,6 @@ type _EncodedJWE struct {
 // EncodedJWS matches the IPLD Schema type "EncodedJWS".  It has struct type-kind, and may be interrogated like map kind.
 type EncodedJWS = *_EncodedJWS
 type _EncodedJWS struct {
-	link       _Link__Maybe
 	payload    _Raw
 	signatures _EncodedSignatures__Maybe
 }

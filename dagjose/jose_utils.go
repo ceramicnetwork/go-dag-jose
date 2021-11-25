@@ -20,33 +20,65 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 	if _, castOk := n.(*_EncodedJWE__Repr); !castOk {
 		// This could still be `_EncodedJWE`, so check for that.
 		if _, castOk := n.(*_EncodedJWE); !castOk {
-			if recipients, err := lookupIgnoreAbsent("recipients", n); err != nil {
-				return nil, err
-			} else if recipients != nil {
-				// If `recipients` is present, this must be a "general" JWE and no changes are needed but make sure that
-				// `header` and/or `encrypted_key` are not also present since that would be a violation of the spec.
-				if encryptedKey, err := lookupIgnoreNoSuchField("encrypted_key", n); err != nil {
-					return nil, err
-				} else if encryptedKey != nil {
-					return nil, errors.New("invalid JWE serialization")
-				}
-				if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
-					return nil, err
-				} else if header != nil {
-					return nil, errors.New("invalid JWE serialization")
-				}
-			} else
-			// If `recipients` is absent, this must be a "flattened" JWE.
 			if ciphertext, err := n.LookupByString("ciphertext"); err != nil {
 				// `ciphertext` is mandatory so if any error occurs, return from here
 				return nil, err
 			} else if ciphertextString, err := ciphertext.AsString(); err != nil {
 				return nil, err
+			} else if recipients, err := lookupIgnoreAbsent("recipients", n); err != nil {
+				return nil, err
 			} else {
-				recipients := make([]map[string]interface{}, 1)
-				recipients[0] = make(map[string]interface{}, 0) // all recipient fields are optional
 				jwe := map[string]interface{}{
 					"ciphertext": ciphertextString,
+				}
+				// If `recipients` is absent, this must be a "flattened" JWE.
+				if recipients == nil {
+					recipientList := make([]map[string]interface{}, 1)
+					recipientList[0] = make(map[string]interface{}, 0) // all recipient fields are optional
+					if encryptedKey, err := lookupIgnoreNoSuchField("encrypted_key", n); err != nil {
+						return nil, err
+					} else if encryptedKey != nil {
+						if encryptedKeyString, err := encryptedKey.AsString(); err != nil {
+							return nil, err
+						} else {
+							recipientList[0]["encrypted_key"] = encryptedKeyString
+						}
+					}
+					if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
+						return nil, err
+					} else if header != nil {
+						var headerMap map[string]interface{}
+						if err := nodeToGo(header, &headerMap); err != nil {
+							return nil, err
+						} else {
+							recipientList[0]["header"] = headerMap
+						}
+					}
+					// Only add `recipients` to the JWE if one or more fields were present in the first list entry
+					if len(recipientList[0]) > 0 {
+						jwe["recipients"] = recipientList
+					}
+				} else {
+					// If `recipients` is present, this must be a "general" JWE and no changes are needed but make sure
+					// that `header` and/or `encrypted_key` are not present since that would be a violation of the spec.
+					if encryptedKey, err := lookupIgnoreNoSuchField("encrypted_key", n); err != nil {
+						return nil, err
+					} else if encryptedKey != nil {
+						return nil, errors.New("invalid JWE serialization")
+					}
+					if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
+						return nil, err
+					} else if header != nil {
+						return nil, errors.New("invalid JWE serialization")
+					}
+					var recipientList []map[string]interface{}
+					if err = nodeToGo(recipients, &recipientList); err != nil {
+						return nil, err
+					}
+					// Only add `recipients` to the JWE if one or more fields were present in the first list entry
+					if len(recipientList[0]) > 0 {
+						jwe["recipients"] = recipientList
+					}
 				}
 				if aad, err := lookupIgnoreAbsent("aad", n); err != nil {
 					return nil, err
@@ -55,24 +87,6 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 						return nil, err
 					} else {
 						jwe["aad"] = aadString
-					}
-				}
-				if encryptedKey, err := lookupIgnoreNoSuchField("encrypted_key", n); err != nil {
-					return nil, err
-				} else if encryptedKey != nil {
-					if encryptedKeyString, err := encryptedKey.AsString(); err != nil {
-						return nil, err
-					} else {
-						recipients[0]["encrypted_key"] = encryptedKeyString
-					}
-				}
-				if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
-					return nil, err
-				} else if header != nil {
-					if headerMap, err := nodeToMap(header); err != nil {
-						return nil, err
-					} else {
-						recipients[0]["header"] = headerMap
 					}
 				}
 				if iv, err := lookupIgnoreAbsent("iv", n); err != nil {
@@ -105,15 +119,12 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 				if unprotected, err := lookupIgnoreAbsent("unprotected", n); err != nil {
 					return nil, err
 				} else if unprotected != nil {
-					if unprotectedMap, err := nodeToMap(unprotected); err != nil {
+					var unprotectedMap map[string]interface{}
+					if err := nodeToGo(unprotected, &unprotectedMap); err != nil {
 						return nil, err
 					} else {
 						jwe["unprotected"] = unprotectedMap
 					}
-				}
-				// Only add `recipients` to the JWE if one or more fields were present in the map
-				if len(recipients[0]) > 0 {
-					jwe["recipients"] = recipients
 				}
 				if n, err = mapToNode(jwe); err != nil {
 					return nil, err
@@ -128,34 +139,13 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 	return n, nil
 }
 
+// Always ignore `link`, if it was present. That is part of the "presentation" of the JWS but doesn't need to be part of
+// the schema.
 func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 	// Check for the fastpath where the passed node is already of type `_EncodedJWES__Repr` or `_EncodedJWS`
 	if _, castOk := n.(*_EncodedJWS__Repr); !castOk {
 		// This could still be `_EncodedJWS`, so check for that.
 		if _, castOk := n.(*_EncodedJWS); !castOk {
-			if signatures, err := lookupIgnoreAbsent("signatures", n); err != nil {
-				return nil, err
-			} else if signatures != nil {
-				// If `signatures` is present, this must be a "general" JWS and no changes are needed but make sure that
-				// `header`, `protected`, and/or `signature` are not also present since that would be a violation of the
-				// spec.
-				if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
-					return nil, err
-				} else if header != nil {
-					return nil, errors.New("invalid JWS serialization")
-				}
-				if protected, err := lookupIgnoreNoSuchField("protected", n); err != nil {
-					return nil, err
-				} else if protected != nil {
-					return nil, errors.New("invalid JWS serialization")
-				}
-				if signature, err := lookupIgnoreNoSuchField("signature", n); err != nil {
-					return nil, err
-				} else if signature != nil {
-					return nil, errors.New("invalid JWS serialization")
-				}
-			} else
-			// If `signatures` is absent, this must be a "flattened" JWS.
 			if payload, err := n.LookupByString("payload"); err != nil {
 				// `payload` is mandatory so if any error occurs, return from here
 				return nil, err
@@ -165,39 +155,69 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 				return nil, errors.New(fmt.Sprintf("payload is not a valid CID: %v", err))
 			} else if payloadString, err := payload.AsString(); err != nil {
 				return nil, err
+			} else if signatures, err := lookupIgnoreAbsent("signatures", n); err != nil {
+				return nil, err
 			} else {
-				signatures := make([]map[string]interface{}, 1)
-				signatures[0] = make(map[string]interface{}, 1) // at least `signature` must be present
 				jws := map[string]interface{}{
-					"payload":    payloadString,
-					"signatures": signatures,
+					"payload": payloadString,
 				}
-				if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
-					return nil, err
-				} else if header != nil {
-					if headerMap, err := nodeToMap(header); err != nil {
+				// If `signatures` is absent, this must be a "flattened" JWS.
+				if signatures == nil {
+					signaturesList := make([]map[string]interface{}, 1)
+					signaturesList[0] = make(map[string]interface{}, 1) // at least one `signature` must be present
+					if header, err := lookupIgnoreAbsent("header", n); err != nil {
 						return nil, err
-					} else {
-						signatures[0]["header"] = headerMap
+					} else if header != nil {
+						var headerMap map[string]interface{}
+						if err := nodeToGo(header, &headerMap); err != nil {
+							return nil, err
+						} else {
+							signaturesList[0]["header"] = headerMap
+						}
 					}
-				}
-				if protected, err := lookupIgnoreNoSuchField("protected", n); err != nil {
-					return nil, err
-				} else if protected != nil {
-					if protectedString, err := protected.AsString(); err != nil {
+					if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
 						return nil, err
-					} else {
-						signatures[0]["protected"] = protectedString
+					} else if protected != nil {
+						if protectedString, err := protected.AsString(); err != nil {
+							return nil, err
+						} else {
+							signaturesList[0]["protected"] = protectedString
+						}
 					}
-				}
-				if signature, err := lookupIgnoreNoSuchField("signature", n); err != nil {
-					return nil, err
-				} else if signature != nil {
-					if signatureString, err := signature.AsString(); err != nil {
+					if signature, err := lookupIgnoreAbsent("signature", n); err != nil {
 						return nil, err
-					} else {
-						signatures[0]["signature"] = signatureString
+					} else if signature != nil {
+						if signatureString, err := signature.AsString(); err != nil {
+							return nil, err
+						} else {
+							signaturesList[0]["signature"] = signatureString
+						}
 					}
+					jws["signatures"] = signaturesList
+				} else {
+					// If `signatures` is present, this must be a "general" JWS and no changes are needed but make sure
+					// that `header`, `protected`, and/or `signature` are not also present since that would be a
+					// violation of the spec.
+					if header, err := lookupIgnoreAbsent("header", n); err != nil {
+						return nil, err
+					} else if header != nil {
+						return nil, errors.New("invalid JWS serialization")
+					}
+					if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
+						return nil, err
+					} else if protected != nil {
+						return nil, errors.New("invalid JWS serialization")
+					}
+					if signature, err := lookupIgnoreAbsent("signature", n); err != nil {
+						return nil, err
+					} else if signature != nil {
+						return nil, errors.New("invalid JWS serialization")
+					}
+					var signatureList []map[string]interface{}
+					if err = nodeToGo(signatures, &signatureList); err != nil {
+						return nil, err
+					}
+					jws["signatures"] = signatureList
 				}
 				if n, err = mapToNode(jws); err != nil {
 					return nil, err
@@ -241,19 +261,21 @@ func mapToNode(m map[string]interface{}) (datamodel.Node, error) {
 	}
 }
 
-func nodeToMap(n datamodel.Node) (map[string]interface{}, error) {
+func nodeToGo(n datamodel.Node, goVar interface{}) error {
 	jsonBytes := bytes.NewBuffer([]byte{})
 	if err := (dagjson.EncodeOptions{
 		EncodeLinks: false,
 		EncodeBytes: false,
 	}.Encode(n, jsonBytes)); err != nil {
-		return nil, err
+		return err
 	} else {
-		m := map[string]interface{}{}
-		if err := json.Unmarshal(jsonBytes.Bytes(), &m); err != nil {
-			return nil, err
+		if err := json.Unmarshal(jsonBytes.Bytes(), &goVar); err != nil {
+			return err
 		} else {
-			return sanitizeMap(m), nil
+			if reflect.TypeOf(goVar).Kind() == reflect.Map {
+				goVar = sanitizeMap(goVar.(map[string]interface{}))
+			}
+			return nil
 		}
 	}
 }

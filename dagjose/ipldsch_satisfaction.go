@@ -8424,9 +8424,6 @@ func (_EncodedJWE__ReprKeyAssembler) Prototype() datamodel.NodePrototype {
 	return _String__Prototype{}
 }
 
-func (n _EncodedJWS) FieldLink() MaybeLink {
-	return &n.link
-}
 func (n _EncodedJWS) FieldPayload() Raw {
 	return &n.payload
 }
@@ -8469,7 +8466,6 @@ func (m MaybeEncodedJWS) Must() EncodedJWS {
 }
 
 var (
-	fieldName__EncodedJWS_Link       = _String{"link"}
 	fieldName__EncodedJWS_Payload    = _String{"payload"}
 	fieldName__EncodedJWS_Signatures = _String{"signatures"}
 )
@@ -8481,11 +8477,6 @@ func (EncodedJWS) Kind() datamodel.Kind {
 }
 func (n EncodedJWS) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
-	case "link":
-		if n.link.m == schema.Maybe_Absent {
-			return datamodel.Absent, nil
-		}
-		return &n.link.v, nil
 	case "payload":
 		return &n.payload, nil
 	case "signatures":
@@ -8520,21 +8511,14 @@ type _EncodedJWS__MapItr struct {
 }
 
 func (itr *_EncodedJWS__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
-	if itr.idx >= 3 {
+	if itr.idx >= 2 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
-		k = &fieldName__EncodedJWS_Link
-		if itr.n.link.m == schema.Maybe_Absent {
-			v = datamodel.Absent
-			break
-		}
-		v = &itr.n.link.v
-	case 1:
 		k = &fieldName__EncodedJWS_Payload
 		v = &itr.n.payload
-	case 2:
+	case 1:
 		k = &fieldName__EncodedJWS_Signatures
 		if itr.n.signatures.m == schema.Maybe_Absent {
 			v = datamodel.Absent
@@ -8548,14 +8532,14 @@ func (itr *_EncodedJWS__MapItr) Next() (k datamodel.Node, v datamodel.Node, _ er
 	return
 }
 func (itr *_EncodedJWS__MapItr) Done() bool {
-	return itr.idx >= 3
+	return itr.idx >= 2
 }
 
 func (EncodedJWS) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (EncodedJWS) Length() int64 {
-	return 3
+	return 2
 }
 func (EncodedJWS) IsAbsent() bool {
 	return false
@@ -8617,7 +8601,6 @@ type _EncodedJWS__Assembler struct {
 	f     int
 
 	cm            schema.Maybe
-	ca_link       _Link__Assembler
 	ca_payload    _Raw__Assembler
 	ca_signatures _EncodedSignatures__Assembler
 }
@@ -8625,16 +8608,14 @@ type _EncodedJWS__Assembler struct {
 func (na *_EncodedJWS__Assembler) reset() {
 	na.state = maState_initial
 	na.s = 0
-	na.ca_link.reset()
 	na.ca_payload.reset()
 	na.ca_signatures.reset()
 }
 
 var (
-	fieldBit__EncodedJWS_Link        = 1 << 0
-	fieldBit__EncodedJWS_Payload     = 1 << 1
-	fieldBit__EncodedJWS_Signatures  = 1 << 2
-	fieldBits__EncodedJWS_sufficient = 0 + 1<<1
+	fieldBit__EncodedJWS_Payload     = 1 << 0
+	fieldBit__EncodedJWS_Signatures  = 1 << 1
+	fieldBits__EncodedJWS_sufficient = 0 + 1<<0
 )
 
 func (na *_EncodedJWS__Assembler) BeginMap(int64) (datamodel.MapAssembler, error) {
@@ -8729,14 +8710,6 @@ func (_EncodedJWS__Assembler) Prototype() datamodel.NodePrototype {
 func (ma *_EncodedJWS__Assembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
-		switch ma.w.link.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 1:
 		switch ma.cm {
 		case schema.Maybe_Value:
 			ma.ca_payload.w = nil
@@ -8746,7 +8719,7 @@ func (ma *_EncodedJWS__Assembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 2:
+	case 1:
 		switch ma.w.signatures.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -8774,23 +8747,13 @@ func (ma *_EncodedJWS__Assembler) AssembleEntry(k string) (datamodel.NodeAssembl
 		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
 	}
 	switch k {
-	case "link":
-		if ma.s&fieldBit__EncodedJWS_Link != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link}
-		}
-		ma.s += fieldBit__EncodedJWS_Link
-		ma.state = maState_midValue
-		ma.f = 0
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-		return &ma.ca_link, nil
 	case "payload":
 		if ma.s&fieldBit__EncodedJWS_Payload != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload}
 		}
 		ma.s += fieldBit__EncodedJWS_Payload
 		ma.state = maState_midValue
-		ma.f = 1
+		ma.f = 0
 		ma.ca_payload.w = &ma.w.payload
 		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload, nil
@@ -8800,7 +8763,7 @@ func (ma *_EncodedJWS__Assembler) AssembleEntry(k string) (datamodel.NodeAssembl
 		}
 		ma.s += fieldBit__EncodedJWS_Signatures
 		ma.state = maState_midValue
-		ma.f = 2
+		ma.f = 1
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 		return &ma.ca_signatures, nil
@@ -8841,14 +8804,10 @@ func (ma *_EncodedJWS__Assembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-		return &ma.ca_link
-	case 1:
 		ma.ca_payload.w = &ma.w.payload
 		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload
-	case 2:
+	case 1:
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 		return &ma.ca_signatures
@@ -8914,21 +8873,13 @@ func (ka *_EncodedJWS__KeyAssembler) AssignString(k string) error {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
-	case "link":
-		if ka.s&fieldBit__EncodedJWS_Link != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link}
-		}
-		ka.s += fieldBit__EncodedJWS_Link
-		ka.state = maState_expectValue
-		ka.f = 0
-		return nil
 	case "payload":
 		if ka.s&fieldBit__EncodedJWS_Payload != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload}
 		}
 		ka.s += fieldBit__EncodedJWS_Payload
 		ka.state = maState_expectValue
-		ka.f = 1
+		ka.f = 0
 		return nil
 	case "signatures":
 		if ka.s&fieldBit__EncodedJWS_Signatures != 0 {
@@ -8936,7 +8887,7 @@ func (ka *_EncodedJWS__KeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__EncodedJWS_Signatures
 		ka.state = maState_expectValue
-		ka.f = 2
+		ka.f = 1
 		return nil
 	default:
 		return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWS", Key: &_String{k}}
@@ -8968,7 +8919,6 @@ func (n EncodedJWS) Representation() datamodel.Node {
 type _EncodedJWS__Repr _EncodedJWS
 
 var (
-	fieldName__EncodedJWS_Link_serial       = _String{"link"}
 	fieldName__EncodedJWS_Payload_serial    = _String{"payload"}
 	fieldName__EncodedJWS_Signatures_serial = _String{"signatures"}
 )
@@ -8979,11 +8929,6 @@ func (_EncodedJWS__Repr) Kind() datamodel.Kind {
 }
 func (n *_EncodedJWS__Repr) LookupByString(key string) (datamodel.Node, error) {
 	switch key {
-	case "link":
-		if n.link.m == schema.Maybe_Absent {
-			return datamodel.Absent, datamodel.ErrNotExists{Segment: datamodel.PathSegmentOfString(key)}
-		}
-		return n.link.v.Representation(), nil
 	case "payload":
 		return n.payload.Representation(), nil
 	case "signatures":
@@ -9009,9 +8954,9 @@ func (n _EncodedJWS__Repr) LookupBySegment(seg datamodel.PathSegment) (datamodel
 	return n.LookupByString(seg.String())
 }
 func (n *_EncodedJWS__Repr) MapIterator() datamodel.MapIterator {
-	end := 3
+	end := 2
 	if n.signatures.m == schema.Maybe_Absent {
-		end = 2
+		end = 1
 	} else {
 		goto done
 	}
@@ -9027,21 +8972,14 @@ type _EncodedJWS__ReprMapItr struct {
 
 func (itr *_EncodedJWS__ReprMapItr) Next() (k datamodel.Node, v datamodel.Node, _ error) {
 advance:
-	if itr.idx >= 3 {
+	if itr.idx >= 2 {
 		return nil, nil, datamodel.ErrIteratorOverread{}
 	}
 	switch itr.idx {
 	case 0:
-		k = &fieldName__EncodedJWS_Link_serial
-		if itr.n.link.m == schema.Maybe_Absent {
-			itr.idx++
-			goto advance
-		}
-		v = itr.n.link.v.Representation()
-	case 1:
 		k = &fieldName__EncodedJWS_Payload_serial
 		v = itr.n.payload.Representation()
-	case 2:
+	case 1:
 		k = &fieldName__EncodedJWS_Signatures_serial
 		if itr.n.signatures.m == schema.Maybe_Absent {
 			itr.idx++
@@ -9061,10 +8999,7 @@ func (_EncodedJWS__Repr) ListIterator() datamodel.ListIterator {
 	return nil
 }
 func (rn *_EncodedJWS__Repr) Length() int64 {
-	l := 3
-	if rn.link.m == schema.Maybe_Absent {
-		l--
-	}
+	l := 2
 	if rn.signatures.m == schema.Maybe_Absent {
 		l--
 	}
@@ -9130,7 +9065,6 @@ type _EncodedJWS__ReprAssembler struct {
 	f     int
 
 	cm            schema.Maybe
-	ca_link       _Link__ReprAssembler
 	ca_payload    _Raw__ReprAssembler
 	ca_signatures _EncodedSignatures__ReprAssembler
 }
@@ -9138,7 +9072,6 @@ type _EncodedJWS__ReprAssembler struct {
 func (na *_EncodedJWS__ReprAssembler) reset() {
 	na.state = maState_initial
 	na.s = 0
-	na.ca_link.reset()
 	na.ca_payload.reset()
 	na.ca_signatures.reset()
 }
@@ -9234,14 +9167,6 @@ func (_EncodedJWS__ReprAssembler) Prototype() datamodel.NodePrototype {
 func (ma *_EncodedJWS__ReprAssembler) valueFinishTidy() bool {
 	switch ma.f {
 	case 0:
-		switch ma.w.link.m {
-		case schema.Maybe_Value:
-			ma.state = maState_initial
-			return true
-		default:
-			return false
-		}
-	case 1:
 		switch ma.cm {
 		case schema.Maybe_Value:
 			ma.cm = schema.Maybe_Absent
@@ -9250,7 +9175,7 @@ func (ma *_EncodedJWS__ReprAssembler) valueFinishTidy() bool {
 		default:
 			return false
 		}
-	case 2:
+	case 1:
 		switch ma.w.signatures.m {
 		case schema.Maybe_Value:
 			ma.state = maState_initial
@@ -9278,24 +9203,13 @@ func (ma *_EncodedJWS__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAss
 		panic("invalid state: AssembleEntry cannot be called on an assembler that's already finished")
 	}
 	switch k {
-	case "link":
-		if ma.s&fieldBit__EncodedJWS_Link != 0 {
-			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link_serial}
-		}
-		ma.s += fieldBit__EncodedJWS_Link
-		ma.state = maState_midValue
-		ma.f = 0
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-
-		return &ma.ca_link, nil
 	case "payload":
 		if ma.s&fieldBit__EncodedJWS_Payload != 0 {
 			return nil, datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload_serial}
 		}
 		ma.s += fieldBit__EncodedJWS_Payload
 		ma.state = maState_midValue
-		ma.f = 1
+		ma.f = 0
 		ma.ca_payload.w = &ma.w.payload
 		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload, nil
@@ -9305,7 +9219,7 @@ func (ma *_EncodedJWS__ReprAssembler) AssembleEntry(k string) (datamodel.NodeAss
 		}
 		ma.s += fieldBit__EncodedJWS_Signatures
 		ma.state = maState_midValue
-		ma.f = 2
+		ma.f = 1
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 
@@ -9348,15 +9262,10 @@ func (ma *_EncodedJWS__ReprAssembler) AssembleValue() datamodel.NodeAssembler {
 	ma.state = maState_midValue
 	switch ma.f {
 	case 0:
-		ma.ca_link.w = &ma.w.link.v
-		ma.ca_link.m = &ma.w.link.m
-
-		return &ma.ca_link
-	case 1:
 		ma.ca_payload.w = &ma.w.payload
 		ma.ca_payload.m = &ma.cm
 		return &ma.ca_payload
-	case 2:
+	case 1:
 		ma.ca_signatures.w = &ma.w.signatures.v
 		ma.ca_signatures.m = &ma.w.signatures.m
 
@@ -9423,21 +9332,13 @@ func (ka *_EncodedJWS__ReprKeyAssembler) AssignString(k string) error {
 		panic("misuse: KeyAssembler held beyond its valid lifetime")
 	}
 	switch k {
-	case "link":
-		if ka.s&fieldBit__EncodedJWS_Link != 0 {
-			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Link_serial}
-		}
-		ka.s += fieldBit__EncodedJWS_Link
-		ka.state = maState_expectValue
-		ka.f = 0
-		return nil
 	case "payload":
 		if ka.s&fieldBit__EncodedJWS_Payload != 0 {
 			return datamodel.ErrRepeatedMapKey{Key: &fieldName__EncodedJWS_Payload_serial}
 		}
 		ka.s += fieldBit__EncodedJWS_Payload
 		ka.state = maState_expectValue
-		ka.f = 1
+		ka.f = 0
 		return nil
 	case "signatures":
 		if ka.s&fieldBit__EncodedJWS_Signatures != 0 {
@@ -9445,7 +9346,7 @@ func (ka *_EncodedJWS__ReprKeyAssembler) AssignString(k string) error {
 		}
 		ka.s += fieldBit__EncodedJWS_Signatures
 		ka.state = maState_expectValue
-		ka.f = 2
+		ka.f = 1
 		return nil
 	}
 	return schema.ErrInvalidKey{TypeName: "dagjose.EncodedJWS.Repr", Key: &_String{k}}

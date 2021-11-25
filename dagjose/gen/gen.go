@@ -80,10 +80,7 @@ func main() {
 	ts.Accumulate(schema.SpawnList("DecodedSignatures", "DecodedSignature", false))
 
 	ts.Accumulate(schema.SpawnStruct("DecodedJWS", []schema.StructField{
-		// `link` is not encoded as part of DAG-JOSE because it is not included in the DAG-JOSE spec but is included
-		// here in the schema because it is required when decoding/encoding from/to other encodings (e.g. DAG-JSON).
-		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
-		// during encode, it is validated against `payload` and then ignored.
+		// The decoded JWS is "enriched" with a CID `link` field corresponding to the `payload`
 		schema.SpawnStructField("link", "Link", true, false),
 		schema.SpawnStructField("payload", "Base64Url", false, false),
 		schema.SpawnStructField("signatures", "DecodedSignatures", true, false),
@@ -125,11 +122,6 @@ func main() {
 	ts.Accumulate(schema.SpawnList("EncodedSignatures", "EncodedSignature", false))
 
 	ts.Accumulate(schema.SpawnStruct("EncodedJWS", []schema.StructField{
-		// `link` is not encoded as part of DAG-JOSE because it is not included in the DAG-JOSE spec but is included
-		// here in the schema because it is required when decoding/encoding from/to other encodings (e.g. DAG-JSON).
-		// If `payload` is present during decode, `link` is added with contents matching `payload`. If `link` is present
-		// during encode, it is validated against `payload` and then ignored.
-		schema.SpawnStructField("link", "Link", true, false),
 		schema.SpawnStructField("payload", "Raw", false, false),
 		schema.SpawnStructField("signatures", "EncodedSignatures", true, false),
 	}, schema.SpawnStructRepresentationMap(nil)))

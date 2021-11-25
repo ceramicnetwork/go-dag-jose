@@ -65,22 +65,19 @@ func EncodeJWE(n datamodel.Node, w io.Writer) error {
 }
 
 func EncodeJWS(n datamodel.Node, w io.Writer) error {
-	// If `link` and `payload` are present, make sure they match.
-	if err := validateLink(n); err != nil {
-		return err
-	} else
 	// Check for the fastpath where the passed node is already of type `_EncodedJWES__Repr` or `_EncodedJWS`
 	if _, castOk := n.(*_EncodedJWS__Repr); !castOk {
 		// This could still be `_EncodedJWS`, so check for that.
 		if _, castOk := n.(*_EncodedJWS); !castOk {
+			// If `link` and `payload` are present, make sure they match.
+			if err := validateLink(n); err != nil {
+				return err
+			}
 			// No fastpath possible, just create a new `_EncodedJWS__ReprBuilder` and copy the passed node into it.
 			jwsBuilder := Type.EncodedJWS__Repr.NewBuilder().(*_EncodedJWS__ReprBuilder)
 			if err := datamodel.Copy(n, jwsBuilder); err != nil {
 				return err
 			}
-			// Mark `link` as absent because we do not want to encode it
-			jwsBuilder.w.link.m = schema.Maybe_Absent
-			jwsBuilder.w.link.v.x = nil
 			n = jwsBuilder.Build()
 		}
 		// The "representation" node gives an accurate view of fields that are actually present
@@ -94,7 +91,7 @@ func EncodeJWS(n datamodel.Node, w io.Writer) error {
 }
 
 func validateLink(n datamodel.Node) error {
-	if linkNode, err := lookupIgnoreAbsent("link", n); err != nil {
+	if linkNode, err := lookupIgnoreNoSuchField("link", n); err != nil {
 		return err
 	} else if linkNode != nil {
 		// If `link` was present then `payload` must be present and the two must match. If any error occurs here
