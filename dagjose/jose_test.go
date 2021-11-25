@@ -9,6 +9,7 @@ import (
 	gojose "gopkg.in/square/go-jose.v2"
 	"io"
 	"pgregory.net/rapid"
+	"reflect"
 	"testing"
 
 	"github.com/ipfs/go-cid"
@@ -122,15 +123,17 @@ func parseJOSE(jsonBytes []byte) (datamodel.Node, error) {
 
 // Generate an arbitrary CID
 func cidGen() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) *cid.Cid {
-		data := rapid.SliceOfN(rapid.Byte(), 10, 100).Draw(t, "cid data bytes").([]byte)
-		mh, err := multihash.Sum(data, multihash.SHA3_384, 48)
-		if err != nil {
-			panic(err)
-		}
-		result := cid.NewCidV1(cid.Raw, mh)
-		return &result
+	return rapid.Custom(func(t *rapid.T) cid.Cid {
+		return createCid(rapid.SliceOfN(rapid.Byte(), 10, 100).Draw(t, "cid data bytes").([]byte))
 	})
+}
+
+func createCid(data []byte) cid.Cid {
+	mh, err := multihash.Sum(data, multihash.SHA3_384, 48)
+	if err != nil {
+		panic(err)
+	}
+	return cid.NewCidV1(cid.Raw, mh)
 }
 
 // An arbitrary ed25519 private key
@@ -144,7 +147,7 @@ func ed25519PrivateKeyGen() *rapid.Generator {
 // Generate a signed JWS along with the private key used to sign it
 func validJWSGen() *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
-		link := cidGen().Draw(t, "Valid DagJOSE payload").(*cid.Cid)
+		link := cidGen().Draw(t, "Valid DagJOSE payload").(cid.Cid)
 		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
 		if signer, err := gojose.NewSigner(gojose.SigningKey{
 			Algorithm: gojose.EdDSA,
@@ -323,7 +326,7 @@ func jweGen(numRecipients int) *rapid.Generator {
 func jwsGen(numSignatures int) *rapid.Generator {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
 		return &_EncodedJWS__Repr{
-			payload:    _Raw{cidGen().Draw(t, "a JWS CID").(*cid.Cid).Bytes()},
+			payload:    _Raw{cidGen().Draw(t, "a JWS CID").(cid.Cid).Bytes()},
 			signatures: signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures__Maybe),
 		}
 	})
@@ -395,38 +398,33 @@ func compareJOSEField(t *rapid.T, key string, encoded datamodel.Node, decoded da
 		if (encodedField.Kind() == decodedField.Kind()) ||
 			(encodedField.Kind() == datamodel.Kind_Bytes && decodedField.Kind() == datamodel.Kind_String) ||
 			(encodedField.Kind() == datamodel.Kind_String && decodedField.Kind() == datamodel.Kind_Bytes) {
-			switch encodedField.Kind() {
-			case datamodel.Kind_List:
-				compareJOSEList(t, encodedField, decodedField)
-			case datamodel.Kind_Map:
-			case datamodel.Kind_Link:
-				compareJOSEMap(t, encodedField, decodedField)
-			default:
-				compareJOSEBytes(t, encodedField, decodedField)
-			}
+			compareNodes(t, encodedField.Kind(), encodedField, decodedField)
 		} else {
 			t.Errorf("fields must be of the same or compatible kind:\nencoded{%s}\ndecoded{%s}", encodedField.Kind(), decodedField.Kind())
 		}
 	}
 }
 
-func compareJOSEList(t *rapid.T, f1 datamodel.Node, f2 datamodel.Node) {
-	if f1String, err := f1.AsString(); err != nil {
-		t.Errorf("error fetching field: %v", err)
-	} else if f2String, err := f2.AsString(); err != nil {
-		t.Errorf("error fetching field: %v", err)
-	} else if f1String != f2String {
-		t.Errorf("fields do not match:\n%s\n%s", f1String, f2String)
+func compareNodes(t *rapid.T, kind datamodel.Kind, f1 datamodel.Node, f2 datamodel.Node) {
+	var goF1, goF2 interface{}
+	switch kind {
+	case datamodel.Kind_List:
+		goF1 = []interface{}{}
+		goF2 = []interface{}{}
+	case datamodel.Kind_Map:
+	case datamodel.Kind_Link:
+		goF1 = map[string]interface{}{}
+		goF2 = map[string]interface{}{}
+	default:
+		compareJOSEBytes(t, f1, f2)
+		return
 	}
-}
-
-func compareJOSEMap(t *rapid.T, f1 datamodel.Node, f2 datamodel.Node) {
-	if f1String, err := f1.AsString(); err != nil {
-		t.Errorf("error fetching field: %v", err)
-	} else if f2String, err := f2.AsString(); err != nil {
-		t.Errorf("error fetching field: %v", err)
-	} else if f1String != f2String {
-		t.Errorf("fields do not match:\n%s\n%s", f1String, f2String)
+	if err := nodeToGo(f1, &goF1); err != nil {
+		t.Errorf("error converting field: %v/%v", f1, err)
+	} else if err := nodeToGo(f2, &goF2); err != nil {
+		t.Errorf("error converting field: %v/%v", f2, err)
+	} else if !reflect.DeepEqual(goF1, goF2) {
+		t.Errorf("fields do not match:\n%s\n%s", goF1, goF2)
 	}
 }
 
@@ -515,7 +513,8 @@ func TestMissingCiphertextErrorParsingJWE(t *testing.T) {
 
 // Trying to serialize a JWS with more than one signature to a flattened serialization should throw an error
 func TestFlattenedJWSErrorIfSignatureAndSignaturesDefined(t *testing.T) {
-	jsonStr := "{\"signature\": \"sig\", \"signatures\": [], \"payload\": \"pay\"}"
+	payload := encodeBase64Url(createCid([]byte("payload")).Bytes())
+	jsonStr := "{\"signature\": \"sig\", \"signatures\": [], \"payload\": \"" + payload + "\"}"
 	jws, err := parseJOSE([]byte(jsonStr))
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "invalid JWS serialization")
