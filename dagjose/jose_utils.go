@@ -48,7 +48,7 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 						return nil, err
 					} else if header != nil {
 						var headerMap map[string]interface{}
-						if err := nodeToGo(header, &headerMap); err != nil {
+						if err := ipldNodeToGoPrimitive(header, &headerMap); err != nil {
 							return nil, err
 						} else {
 							recipientList[0]["header"] = headerMap
@@ -72,7 +72,7 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 						return nil, errors.New("invalid JWE serialization")
 					}
 					var recipientList []map[string]interface{}
-					if err = nodeToGo(recipients, &recipientList); err != nil {
+					if err = ipldNodeToGoPrimitive(recipients, &recipientList); err != nil {
 						return nil, err
 					}
 					// Only add `recipients` to the JWE if one or more fields were present in the first list entry
@@ -120,13 +120,13 @@ func unflattenJWE(n datamodel.Node) (datamodel.Node, error) {
 					return nil, err
 				} else if unprotected != nil {
 					var unprotectedMap map[string]interface{}
-					if err := nodeToGo(unprotected, &unprotectedMap); err != nil {
+					if err := ipldNodeToGoPrimitive(unprotected, &unprotectedMap); err != nil {
 						return nil, err
 					} else {
 						jwe["unprotected"] = unprotectedMap
 					}
 				}
-				if n, err = mapToNode(jwe); err != nil {
+				if n, err = goPrimitiveToIpldNode(jwe); err != nil {
 					return nil, err
 				}
 			}
@@ -165,17 +165,17 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 				if signatures == nil {
 					signaturesList := make([]map[string]interface{}, 1)
 					signaturesList[0] = make(map[string]interface{}, 1) // at least one `signature` must be present
-					if header, err := lookupIgnoreAbsent("header", n); err != nil {
+					if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
 						return nil, err
 					} else if header != nil {
 						var headerMap map[string]interface{}
-						if err := nodeToGo(header, &headerMap); err != nil {
+						if err := ipldNodeToGoPrimitive(header, &headerMap); err != nil {
 							return nil, err
 						} else {
 							signaturesList[0]["header"] = headerMap
 						}
 					}
-					if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
+					if protected, err := lookupIgnoreNoSuchField("protected", n); err != nil {
 						return nil, err
 					} else if protected != nil {
 						if protectedString, err := protected.AsString(); err != nil {
@@ -184,7 +184,7 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 							signaturesList[0]["protected"] = protectedString
 						}
 					}
-					if signature, err := lookupIgnoreAbsent("signature", n); err != nil {
+					if signature, err := lookupIgnoreNoSuchField("signature", n); err != nil {
 						return nil, err
 					} else if signature != nil {
 						if signatureString, err := signature.AsString(); err != nil {
@@ -198,28 +198,28 @@ func unflattenJWS(n datamodel.Node) (datamodel.Node, error) {
 					// If `signatures` is present, this must be a "general" JWS and no changes are needed but make sure
 					// that `header`, `protected`, and/or `signature` are not also present since that would be a
 					// violation of the spec.
-					if header, err := lookupIgnoreAbsent("header", n); err != nil {
+					if header, err := lookupIgnoreNoSuchField("header", n); err != nil {
 						return nil, err
 					} else if header != nil {
 						return nil, errors.New("invalid JWS serialization")
 					}
-					if protected, err := lookupIgnoreAbsent("protected", n); err != nil {
+					if protected, err := lookupIgnoreNoSuchField("protected", n); err != nil {
 						return nil, err
 					} else if protected != nil {
 						return nil, errors.New("invalid JWS serialization")
 					}
-					if signature, err := lookupIgnoreAbsent("signature", n); err != nil {
+					if signature, err := lookupIgnoreNoSuchField("signature", n); err != nil {
 						return nil, err
 					} else if signature != nil {
 						return nil, errors.New("invalid JWS serialization")
 					}
 					var signatureList []map[string]interface{}
-					if err = nodeToGo(signatures, &signatureList); err != nil {
+					if err = ipldNodeToGoPrimitive(signatures, &signatureList); err != nil {
 						return nil, err
 					}
 					jws["signatures"] = signatureList
 				}
-				if n, err = mapToNode(jws); err != nil {
+				if n, err = goPrimitiveToIpldNode(jws); err != nil {
 					return nil, err
 				}
 			}
@@ -248,8 +248,8 @@ func isJWE(n datamodel.Node) (bool, error) {
 	}
 }
 
-func mapToNode(m map[string]interface{}) (datamodel.Node, error) {
-	if jsonBytes, err := json.Marshal(m); err != nil {
+func goPrimitiveToIpldNode(g interface{}) (datamodel.Node, error) {
+	if jsonBytes, err := json.Marshal(g); err != nil {
 		return nil, err
 	} else {
 		na := basicnode.Prototype.Any.NewBuilder()
@@ -261,7 +261,8 @@ func mapToNode(m map[string]interface{}) (datamodel.Node, error) {
 	}
 }
 
-func nodeToGo(n datamodel.Node, goVar interface{}) error {
+// TODO: Doesn't currently work for IPLD nodes with (nested) `bytes` type fields
+func ipldNodeToGoPrimitive(n datamodel.Node, g interface{}) error {
 	jsonBytes := bytes.NewBuffer([]byte{})
 	if err := (dagjson.EncodeOptions{
 		EncodeLinks: false,
@@ -269,11 +270,11 @@ func nodeToGo(n datamodel.Node, goVar interface{}) error {
 	}.Encode(n, jsonBytes)); err != nil {
 		return err
 	} else {
-		if err := json.Unmarshal(jsonBytes.Bytes(), &goVar); err != nil {
+		if err := json.Unmarshal(jsonBytes.Bytes(), &g); err != nil {
 			return err
 		} else {
-			if reflect.TypeOf(goVar).Kind() == reflect.Map {
-				goVar = sanitizeMap(goVar.(map[string]interface{}))
+			if reflect.TypeOf(g).Kind() == reflect.Map {
+				g = sanitizeMap(g.(map[string]interface{}))
 			}
 			return nil
 		}

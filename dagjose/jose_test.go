@@ -385,6 +385,11 @@ func compareJOSE(t *rapid.T, encoded datamodel.Node, decoded datamodel.Node) {
 	compareJOSEField(t, "payload", encoded, decoded)
 	compareJOSEField(t, "protected", encoded, decoded)
 	compareJOSEField(t, "tag", encoded, decoded)
+
+	// TODO: `ipldNodeToGoPrimitive` doesn't currently work for IPLD nodes with (nested) `bytes` type fields
+	//compareJOSEField(t, "recipients", encoded, decoded)
+	//compareJOSEField(t, "signatures", encoded, decoded)
+	//compareJOSEField(t, "unprotected", encoded, decoded)
 }
 
 func compareJOSEField(t *rapid.T, key string, encoded datamodel.Node, decoded datamodel.Node) {
@@ -419,9 +424,9 @@ func compareNodes(t *rapid.T, kind datamodel.Kind, f1 datamodel.Node, f2 datamod
 		compareJOSEBytes(t, f1, f2)
 		return
 	}
-	if err := nodeToGo(f1, &goF1); err != nil {
+	if err := ipldNodeToGoPrimitive(f1, &goF1); err != nil {
 		t.Errorf("error converting field: %v/%v", f1, err)
-	} else if err := nodeToGo(f2, &goF2); err != nil {
+	} else if err := ipldNodeToGoPrimitive(f2, &goF2); err != nil {
 		t.Errorf("error converting field: %v/%v", f2, err)
 	} else if !reflect.DeepEqual(goF1, goF2) {
 		t.Errorf("fields do not match:\n%s\n%s", goF1, goF2)
