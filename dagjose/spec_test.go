@@ -5,12 +5,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"os"
+	"strings"
 	"testing"
 
 	qt "github.com/frankban/quicktest"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/codec/dagjson"
 	"github.com/ipld/go-ipld-prime/datamodel"
+	cidlink "github.com/ipld/go-ipld-prime/linking/cid"
 	"github.com/ipld/go-ipld-prime/traversal"
 	"github.com/warpfork/go-testmark"
 )
@@ -62,6 +64,35 @@ func TestSpecFixtures(t *testing.T) {
 					reencodeHex := hex.EncodeToString(reencodeBinary)
 					qt.Check(t, reencodeHex, qt.Equals, string(fixtureDataHex))
 				})
+
+				if fixtureCid, exists := dir.Children["serial.dag-jose.cid"]; exists {
+					t.Run("match-cid", func(t *testing.T) {
+						n, err := ipld.Decode(fixtureDataBinary, Decode)
+						if err != nil {
+							t.Fatalf("%s", err)
+						}
+						var linkSystem = cidlink.DefaultLinkSystem()
+						encoder, err := linkSystem.EncoderChooser(dagJOSELink)
+						if err != nil {
+							t.Fatalf("could not choose an encoder: %v", err)
+						}
+						hasher, err := linkSystem.HasherChooser(dagJOSELink)
+						if err != nil {
+							t.Fatalf("could not choose a hasher: %v", err)
+						}
+						err = encoder(n, hasher)
+						if err != nil {
+							t.Fatalf("%s", err)
+						}
+						lnk := dagJOSELink.BuildLink(hasher.Sum(nil))
+						cidLink, ok := lnk.(cidlink.Link)
+						if !ok {
+							t.Fatalf("%s", err)
+						}
+						fixtureCidString := strings.Replace(string(fixtureCid.Hunk.Body), "\n", "", -1)
+						qt.Check(t, cidLink.String(), qt.Equals, fixtureCidString)
+					})
+				}
 
 				if fixturePaths, exists := dir.Children["paths"]; exists {
 					t.Run("datamodel-pathlist", func(t *testing.T) {

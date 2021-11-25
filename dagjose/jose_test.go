@@ -35,8 +35,8 @@ import (
 var dagJOSELink = cidlink.LinkPrototype{Prefix: cid.Prefix{
 	Version:  1,    // Usually '1'.
 	Codec:    0x85, // 0x85 means "dag-jose" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-	MhType:   0x15, // 0x15 means "sha3-384" -- See the multicodecs table: https://github.com/multiformats/multicodec/
-	MhLength: 48,   // sha3-224 hash has a 48-byte sum.
+	MhType:   0x12, // 0x12 means "sha2-256" -- See the multicodecs table: https://github.com/multiformats/multicodec/
+	MhLength: 32,   // sha2-256 hash has a 32-byte sum.
 }}
 
 // storeJOSE is a convenience function that passes the correct DAG-JOSE link prototype and DAG-JOSE object to
