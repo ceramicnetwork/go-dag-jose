@@ -67,10 +67,6 @@ func TestSpecFixtures(t *testing.T) {
 
 				if fixtureCid, exists := dir.Children["serial.dag-jose.cid"]; exists {
 					t.Run("match-cid", func(t *testing.T) {
-						n, err := ipld.Decode(fixtureDataBinary, Decode)
-						if err != nil {
-							t.Fatalf("%s", err)
-						}
 						var linkSystem = cidlink.DefaultLinkSystem()
 						encoder, err := linkSystem.EncoderChooser(dagJOSELink)
 						if err != nil {
