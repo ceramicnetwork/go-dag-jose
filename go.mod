@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/frankban/quicktest v1.14.0
 	github.com/ipfs/go-cid v0.0.7
-	github.com/ipld/go-ipld-prime v0.14.1-0.20211119015904-892d2f92ba8b
+	github.com/ipld/go-ipld-prime v0.14.1
 	github.com/multiformats/go-multibase v0.0.3
 	github.com/multiformats/go-multihash v0.1.0
 	github.com/stretchr/testify v1.7.0

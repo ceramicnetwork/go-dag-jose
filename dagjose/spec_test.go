@@ -80,7 +80,7 @@ func TestSpecFixtures(t *testing.T) {
 				if fixturePaths, exists := dir.Children["paths"]; exists {
 					t.Run("datamodel-pathlist", func(t *testing.T) {
 						var foundPaths bytes.Buffer
-						traversal.Walk(n, func(tp traversal.Progress, _ datamodel.Node) error {
+						traversal.WalkLocal(n, func(tp traversal.Progress, _ datamodel.Node) error {
 							if tp.Path.Len() == 0 {
 								return nil
 							}
