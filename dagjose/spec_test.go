@@ -68,25 +68,12 @@ func TestSpecFixtures(t *testing.T) {
 				if fixtureCid, exists := dir.Children["serial.dag-jose.cid"]; exists {
 					t.Run("match-cid", func(t *testing.T) {
 						var linkSystem = cidlink.DefaultLinkSystem()
-						encoder, err := linkSystem.EncoderChooser(dagJOSELink)
-						if err != nil {
-							t.Fatalf("could not choose an encoder: %v", err)
-						}
-						hasher, err := linkSystem.HasherChooser(dagJOSELink)
-						if err != nil {
-							t.Fatalf("could not choose a hasher: %v", err)
-						}
-						err = encoder(n, hasher)
-						if err != nil {
+						if lnk, err := linkSystem.ComputeLink(dagJOSELink, n); err != nil {
 							t.Fatalf("%s", err)
+						} else {
+							fixtureCidString := strings.TrimSpace(string(fixtureCid.Hunk.Body))
+							qt.Check(t, lnk.String(), qt.Equals, fixtureCidString)
 						}
-						lnk := dagJOSELink.BuildLink(hasher.Sum(nil))
-						cidLink, ok := lnk.(cidlink.Link)
-						if !ok {
-							t.Fatalf("%s", err)
-						}
-						fixtureCidString := strings.Replace(string(fixtureCid.Hunk.Body), "\n", "", -1)
-						qt.Check(t, cidLink.String(), qt.Equals, fixtureCidString)
 					})
 				}
 
