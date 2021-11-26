@@ -1,11 +1,13 @@
 package dagjose
 
+//go:generate go run ./gen .
+//go:generate go fmt ./
+
 import (
-	dagcbor "github.com/ipld/go-ipld-prime/codec/dagcbor"
-	multicodec "github.com/ipld/go-ipld-prime/multicodec"
+	"github.com/ipld/go-ipld-prime/multicodec"
 )
 
 func init() {
-	multicodec.RegisterDecoder(0x85, dagcbor.Decode)
-	multicodec.RegisterEncoder(0x85, dagcbor.Encode)
+	multicodec.RegisterDecoder(0x85, Decode)
+	multicodec.RegisterEncoder(0x85, Encode)
 }
