@@ -80,14 +80,16 @@ func TestSpecFixtures(t *testing.T) {
 				if fixturePaths, exists := dir.Children["paths"]; exists {
 					t.Run("datamodel-pathlist", func(t *testing.T) {
 						var foundPaths bytes.Buffer
-						traversal.WalkLocal(n, func(tp traversal.Progress, _ datamodel.Node) error {
+						if err := traversal.WalkLocal(n, func(tp traversal.Progress, _ datamodel.Node) error {
 							if tp.Path.Len() == 0 {
 								return nil
 							}
 							foundPaths.WriteString(tp.Path.String())
 							foundPaths.WriteRune('\n')
 							return nil
-						})
+						}); err != nil {
+							t.Fatalf("%s", err)
+						}
 
 						if *testmark.Regen {
 							patches.AppendPatchIfBodyDiffers(*fixturePaths.Hunk, foundPaths.Bytes())
