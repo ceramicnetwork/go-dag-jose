@@ -6,6 +6,7 @@ toolchain go1.23.1
 
 require (
 	github.com/frankban/quicktest v1.14.6
+	github.com/go-jose/go-jose/v4 v4.0.4
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipld/go-ipld-prime v0.21.0
 	github.com/multiformats/go-multibase v0.2.0
@@ -13,7 +14,6 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/warpfork/go-testmark v0.12.1
 	golang.org/x/crypto v0.28.0
-	gopkg.in/go-jose/go-jose.v2 v2.6.3
 	pgregory.net/rapid v0.4.7
 )
 
