@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"gopkg.in/square/go-jose.v2/json"
+	"gopkg.in/go-jose/go-jose.v2/json"
 	"reflect"
 
 	"github.com/ipfs/go-cid"

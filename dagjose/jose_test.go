@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/ed25519"
-	gojose "gopkg.in/square/go-jose.v2"
+	gojose "gopkg.in/go-jose/go-jose.v2"
 	"io"
 	"pgregory.net/rapid"
 	"reflect"
