@@ -122,9 +122,9 @@ func parseJOSE(jsonBytes []byte) (datamodel.Node, error) {
 }
 
 // Generate an arbitrary CID
-func cidGen() *rapid.Generator {
+func cidGen() *rapid.Generator[cid.Cid] {
 	return rapid.Custom(func(t *rapid.T) cid.Cid {
-		return createCid(rapid.SliceOfN(rapid.Byte(), 10, 100).Draw(t, "cid data bytes").([]byte))
+		return createCid(rapid.SliceOfN(rapid.Byte(), 10, 100).Draw(t, "cid data bytes"))
 	})
 }
 
@@ -137,18 +137,18 @@ func createCid(data []byte) cid.Cid {
 }
 
 // An arbitrary ed25519 private key
-func ed25519PrivateKeyGen() *rapid.Generator {
+func ed25519PrivateKeyGen() *rapid.Generator[ed25519.PrivateKey] {
 	return rapid.Custom(func(t *rapid.T) ed25519.PrivateKey {
-		seedBytes := rapid.ArrayOf(ed25519.SeedSize, rapid.Byte()).Draw(t, "private key bytes").([ed25519.SeedSize]byte)
+		seedBytes := rapid.SliceOfN(rapid.Byte(), ed25519.SeedSize, ed25519.SeedSize).Draw(t, "private key bytes")
 		return ed25519.NewKeyFromSeed(seedBytes[:])
 	})
 }
 
 // Generate a signed JWS along with the private key used to sign it
-func validJWSGen() *rapid.Generator {
+func validJWSGen() *rapid.Generator[datamodel.Node] {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
-		link := cidGen().Draw(t, "Valid DagJOSE payload").(cid.Cid)
-		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key").(ed25519.PrivateKey)
+		link := cidGen().Draw(t, "Valid DagJOSE payload")
+		privateKey := ed25519PrivateKeyGen().Draw(t, "valid jws private key")
 		if signer, err := gojose.NewSigner(gojose.SigningKey{
 			Algorithm: gojose.EdDSA,
 			Key:       privateKey,
@@ -168,7 +168,7 @@ func validJWSGen() *rapid.Generator {
 
 // Generate a non-empty slice of JWSSignatures. Note that the signatures are not valid, they are just arbitrary byte
 // sequences.
-func signatures(numSignatures int) *rapid.Generator {
+func signatures(numSignatures int) *rapid.Generator[_EncodedSignatures__Maybe] {
 	return rapid.Custom(func(t *rapid.T) _EncodedSignatures__Maybe {
 		return _EncodedSignatures__Maybe{
 			schema.Maybe_Value,
@@ -177,16 +177,16 @@ func signatures(numSignatures int) *rapid.Generator {
 					signatureGen(),
 					1,
 					numSignatures,
-				).Draw(t, "A non-empty slice of signatures").([]_EncodedSignature),
+				).Draw(t, "A non-empty slice of signatures"),
 			},
 		}
 	})
 }
 
 // Generate a slice of JWERecipients
-func recipients(numRecipients int) *rapid.Generator {
+func recipients(numRecipients int) *rapid.Generator[_EncodedRecipients__Maybe] {
 	return rapid.Custom(func(t *rapid.T) _EncodedRecipients__Maybe {
-		isNil := rapid.Bool().Draw(t, "").(bool)
+		isNil := rapid.Bool().Draw(t, "")
 		if isNil {
 			return _EncodedRecipients__Maybe{schema.Maybe_Absent, _EncodedRecipients{}}
 		}
@@ -197,81 +197,52 @@ func recipients(numRecipients int) *rapid.Generator {
 					recipientGen(),
 					numRecipients,
 					numRecipients,
-				).Draw(t, "A non-empty slice of recipients").([]_EncodedRecipient),
+				).Draw(t, "A non-empty slice of recipients"),
 			},
 		}
 	})
 }
 
-// Generate a slice of bytes, the slice may be nil
-func sliceOfBytes() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) []byte {
-		isNil := rapid.Bool().Draw(t, "").(bool)
-		if isNil {
-			return nil
-		}
-		return nonNilSliceOfBytes().Draw(t, "").([]byte)
-	})
-}
-
 // Generate a non-nillable slice of bytes
-func nonNilSliceOfBytes() *rapid.Generator {
+func nonNilSliceOfBytes() *rapid.Generator[[]byte] {
 	return rapid.Custom(func(t *rapid.T) []byte {
-		return rapid.SliceOfN(rapid.Byte(), 1, -1).Draw(t, "a slice of bytes").([]byte)
+		return rapid.SliceOfN(rapid.Byte(), 1, -1).Draw(t, "a slice of bytes")
 	})
 }
 
 // Generate a slice of bytes, the slice may be nil
-func sliceOfRawBytes() *rapid.Generator {
+func sliceOfRawBytes() *rapid.Generator[_Raw__Maybe] {
 	return rapid.Custom(func(t *rapid.T) _Raw__Maybe {
-		isNil := rapid.Bool().Draw(t, "").(bool)
+		isNil := rapid.Bool().Draw(t, "")
 		if isNil {
 			return _Raw__Maybe{schema.Maybe_Absent, _Raw{}}
 		}
-		return _Raw__Maybe{schema.Maybe_Value, nonNilSliceOfRawBytes().Draw(t, "").(_Raw)}
+		return _Raw__Maybe{schema.Maybe_Value, nonNilSliceOfRawBytes().Draw(t, "")}
 	})
 }
 
 // Generate a non-nillable slice of bytes
-func nonNilSliceOfRawBytes() *rapid.Generator {
+func nonNilSliceOfRawBytes() *rapid.Generator[_Raw] {
 	return rapid.Custom(func(t *rapid.T) _Raw {
-		return _Raw{nonNilSliceOfBytes().Draw(t, "").([]byte)}
-	})
-}
-
-// Generate a slice of bytes, the slice may be nil
-func sliceOfEncodedBytes() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) _Base64Url__Maybe {
-		isNil := rapid.Bool().Draw(t, "").(bool)
-		if isNil {
-			return _Base64Url__Maybe{schema.Maybe_Absent, _Base64Url{}}
-		}
-		return nonNilSliceOfRawBytes().Draw(t, "").(_Base64Url__Maybe)
-	})
-}
-
-// Generate a non-nillable slice of bytes
-func nonNilSliceOfEncodedBytes() *rapid.Generator {
-	return rapid.Custom(func(t *rapid.T) _Base64Url__Maybe {
-		return _Base64Url__Maybe{schema.Maybe_Value, _Base64Url{string(nonNilSliceOfBytes().Draw(t, "").([]byte))}}
+		return _Raw{nonNilSliceOfBytes().Draw(t, "")}
 	})
 }
 
 // Generate a map of ipld nodes with string keys. This is used for the top
 // level of the unprotected header of JOSE objects.
-func mapGen() *rapid.Generator {
+func mapGen() *rapid.Generator[_Any__Maybe] {
 	return rapid.Custom(func(t *rapid.T) _Any__Maybe {
 		keys := rapid.SliceOfDistinct(
 			rapid.StringN(1, -1, -1),
 			func(k string) string {
 				return k
 			},
-		).Draw(t, "map keys").([]string)
+		).Draw(t, "map keys")
 		header := make(map[_String]Any)
 		entries := make([]_Map__entry, 0, len(keys))
 		for _, key := range keys {
 			k := _String{key}
-			v := _Any{&_String{string(nonNilSliceOfBytes().Draw(t, "string").([]byte))}}
+			v := _Any{&_String{string(nonNilSliceOfBytes().Draw(t, "string"))}}
 			header[k] = &v
 			entries = append(entries, _Map__entry{k, v})
 		}
@@ -280,42 +251,42 @@ func mapGen() *rapid.Generator {
 }
 
 // Generate an arbitrary JWSSignature, note that the signature is not valid
-func signatureGen() *rapid.Generator {
+func signatureGen() *rapid.Generator[_EncodedSignature] {
 	return rapid.Custom(func(t *rapid.T) _EncodedSignature {
 		return _EncodedSignature{
-			header:    mapGen().Draw(t, "signature header").(_Any__Maybe),
-			protected: sliceOfRawBytes().Draw(t, "signature protected bytes").(_Raw__Maybe),
-			signature: nonNilSliceOfRawBytes().Draw(t, "signature bytes").(_Raw),
+			header:    mapGen().Draw(t, "signature header"),
+			protected: sliceOfRawBytes().Draw(t, "signature protected bytes"),
+			signature: nonNilSliceOfRawBytes().Draw(t, "signature bytes"),
 		}
 	})
 }
 
 // Generate an arbitrary JWERecipient
-func recipientGen() *rapid.Generator {
+func recipientGen() *rapid.Generator[_EncodedRecipient] {
 	return rapid.Custom(func(t *rapid.T) _EncodedRecipient {
 		return _EncodedRecipient{
-			header:        mapGen().Draw(t, "recipient header").(_Any__Maybe),
-			encrypted_key: sliceOfRawBytes().Draw(t, "recipient encrypted key").(_Raw__Maybe),
+			header:        mapGen().Draw(t, "recipient header"),
+			encrypted_key: sliceOfRawBytes().Draw(t, "recipient encrypted key"),
 		}
 	})
 }
 
 // Generate an arbitrary JWE, note that the ciphertext is just random bytes and
 // cannot be decrypted to anything
-func jweGen(numRecipients int) *rapid.Generator {
+func jweGen(numRecipients int) *rapid.Generator[datamodel.Node] {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
-		aad := sliceOfRawBytes().Draw(t, "aad").(_Raw__Maybe)
-		ciphertext := nonNilSliceOfRawBytes().Draw(t, "ciphertext").(_Raw)
-		iv := sliceOfRawBytes().Draw(t, "iv").(_Raw__Maybe)
-		protected := sliceOfRawBytes().Draw(t, "protected").(_Raw__Maybe)
-		unprotected := mapGen().Draw(t, "unprotected").(_Any__Maybe)
-		tag := sliceOfRawBytes().Draw(t, "JOSE iv").(_Raw__Maybe)
+		aad := sliceOfRawBytes().Draw(t, "aad")
+		ciphertext := nonNilSliceOfRawBytes().Draw(t, "ciphertext")
+		iv := sliceOfRawBytes().Draw(t, "iv")
+		protected := sliceOfRawBytes().Draw(t, "protected")
+		unprotected := mapGen().Draw(t, "unprotected")
+		tag := sliceOfRawBytes().Draw(t, "JOSE iv")
 		return &_EncodedJWE__Repr{
 			aad,
 			ciphertext,
 			iv,
 			protected,
-			recipients(numRecipients).Draw(t, "JWE recipients").(_EncodedRecipients__Maybe),
+			recipients(numRecipients).Draw(t, "JWE recipients"),
 			tag,
 			unprotected,
 		}
@@ -323,23 +294,23 @@ func jweGen(numRecipients int) *rapid.Generator {
 }
 
 // Generate an arbitrary JWS, note that the signatures will not  be valid
-func jwsGen(numSignatures int) *rapid.Generator {
+func jwsGen(numSignatures int) *rapid.Generator[datamodel.Node] {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
 		return &_EncodedJWS__Repr{
-			payload:    _Raw{cidGen().Draw(t, "a JWS CID").(cid.Cid).Bytes()},
-			signatures: signatures(numSignatures).Draw(t, "JWS signatures").(_EncodedSignatures__Maybe),
+			payload:    _Raw{cidGen().Draw(t, "a JWS CID").Bytes()},
+			signatures: signatures(numSignatures).Draw(t, "JWS signatures"),
 		}
 	})
 }
 
-// Generate an arbitrary JOSE object, i.e either a JWE or a JWS
-func arbitraryJoseGen() *rapid.Generator {
+// Generate an arbitrary JOSE object, i.e. either a JWE or a JWS
+func arbitraryJoseGen() *rapid.Generator[datamodel.Node] {
 	return rapid.Custom(func(t *rapid.T) datamodel.Node {
-		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe").(bool)
+		isJwe := rapid.Bool().Draw(t, "whether this jose is a jwe")
 		if isJwe {
-			return jweGen(-1).Draw(t, "an arbitrary JWE").(datamodel.Node)
+			return jweGen(-1).Draw(t, "an arbitrary JWE")
 		} else {
-			return jwsGen(-1).Draw(t, "an arbitrary JWS").(datamodel.Node)
+			return jwsGen(-1).Draw(t, "an arbitrary JWS")
 		}
 	})
 }
@@ -533,7 +504,7 @@ func TestLoadingJWSWithNonCIDPayloadReturnsError(t *testing.T) {
 		payload := nonNilSliceOfBytes().Filter(func(payloadBytes []byte) bool {
 			_, _, err := cid.CidFromBytes(payloadBytes)
 			return err != nil
-		}).Draw(t, "A slice of bytes which is not a valid CID").([]byte)
+		}).Draw(t, "A slice of bytes which is not a valid CID")
 		node := fluent.MustBuildMap(
 			basicnode.Prototype.Map,
 			2,

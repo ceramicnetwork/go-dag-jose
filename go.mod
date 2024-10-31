@@ -14,7 +14,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/warpfork/go-testmark v0.12.1
 	golang.org/x/crypto v0.28.0
-	pgregory.net/rapid v0.4.7
+	pgregory.net/rapid v1.1.0
 )
 
 require (
